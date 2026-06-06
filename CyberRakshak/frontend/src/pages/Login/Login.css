@@ -1,0 +1,38 @@
+.login-container{
+  min-height:100vh;
+  background:#f5f7fb;
+}
+
+.login-header{
+  background:#2f55d4;
+  color:white;
+  text-align:center;
+  padding:50px 20px;
+}
+
+.login-card{
+  max-width:400px;
+  margin:30px auto;
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 0 15px rgba(0,0,0,0.1);
+}
+
+.login-card input{
+  width:100%;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+.login-card button{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:10px;
+  background:#2f55d4;
+  color:white;
+  font-size:16px;
+}

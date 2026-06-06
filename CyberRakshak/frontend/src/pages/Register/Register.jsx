@@ -1,21 +1,60 @@
+import { useNavigate } from "react-router-dom";
+import "./Register.css";
+
 function Register() {
+
+  const navigate = useNavigate();
+
   return (
-    <div>
-      <h1>Register Page</h1>
+    <div className="register-page">
 
-      <input type="text" placeholder="Full Name" />
-      <br />
-      <br />
+      <div className="register-header">
+        <h1>CyberRakshak</h1>
+        <p>Create Your Account</p>
+      </div>
 
-      <input type="email" placeholder="Email" />
-      <br />
-      <br />
+      <div className="register-card">
 
-      <input type="password" placeholder="Password" />
-      <br />
-      <br />
+        <input
+          type="text"
+          placeholder="Full Name"
+        />
 
-      <button>Register</button>
+        <input
+          type="tel"
+          placeholder="Mobile Number"
+        />
+
+        <input
+          type="email"
+          placeholder="Email Address"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+        />
+
+        <button className="register-btn">
+          Register
+        </button>
+
+        <p className="login-text">
+          Already have an account?
+          <span
+            className="login-link"
+            onClick={() => navigate("/login")}
+          >
+            {" "}Login
+          </span>
+        </p>
+
+        <div className="secure-box">
+          🔒 Your data is completely secure
+        </div>
+
+      </div>
+
     </div>
   );
 }

@@ -1,17 +1,32 @@
+import "./Login.css";
+
 function Login() {
   return (
-    <div>
-      <h1>Login Page</h1>
+    <div className="login-container">
 
-      <input type="email" placeholder="Email" />
-      <br />
-      <br />
+      <div className="login-header">
+        <h1>CyberRakshak</h1>
+        <p>Login</p>
+      </div>
 
-      <input type="password" placeholder="Password" />
-      <br />
-      <br />
+      <div className="login-card">
 
-      <button>Login</button>
+        <input
+          type="email"
+          placeholder="Email Address"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+        />
+
+        <button>
+          Login
+        </button>
+
+      </div>
+
     </div>
   );
 }
