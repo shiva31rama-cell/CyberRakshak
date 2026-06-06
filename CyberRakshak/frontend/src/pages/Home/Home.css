@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.home {
+  text-align: center;
+}
+
+.header {
+  background: #1f4ed8;
+  color: white;
+  padding: 30px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: scale(1.03);
+}
+.languages {
+  margin-top: 15px;
+}
+
+.languages button {
+  margin: 5px;
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: none;
+}
+
+.tip-card {
+  background: green;
+  color: white;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.auth-buttons {
+  margin-top: 20px;
+}
+
+.login-btn,
+.register-btn {
+  margin: 10px;
+  padding: 12px 25px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
