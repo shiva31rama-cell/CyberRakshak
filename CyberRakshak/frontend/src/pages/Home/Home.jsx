@@ -19,7 +19,10 @@ function Home() {
       </div>
 
       <div className="cards">
-        <div className="card">
+        <div
+          className="card"
+          onClick={() => navigate("/learn")}
+        >
           <h3>📘 Learn Cyber Safety</h3>
         </div>
 
@@ -42,11 +45,17 @@ function Home() {
       </div>
 
       <div className="auth-buttons">
-        <button className="login-btn" onClick={() => navigate("/login")}>
+        <button
+          className="login-btn"
+          onClick={() => navigate("/login")}
+        >
           Login
         </button>
 
-        <button className="register-btn" onClick={() => navigate("/register")}>
+        <button
+          className="register-btn"
+          onClick={() => navigate("/register")}
+        >
           Register
         </button>
       </div>
