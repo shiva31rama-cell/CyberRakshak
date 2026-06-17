@@ -1,32 +1,393 @@
-.register-page {
+.register-container {
   min-height: 100vh;
-  background-color: #eef2f7;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  padding: 2rem 20px;
+  background: linear-gradient(135deg, #f5f7fb 0%, #f0f4ff 100%);
+}
+
+.register-box {
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  max-width: 450px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .register-header {
-  background: #2f52d0;
-  color: white;
   text-align: center;
-  padding: 40px 20px;
+  margin-bottom: 2rem;
 }
 
 .register-header h1 {
-  margin: 0;
-  font-size: 42px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .register-header p {
-  margin-top: 10px;
+  color: #666;
+  font-size: 1rem;
 }
 
-.register-card {
+/* Alert */
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid;
+}
+
+.alert-danger {
+  background-color: #ffebee;
+  border-color: #f44336;
+  color: #c62828;
+}
+
+/* Form */
+.register-form {
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 2.5rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #667eea;
+  transition: all 0.3s ease;
+}
+
+.toggle-password:hover {
+  transform: scale(1.1);
+}
+
+/* Password Requirements */
+.password-requirements {
+  background: #f5f7fb;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 0.75rem;
+  border-left: 4px solid #667eea;
+}
+
+.requirement-title {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.password-requirements ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0.75rem;
+}
+
+.password-requirements li {
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 0.3rem;
+  padding-left: 1.5rem;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.password-requirements li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.password-requirements li.not-met {
+  color: #999;
+}
+
+.password-requirements li.not-met::before {
+  content: "✗";
+  color: #f44336;
+}
+
+.password-requirements li.met {
+  color: #4caf50;
+}
+
+.password-requirements li.met::before {
+  color: #4caf50;
+}
+
+/* Strength Bar */
+.strength-bar {
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+
+.strength-fill {
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.strength-label {
+  font-size: 0.75rem;
+  color: #999;
+  margin: 0;
+}
+
+/* Checkbox */
+.form-group.checkbox {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.form-group.checkbox input {
+  width: 18px;
+  height: 18px;
+  margin-right: 0.75rem;
+  cursor: pointer;
+}
+
+.form-group.checkbox label {
+  margin: 0;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.terms-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.terms-link:hover {
+  text-decoration: underline;
+}
+
+/* Register Button */
+.register-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.register-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.register-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Footer */
+.register-footer {
+  text-align: center;
+  border-top: 2px solid #f0f0f0;
+  padding-top: 1.5rem;
+}
+
+.register-footer p {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.login-link,
+.back-home-link {
+  color: #667eea;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.login-link:hover,
+.back-home-link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+.back-home-link {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+/* Benefits Section */
+.register-benefits {
   background: white;
-  width: 420px;
-  max-width: 90%;
-  margin: 40px auto;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.register-benefits h2 {
+  color: #667eea;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.benefit-card {
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.benefit-card:hover {
+  transform: translateY(-5px);
+  border-color: #667eea;
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.15);
+}
+
+.benefit-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.benefit-card h3 {
+  color: #667eea;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.benefit-card p {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+  .register-container {
+    grid-template-columns: 1fr;
+  }
+
+  .register-box {
+    max-width: 400px;
+  }
+
+  .register-benefits {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    padding: 1rem 15px;
+  }
+
+  .register-box {
+    padding: 2rem;
+  }
+
+  .register-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .register-benefits h2 {
+    font-size: 1.3rem;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .benefit-card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-container {
+    padding: 1rem 10px;
+  }
+
+  .register-box {
+    padding: 1.5rem;
+  }
+
+  .register-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .register-card input {
