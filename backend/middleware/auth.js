@@ -1,50 +1,42 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-// Middleware to verify JWT token
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
-    let token;
-
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    } else if (req.cookies && req.cookies.token) {
-      token = req.cookies.token;
+    const header = req.headers.authorization || "";
+    if (!header.startsWith("Bearer ")) {
+      return res.status(401).json({ success: false, message: "Authentication required" });
     }
 
+    const token = header.slice(7).trim();
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized to access this route",
-      });
+      return res.status(401).json({ success: false, message: "Authentication required" });
     }
 
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: decoded.id };
+    const user = await User.findById(decoded.id).select("_id name email role");
 
+    if (!user) {
+      return res.status(401).json({ success: false, message: "User account no longer exists" });
+    }
+
+    req.user = {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
     next();
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: "Not authorized to access this route",
-    });
+    return res.status(401).json({ success: false, message: "Invalid or expired authentication token" });
   }
 };
 
-// Middleware to check if user is admin
-const authorize = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: "User role is not authorized to access this route",
-      });
-    }
-    next();
-  };
+const authorize = (...roles) => (req, res, next) => {
+  if (!req.user || !roles.includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: "Administrator access required" });
+  }
+  next();
 };
 
 module.exports = { protect, authorize };
