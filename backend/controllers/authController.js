@@ -1,72 +1,62 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
-// Generate JWT Token
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
-  });
+  if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not configured");
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
+
+const normalizeEmail = (email) => (typeof email === "string" ? email.trim().toLowerCase() : "");
+const publicUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  lastLogin: user.lastLogin,
+});
 
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, confirmPassword } = req.body;
+    const { name, password, confirmPassword } = req.body;
+    const email = normalizeEmail(req.body.email);
+    const cleanName = typeof name === "string" ? name.trim() : "";
 
-    // Validation
-    if (!name || !email || !password || !confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide all required fields",
-      });
+    if (!cleanName || !email || !password || !confirmPassword) {
+      return res.status(400).json({ success: false, message: "Please provide all required fields" });
     }
-
+    if (cleanName.length > 50) {
+      return res.status(400).json({ success: false, message: "Name cannot be more than 50 characters" });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
+    }
     if (password !== confirmPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Passwords do not match",
-      });
+      return res.status(400).json({ success: false, message: "Passwords do not match" });
     }
 
-    // Check if user already exists
-    let user = await User.findOne({ email });
-
-    if (user) {
-      return res.status(409).json({
-        success: false,
-        message: "User with this email already exists",
-      });
+    const existingUser = await User.findOne({ email }).select("_id");
+    if (existingUser) {
+      return res.status(409).json({ success: false, message: "User with this email already exists" });
     }
 
-    // Create user
-    user = await User.create({
-      name,
-      email,
-      password,
-      role: "user",
-    });
-
-    // Generate token
+    const user = await User.create({ name: cleanName, email, password, role: "user" });
     const token = generateToken(user._id);
 
     res.status(201).json({
       success: true,
       message: "User registered successfully",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      user: publicUser(user),
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Error registering user",
-    });
+    if (error?.code === 11000) {
+      return res.status(409).json({ success: false, message: "User with this email already exists" });
+    }
+    console.error("Registration error:", error);
+    res.status(500).json({ success: false, message: "Error registering user" });
   }
 };
 
@@ -75,60 +65,31 @@ exports.register = async (req, res) => {
 // @access  Public
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = normalizeEmail(req.body.email);
+    const { password } = req.body;
 
-    // Validation
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide email and password",
-      });
+      return res.status(400).json({ success: false, message: "Please provide email and password" });
     }
 
-    // Check for user
     const user = await User.findOne({ email }).select("+password");
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+    if (!user || !(await user.matchPassword(password))) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
-    // Check if password matches
-    const isPasswordMatch = await user.matchPassword(password);
-
-    if (!isPasswordMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-    }
-
-    // Update last login
     user.lastLogin = new Date();
     await user.save();
 
-    // Generate token
     const token = generateToken(user._id);
-
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        lastLogin: user.lastLogin,
-      },
+      user: publicUser(user),
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Error logging in user",
-    });
+    console.error("Login error:", error);
+    res.status(500).json({ success: false, message: "Error logging in user" });
   }
 };
 
@@ -137,17 +98,13 @@ exports.login = async (req, res) => {
 // @access  Private
 exports.getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select("_id name email role lastLogin createdAt updatedAt").lean();
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    res.status(200).json({
-      success: true,
-      user,
-    });
+    res.status(200).json({ success: true, user });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Error fetching user",
-    });
+    console.error("Current-user error:", error);
+    res.status(500).json({ success: false, message: "Error fetching user" });
   }
 };
 
@@ -155,15 +112,5 @@ exports.getCurrentUser = async (req, res) => {
 // @route   POST /api/auth/logout
 // @access  Private
 exports.logout = async (req, res) => {
-  try {
-    res.status(200).json({
-      success: true,
-      message: "User logged out successfully",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Error logging out",
-    });
-  }
+  res.status(200).json({ success: true, message: "User logged out successfully" });
 };

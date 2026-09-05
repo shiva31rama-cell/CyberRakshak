@@ -2,26 +2,39 @@ name: CyberRakshak CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   backend-check:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm install
+      - run: node -c server.js
+      - run: npm test
 
-      - name: Install Backend Dependencies
-        run: |
-          cd backend
-          npm install
-
-      - name: Check server syntax
-        run: |
-          cd backend
-          node -c server.js
+  frontend-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm install
+      - run: npm run lint
+      - run: npm run build

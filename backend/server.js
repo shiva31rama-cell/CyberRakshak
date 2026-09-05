@@ -1,61 +1,61 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const connectDB = require("./config/db");
 
-// Load environment variables
 dotenv.config();
 
-// Initialize Express app
 const app = express();
+const PORT = Number(process.env.PORT) || 5000;
 
-// Connect to MongoDB
-connectDB();
+app.disable("x-powered-by");
+app.use(helmet());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+app.use(express.json({ limit: "100kb" }));
+app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 50,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many authentication requests. Please try again later." },
+});
 
-// Routes
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/quiz", require("./routes/quiz"));
 app.use("/api/feedback", require("./routes/feedback"));
 app.use("/api/scam-report", require("./routes/scamReport"));
 
-// Basic route
-app.get("/", (req, res) => {
-  res.json({
-    message: "CyberRakshak Backend Running Successfully 🚀",
-    version: "1.0.0",
-    endpoints: {
-      auth: "/api/auth",
-      quiz: "/api/quiz",
-      feedback: "/api/feedback",
-      scamReport: "/api/scam-report",
-    },
-  });
-});
+app.get("/", (req, res) => res.json({ success: true, message: "CyberRakshak Backend Running Successfully 🚀", version: "1.1.0" }));
+app.get("/health", (req, res) => res.json({ success: true, status: "ok", service: "CyberRakshak API" }));
 
-// Error handling middleware
+app.use((req, res) => res.status(404).json({ success: false, message: "Route not found" }));
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
+  console.error(err);
+  if (res.headersSent) return next(err);
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({ success: false, message: status >= 500 ? "Internal server error" : err.message });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
-});
+const start = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  } catch (error) {
+    console.error("Startup failed:", error.message);
+    process.exit(1);
+  }
+};
 
-const PORT = process.env.PORT || 5000;
+if (require.main === module) start();
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+module.exports = app;

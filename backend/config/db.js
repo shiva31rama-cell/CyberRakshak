@@ -1,16 +1,16 @@
 const mongoose = require("mongoose");
-require("dotenv").config();
 
 const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+  const uri = process.env.MONGODB_URI;
+  if (!uri) throw new Error("MONGODB_URI is not configured");
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-    return conn;
-  } catch (error) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1);
-  }
+  const conn = await mongoose.connect(uri, {
+    serverSelectionTimeoutMS: 10000,
+    maxPoolSize: 10,
+  });
+
+  console.log(`MongoDB Connected: ${conn.connection.host}`);
+  return conn;
 };
 
 module.exports = connectDB;
