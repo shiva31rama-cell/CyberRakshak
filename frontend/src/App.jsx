@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Pages
 import Home from "./pages/Home/Home";
@@ -13,6 +14,7 @@ import DigitalLiteracyQuiz from "./pages/DigitalLiteracyQuiz/DigitalLiteracyQuiz
 import EmergencyHelp from "./pages/EmergencyHelp/EmergencyHelp";
 import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
+import NotFound from "./pages/NotFound";
 
 // Learning Modules
 import UPISafety from "./pages/LearningModules/UPISafety";
@@ -25,44 +27,31 @@ import "./App.css";
 function App() {
   return (
     <BrowserRouter>
-      <div className="app">
-        <Navbar />
-        <main className="app-main">
-          <Routes>
-            {/* Main Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-
-            {/* Learning Routes */}
-            <Route path="/learn" element={<Learn />} />
-            <Route path="/digital-literacy" element={<DigitalLiteracy />} />
-            <Route
-              path="/digital-literacy-quiz"
-              element={<DigitalLiteracyQuiz />}
-            />
-
-            {/* Learning Modules */}
-            <Route path="/upi-safety" element={<UPISafety />} />
-            <Route
-              path="/cyber-crime-awareness"
-              element={<CyberCrimeAwareness />}
-            />
-            <Route
-              path="/social-media-safety"
-              element={<SocialMediaSafety />}
-            />
-            <Route path="/password-security" element={<PasswordSecurity />} />
-
-            {/* Emergency & Reporting */}
-            <Route path="/emergency-help" element={<EmergencyHelp />} />
-            <Route path="/report-scam" element={<ScamSolutions />} />
-            <Route path="/feedback" element={<Feedback />} />
-          </Routes>
-        </main>
-        <Footer />
-        <Chatbot />
-      </div>
+      <ErrorBoundary>
+        <div className="app">
+          <Navbar />
+          <main className="app-main">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/learn" element={<Learn />} />
+              <Route path="/digital-literacy" element={<DigitalLiteracy />} />
+              <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
+              <Route path="/upi-safety" element={<UPISafety />} />
+              <Route path="/cyber-crime-awareness" element={<CyberCrimeAwareness />} />
+              <Route path="/social-media-safety" element={<SocialMediaSafety />} />
+              <Route path="/password-security" element={<PasswordSecurity />} />
+              <Route path="/emergency-help" element={<EmergencyHelp />} />
+              <Route path="/report-scam" element={<ScamSolutions />} />
+              <Route path="/feedback" element={<Feedback />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <Footer />
+          <Chatbot />
+        </div>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }
