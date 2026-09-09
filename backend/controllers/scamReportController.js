@@ -1,5 +1,7 @@
 const ScamReport = require("../models/ScamReport");
 
+const REPORT_STATUSES = ["new", "investigating", "resolved", "closed"];
+
 exports.submitScamReport = async (req, res) => {
   try {
     const {
@@ -38,7 +40,6 @@ exports.submitScamReport = async (req, res) => {
       amountLost: numericAmount,
     });
 
-    // Never return private report fields in the submission response.
     return res.status(201).json({
       success: true,
       message: "Scam report submitted successfully",
@@ -70,7 +71,6 @@ exports.getScamReportByCaseNumber = async (req, res) => {
       return res.status(404).json({ success: false, message: "Scam report not found" });
     }
 
-    // Public tracking must expose only non-sensitive case information.
     res.json({
       success: true,
       report: {
@@ -106,14 +106,17 @@ exports.getUserScamReports = async (req, res) => {
 
 exports.updateScamReportStatus = async (req, res) => {
   try {
-    const allowed = ["new", "under-investigation", "resolved"];
-    if (!allowed.includes(req.body.status)) {
-      return res.status(400).json({ success: false, message: "Invalid report status" });
+    const { status } = req.body;
+    if (!REPORT_STATUSES.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid report status. Allowed values: ${REPORT_STATUSES.join(", ")}`,
+      });
     }
 
     const report = await ScamReport.findByIdAndUpdate(
       req.params.id,
-      { status: req.body.status },
+      { status },
       { new: true, runValidators: true },
     );
 
@@ -136,7 +139,7 @@ exports.updateScamReportStatus = async (req, res) => {
 
 exports.getScamStatistics = async (req, res) => {
   try {
-    const [totalReports, reportsByType, reportsByStatus] = await Promise.all([
+    const [totalReports, reportsByType, reportsByStatus, totalAmountLost] = await Promise.all([
       ScamReport.countDocuments(),
       ScamReport.aggregate([
         {
@@ -146,6 +149,7 @@ exports.getScamStatistics = async (req, res) => {
             totalAmountLost: { $sum: "$amountLost" },
           },
         },
+        { $sort: { count: -1 } },
       ]),
       ScamReport.aggregate([
         {
@@ -154,12 +158,26 @@ exports.getScamStatistics = async (req, res) => {
             count: { $sum: 1 },
           },
         },
+        { $sort: { count: -1 } },
+      ]),
+      ScamReport.aggregate([
+        {
+          $group: {
+            _id: null,
+            total: { $sum: "$amountLost" },
+          },
+        },
       ]),
     ]);
 
     res.json({
       success: true,
-      statistics: { totalReports, reportsByType, reportsByStatus },
+      statistics: {
+        totalReports,
+        totalAmountLost: totalAmountLost[0]?.total || 0,
+        reportsByType,
+        reportsByStatus,
+      },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Error fetching statistics" });
