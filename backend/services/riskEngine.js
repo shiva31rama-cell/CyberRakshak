@@ -79,7 +79,7 @@ const levelForScore = (score) => {
   return { level: "low", label: "LOW RISK", color: "green" };
 };
 
-export const analyzeScamText = (value = "") => {
+const analyzeScamText = (value = "") => {
   const text = normalizeText(value);
   const signals = [];
   const categories = new Map();
@@ -95,6 +95,7 @@ export const analyzeScamText = (value = "") => {
   }
 
   for (const pattern of urlPatterns) {
+    pattern.regex.lastIndex = 0;
     if (pattern.regex.test(value)) {
       score += pattern.weight;
       signals.push({ id: pattern.id, title: pattern.id.replaceAll("-", " "), reason: pattern.reason });
@@ -135,9 +136,9 @@ export const analyzeScamText = (value = "") => {
   };
 };
 
-export const extractUrls = (value = "") => String(value).match(/https?:\/\/[^\s]+/gi) || [];
+const extractUrls = (value = "") => String(value).match(/https?:\/\/[^\s]+/gi) || [];
 
-export const analyzeUrl = (rawUrl = "") => {
+const analyzeUrl = (rawUrl = "") => {
   const input = String(rawUrl).trim();
   if (!input) return { success: false, message: "A URL is required." };
 
@@ -198,7 +199,7 @@ export const analyzeUrl = (rawUrl = "") => {
   };
 };
 
-export const supportedScamCategories = [
+const supportedScamCategories = [
   "phishing",
   "smishing",
   "upi-fraud",
@@ -212,3 +213,10 @@ export const supportedScamCategories = [
   "tech-support",
   "social-media"
 ];
+
+module.exports = {
+  analyzeScamText,
+  extractUrls,
+  analyzeUrl,
+  supportedScamCategories,
+};
