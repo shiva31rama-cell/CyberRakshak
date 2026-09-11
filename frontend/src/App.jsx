@@ -18,6 +18,8 @@ import Feedback from "./pages/Feedback/Feedback";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import ScamAnalyzer from "./pages/ScamAnalyzer/ScamAnalyzer";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 import UPISafety from "./pages/LearningModules/UPISafety";
 import CyberCrimeAwareness from "./pages/LearningModules/CyberCrimeAwareness";
@@ -50,6 +52,8 @@ function App() {
                   <Route path="/emergency-help" element={<EmergencyHelp />} />
                   <Route path="/report-scam" element={<ScamSolutions />} />
                   <Route path="/feedback" element={<Feedback />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
