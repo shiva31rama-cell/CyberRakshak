@@ -1,78 +1,60 @@
+import { Link } from "react-router-dom";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./Footer.css";
 
 function Footer() {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
 
   return (
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-content">
           <div className="footer-section">
-            <h3>About CyberRakshak</h3>
-            <p>
-              Empowering citizens with cyber security knowledge to stay safe
-              online and protect themselves from digital threats.
-            </p>
+            <h3>{t("footerAbout")}</h3>
+            <p>{t("footerAboutText")}</p>
           </div>
 
           <div className="footer-section">
-            <h3>Quick Links</h3>
+            <h3>{t("quickLinks")}</h3>
             <ul>
-              <li>
-                <a href="/">Home</a>
-              </li>
-              <li>
-                <a href="/learn">Learning Center</a>
-              </li>
-              <li>
-                <a href="/emergency-help">Emergency Help</a>
-              </li>
-              <li>
-                <a href="/report-scam">Report Scam</a>
-              </li>
+              <li><Link to="/">{t("home")}</Link></li>
+              <li><Link to="/check">{t("check")}</Link></li>
+              <li><Link to="/learn">{t("learn")}</Link></li>
+              <li><Link to="/emergency-help">{t("emergency")}</Link></li>
+              <li><Link to="/report-scam">{t("report")}</Link></li>
             </ul>
           </div>
 
           <div className="footer-section">
-            <h3>Emergency Contacts</h3>
+            <h3>{t("footerEmergency")}</h3>
             <ul>
-              <li>🚨 Cyber Helpline: 1930</li>
-              <li>📞 Police: 100</li>
-              <li>🏥 Ambulance: 102</li>
-              <li>🚒 Fire: 101</li>
+              <li><a href="tel:1930">🛡️ 1930 — {t("cyberHelpline")}</a></li>
+              <li><a href="tel:112">🚨 112 — {t("policeEmergency")}</a></li>
+              <li><a href="tel:102">🏥 102 — {t("ambulance")}</a></li>
+              <li><a href="tel:101">🚒 101 — {t("fire")}</a></li>
             </ul>
           </div>
 
           <div className="footer-section">
-            <h3>Connect With Us</h3>
-            <div className="social-links">
-              <a href="#" aria-label="Facebook">
-                f
-              </a>
-              <a href="#" aria-label="Twitter">
-                𝕏
-              </a>
-              <a href="#" aria-label="Instagram">
-                📷
-              </a>
-              <a href="#" aria-label="LinkedIn">
-                in
-              </a>
-            </div>
+            <h3>{t("connect")}</h3>
+            <ul className="footer-official-links">
+              <li><a href="https://cybercrime.gov.in/" target="_blank" rel="noopener noreferrer">🇮🇳 National Cyber Crime Portal</a></li>
+              <li><a href="https://www.cert-in.org.in/" target="_blank" rel="noopener noreferrer">🛡️ CERT-In</a></li>
+              <li><a href="https://www.sancharsaathi.gov.in/" target="_blank" rel="noopener noreferrer">📱 Sanchar Saathi</a></li>
+            </ul>
           </div>
         </div>
 
         <div className="footer-bottom">
           <div className="footer-info">
-            <p>
-              &copy; {currentYear} CyberRakshak. All rights reserved. | Privacy
-              Policy | Terms of Service
-            </p>
+            <p>&copy; {currentYear} CyberRakshak. All rights reserved.</p>
+            <div className="footer-legal"><Link to="/privacy">{t("privacy")}</Link><span>•</span><Link to="/terms">{t("terms")}</Link></div>
           </div>
           <div className="footer-badges">
-            <span className="badge">🔒 Secure</span>
-            <span className="badge">✅ Verified</span>
-            <span className="badge">🌍 Multi-language</span>
+            <span className="badge">🔒 {t("secure")}</span>
+            <span className="badge">✅ {t("verified")}</span>
+            <span className="badge">🌐 {t("multiLanguage")}</span>
           </div>
         </div>
       </div>
