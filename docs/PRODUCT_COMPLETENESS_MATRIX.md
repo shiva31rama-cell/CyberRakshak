@@ -2,24 +2,31 @@
 
 ## Purpose
 
-This document is the single source of truth for the complete CyberRakshak product scope. It prevents useful capabilities from being forgotten while keeping unfinished capabilities explicitly marked as planned rather than pretending they are production-ready.
+This is the product source of truth. Implemented capabilities are separated from planned capabilities so the project never claims unfinished technology as production-ready.
 
 ## Core user journeys
 
 | Area | Status | Capability |
 |---|---|---|
-| Home | Implemented | Simple entry points for learning, safety checking, emergency help, scam reporting and feedback |
-| Safety Checker | Implemented | Analyze suspicious text and URLs with explainable risk signals |
-| Learning | Implemented | Cyber-safety and digital-literacy learning modules |
-| Quizzes | Implemented | Quiz flow, scoring and user results |
-| Authentication | Implemented | Registration/login with JWT and role-aware access |
-| Scam reporting | Implemented | Report scams and generate case numbers |
+| Home | Implemented | Simple entry points into checking, learning, emergency help and reporting |
+| Safety Checker | Implemented | Explainable message and URL risk analysis |
+| Learning | Implemented | Cyber-safety learning modules |
+| Quizzes | Implemented | Scenario-based learning checks and results |
+| Authentication | Implemented | Registration/login with role-aware access |
+| Scam reporting | Implemented | Scam submission and case workflow |
 | Case tracking | Implemented | Privacy-limited case lookup |
-| Feedback | Implemented | User feedback submission and admin review |
-| Admin SOC | Implemented | Scam reports, analytics and feedback administration |
-| AI assistant | Implemented | Defensive chatbot API with configurable provider and safe fallback |
-| Emergency help | Implemented | Safety guidance and emergency resource navigation |
-| Personalization | Implemented | Self-declared age group and language stored locally |
+| Feedback | Implemented | User feedback workflow |
+| Admin SOC | Implemented | Authorized administration of reports, analytics and feedback |
+| AI assistant | Implemented | Defensive assistant with configurable provider and fallback |
+| Emergency help | Implemented | Incident-response guidance |
+| Personalization | Implemented | Self-declared preferences stored locally |
+| Unified page template | Implemented | Shared page framing, title, purpose and accessibility entry point |
+| Compact navigation | Implemented | Five primary actions with secondary features under More |
+| India escalation guide | Implemented | Official-resource guidance layer |
+| Privacy baseline | Implemented | Data minimization and AI/data safety rules |
+| Accessibility baseline | Implemented | Mobile, keyboard, contrast, motion and plain-language checks |
+| Maintenance automation | Implemented | Scheduled verification and failure issue reporting |
+| Dependency update proposals | Implemented | Dependabot configuration for root/backend/frontend manifests |
 
 ## Safety intelligence roadmap
 
@@ -30,68 +37,39 @@ This document is the single source of truth for the complete CyberRakshak produc
 | Fake-job scam detection | Implemented | Employment scam indicators |
 | Digital-arrest impersonation detection | Implemented | Authority/urgency indicators |
 | SIM/eSIM takeover awareness | Implemented | Telecom-risk guidance |
-| Credential/OTP theft detection | Implemented | Credential and OTP request indicators |
-| Screenshot/OCR analysis | Planned | Extract text from user-provided screenshots and analyze locally/server-side with privacy controls |
-| Voice/call analysis | Planned | Consent-based analysis of user-provided call recordings; never automatic interception |
-| Deepfake awareness | Planned | Defensive media authenticity assessment with uncertainty reporting |
-| Live threat intelligence | Planned | Server-side feeds with provenance, caching and expiry |
-| Custom ML classifier | Planned | Evaluated model trained only on legally usable data |
-| Real-time alerts | Planned | WebSocket/event delivery for opted-in security events |
-| Flutter mobile client | Planned | Reuse the same API/security contract |
+| Credential/OTP theft detection | Implemented | Credential/OTP request indicators |
+| Screenshot/OCR analysis | Planned | Privacy-aware extraction from user-provided screenshots |
+| Voice/call analysis | Planned | Consent-based analysis of user-provided recordings |
+| Deepfake awareness | Planned | Uncertainty-aware defensive media assessment |
+| Live threat intelligence | Planned | Provenance, cache, expiry and abuse controls |
+| Custom ML classifier | Planned | Evaluated model using legally usable data |
+| Real-time alerts | Planned | Authorized event delivery for opted-in users |
+| Flutter mobile client | Planned | Reuse the API/security contract |
+
+## Realtime foundation
+
+| Area | Status | Capability |
+|---|---|---|
+| Event envelope | Implemented | Versioned event IDs, timestamps and actors |
+| Event safety | Implemented | No secrets and explicit authorization requirements |
+| Browser realtime delivery | Planned | WebSockets/Socket.IO after database/backend migration |
+| Durable replay | Planned | Persisted event stream where audit/replay is required |
 
 ## AI/ML safety requirements
 
 1. Never expose API keys to the frontend.
 2. Never execute, crawl or open URLs merely because a dataset labels them malicious.
-3. Treat public security datasets as offline training/evaluation material.
-4. Record dataset name, source URL, license, version/date and intended use before training.
+3. Treat public datasets as offline material until a separate integration is reviewed.
+4. Record provenance, license, version/date and intended use before training.
 5. Keep raw third-party datasets out of the application repository unless redistribution rights are verified.
-6. Prefer extracted features, hashed/normalized indicators or curated samples when redistribution rights are unclear.
-7. Report uncertainty instead of presenting a classifier score as certainty.
-8. Keep deterministic safety rules as a fallback when an AI provider is unavailable.
-9. Do not send unnecessary personal data to external AI providers.
-10. Add rate limits, input-size limits and abuse controls to analysis endpoints.
-
-## Data domains to support
-
-- phishing URLs
-- phishing email/text
-- SMS/smishing
-- OTP and financial-message intent
-- scam/job-offer messages
-- malicious/benign web-page features
-- payment/UPI fraud language
-- impersonation and urgency patterns
-- multilingual cyber-safety examples
-- safe educational question/answer material
-
-## Data quality controls
-
-Every training/evaluation source should be checked for:
-
-- license and redistribution terms
-- provenance
-- duplicates
-- label quality
-- class imbalance
-- language coverage
-- temporal drift
-- personally identifiable information
-- malicious payloads or executable artifacts
-- train/test contamination
+6. Report uncertainty and retain deterministic fallback behavior.
+7. Minimize data sent to external AI providers.
+8. Apply rate and input-size limits.
 
 ## Production gates
 
-A capability is considered production-ready only after:
+A capability is production-ready only after implementation, automated tests, security review, privacy review, documented failure behavior, appropriate rate limits, passing CI, deployment verification and clear user-facing limitations.
 
-- implementation is complete
-- automated tests exist
-- security review is complete
-- failure behavior is defined
-- privacy impact is considered
-- rate limits are applied where appropriate
-- CI passes
-- deployment configuration is documented
-- user-facing uncertainty/limitations are clear
+## Current technology transition
 
-This matrix deliberately distinguishes implemented functionality from validated future work. That distinction is part of CyberRakshak's safety and engineering quality.
+The existing application uses MongoDB/Mongoose. PostgreSQL is the planned database target. Realtime delivery will follow the event contract after the database/backend migration is validated.
