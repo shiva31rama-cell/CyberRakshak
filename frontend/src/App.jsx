@@ -14,6 +14,7 @@ import DigitalLiteracyQuiz from "./pages/DigitalLiteracyQuiz/DigitalLiteracyQuiz
 import EmergencyHelp from "./pages/EmergencyHelp/EmergencyHelp";
 import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
+import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 // Learning Modules
@@ -45,6 +46,7 @@ function App() {
               <Route path="/emergency-help" element={<EmergencyHelp />} />
               <Route path="/report-scam" element={<ScamSolutions />} />
               <Route path="/feedback" element={<Feedback />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

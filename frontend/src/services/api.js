@@ -19,6 +19,8 @@ export const apiRequest = async (path, options = {}) => {
   const controller = new AbortController();
   const timeoutMs = Number(options.timeoutMs) > 0 ? Number(options.timeoutMs) : DEFAULT_TIMEOUT_MS;
   const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  const fetchOptions = { ...options };
+  delete fetchOptions.timeoutMs;
 
   const headers = {
     ...(options.body instanceof FormData
@@ -27,8 +29,6 @@ export const apiRequest = async (path, options = {}) => {
     ...getAuthHeaders(),
     ...(options.headers || {}),
   };
-
-  const { timeoutMs: _timeout, ...fetchOptions } = options;
 
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -57,10 +57,10 @@ export const apiRequest = async (path, options = {}) => {
     return data;
   } catch (error) {
     if (error?.name === "AbortError") {
-      throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)} seconds`);
+      throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)} seconds`, { cause: error });
     }
     if (error instanceof TypeError) {
-      throw new Error("Unable to reach the CyberRakshak server. Check your connection and try again.");
+      throw new Error("Unable to reach the CyberRakshak server. Check your connection and try again.", { cause: error });
     }
     throw error;
   } finally {
