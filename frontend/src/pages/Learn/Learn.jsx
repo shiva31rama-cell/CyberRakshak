@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./Learn.css";
 
 const modules = [
@@ -19,6 +20,7 @@ const tracks = [
 
 function Learn() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [level, setLevel] = useState("all");
   const [query, setQuery] = useState("");
 
@@ -33,75 +35,11 @@ function Learn() {
 
   return (
     <div className="learn-container">
-      <section className="learn-hero">
-        <div>
-          <span className="learn-kicker">LEARN • SEE • PRACTISE</span>
-          <h1>Cyber safety should feel like learning, not reading a manual.</h1>
-          <p>Every core lesson is designed around one visual idea, one real-world scenario and one practical action. Open a topic when you are ready instead of loading everything onto one page.</p>
-        </div>
-        <div className="learn-hero-orbit" aria-hidden="true">🛡️</div>
-      </section>
-
-      <section className="learning-command" aria-label="Learning controls">
-        <div>
-          <label htmlFor="learning-search">Find a lesson</label>
-          <input id="learning-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search phishing, UPI, passwords…" />
-        </div>
-        <div>
-          <span className="filter-label">Level</span>
-          <div className="level-tabs" role="tablist" aria-label="Filter learning level">
-            {["all", "beginner", "intermediate"].map((item) => (
-              <button key={item} type="button" className={level === item ? "active" : ""} onClick={() => setLevel(item)}>{item === "all" ? "All" : item[0].toUpperCase() + item.slice(1)}</button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="learn-section">
-        <div className="section-title-row">
-          <div><span className="learn-kicker">CORE PATH</span><h2>Start with the skills you use every day</h2></div>
-          <span className="result-count">{filtered.length} lessons paths</span>
-        </div>
-
-        <div className="learning-grid">
-          {filtered.map((module) => (
-            <article className="learning-card" key={module.id}>
-              <img src={module.image} alt="" className="learning-image" loading="lazy" />
-              <div className="learning-card-body">
-                <div className="learning-card-top"><span className="learning-icon">{module.icon}</span><span className={`level-pill ${module.level}`}>{module.level}</span></div>
-                <h3>{module.title}</h3>
-                <p>{module.description}</p>
-                <div className="learning-outcome"><strong>🎯 Takeaway</strong><span>{module.outcome}</span></div>
-                <div className="learning-meta"><span>📖 {module.lessons} lessons</span><span>⏱️ {module.duration}</span></div>
-                <button type="button" onClick={() => navigate(module.link)} className="learning-open">Open lesson <span>→</span></button>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        {filtered.length === 0 && <div className="empty-learning"><strong>No matching lesson.</strong><span>Try another word or choose All.</span></div>}
-      </section>
-
-      <section className="learning-media">
-        <div className="media-copy">
-          <span className="learn-kicker">SEE IT IN ACTION</span>
-          <h2>Videos, booklets and official awareness material</h2>
-          <p>Some topics are easier to understand by seeing the warning signs. We keep official external media separate from CyberRakshak's own explanations so the source is clear.</p>
-          <div className="media-actions">
-            <a href="https://www.cert-in.org.in/s2cMainServlet?pageid=digitalpayment" target="_blank" rel="noreferrer">▶ Digital Payment awareness</a>
-            <a href="https://cert-in.org.in/AwarenessBooklets.jsp" target="_blank" rel="noreferrer">📘 CERT-In awareness booklets</a>
-            <a href="https://cybercrime.gov.in/" target="_blank" rel="noreferrer">🇮🇳 I4C cyber awareness</a>
-          </div>
-        </div>
-        <div className="media-preview" aria-hidden="true"><div className="play-button">▶</div><span>Visual learning layer</span></div>
-      </section>
-
-      <section className="learn-section">
-        <div className="section-title-row"><div><span className="learn-kicker">EXPANSION TRACKS</span><h2>More domains we are building carefully</h2></div><span className="result-count">Validated before release</span></div>
-        <div className="track-grid">
-          {tracks.map((track) => <article className="track-card" key={track.title}><img src={track.image} alt="" loading="lazy" /><div><span>{track.icon}</span><h3>{track.title}</h3><p>{track.text}</p><small>{track.state}</small></div></article>)}
-        </div>
-      </section>
+      <section className="learn-hero"><div><span className="learn-kicker">LEARN • SEE • PRACTISE</span><h1>Cyber safety should feel like learning, not reading a manual.</h1><p>Every core lesson is designed around one visual idea, one real-world scenario and one practical action.</p></div><div className="learn-hero-orbit" aria-hidden="true">🛡️</div></section>
+      <section className="learning-command" aria-label="Learning controls"><div><label htmlFor="learning-search">Find a lesson</label><input id="learning-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("searchLessons")} /></div><div><span className="filter-label">Level</span><div className="level-tabs" role="tablist" aria-label="Filter learning level">{["all", "beginner", "intermediate"].map((item) => <button key={item} type="button" className={level === item ? "active" : ""} onClick={() => setLevel(item)}>{item === "all" ? "All" : item[0].toUpperCase() + item.slice(1)}</button>)}</div></div></section>
+      <section className="learn-section"><div className="section-title-row"><div><span className="learn-kicker">{t("startHere")}</span><h2>{t("chooseNeed")}</h2></div><span className="result-count">{filtered.length} lesson paths</span></div><div className="learning-grid">{filtered.map((module) => <article className="learning-card" key={module.id}><img src={module.image} alt="" className="learning-image" loading="lazy"/><div className="learning-card-body"><div className="learning-card-top"><span className="learning-icon">{module.icon}</span><span className={`level-pill ${module.level}`}>{module.level}</span></div><h3>{module.title}</h3><p>{module.description}</p><div className="learning-outcome"><strong>🎯 Takeaway</strong><span>{module.outcome}</span></div><div className="learning-meta"><span>📖 {module.lessons} lessons</span><span>⏱️ {module.duration}</span></div><button type="button" onClick={() => navigate(module.link)} className="learning-open">{t("openChecker").replace("checker", "lesson")} <span>→</span></button></div></article>)}</div>{filtered.length === 0 && <div className="empty-learning"><strong>{t("noMatching")}</strong><span>Try another word or choose All.</span></div>}</section>
+      <section className="learning-media"><div className="media-copy"><span className="learn-kicker">SEE IT IN ACTION</span><h2>Videos, booklets and official awareness material</h2><p>Official external media is kept separate from CyberRakshak's own explanations so the source is clear.</p><div className="media-actions"><a href="https://www.cert-in.org.in/s2cMainServlet?pageid=digitalpayment" target="_blank" rel="noreferrer">▶ Digital Payment awareness</a><a href="https://cert-in.org.in/AwarenessBooklets.jsp" target="_blank" rel="noreferrer">📘 CERT-In awareness booklets</a><a href="https://cybercrime.gov.in/" target="_blank" rel="noreferrer">🇮🇳 I4C cyber awareness</a></div></div><div className="media-preview" aria-hidden="true"><div className="play-button">▶</div><span>Visual learning layer</span></div></section>
+      <section className="learn-section"><div className="section-title-row"><div><span className="learn-kicker">EXPANSION TRACKS</span><h2>More domains we are building carefully</h2></div><span className="result-count">Validated before release</span></div><div className="track-grid">{tracks.map((track) => <article className="track-card" key={track.title}><img src={track.image} alt="" loading="lazy"/><div><span>{track.icon}</span><h3>{track.title}</h3><p>{track.text}</p><small>{track.state}</small></div></article>)}</div></section>
     </div>
   );
 }
