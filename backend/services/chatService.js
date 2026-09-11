@@ -58,9 +58,10 @@ function timeoutSignal() {
 
 function extractTextFromGemini(interaction) {
   if (typeof interaction?.output_text === "string") return interaction.output_text.trim();
-  const outputs = Array.isArray(interaction?.outputs) ? interaction.outputs : [];
-  return outputs
-    .flatMap((item) => item?.content || [])
+  const steps = Array.isArray(interaction?.steps) ? interaction.steps : [];
+  return steps
+    .filter((step) => step?.type === "model_output")
+    .flatMap((step) => step?.content || [])
     .filter((item) => item?.type === "text" && typeof item?.text === "string")
     .map((item) => item.text)
     .join("\n")
@@ -71,20 +72,27 @@ async function callGemini({ messages, language, ageGroup, previousInteractionId 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
 
-  const conversation = messages.map((message) => `${message.role === "user" ? "USER" : "ASSISTANT"}: ${message.content}`).join("\n\n");
-  const context = `Preferred language: ${language || "English"}\nAge group: ${ageGroup || "not provided"}\n\nConversation:\n${conversation}`;
+  const lastUserMessage = [...messages].reverse().find((message) => message.role === "user");
+  if (!lastUserMessage) throw new Error("A user message is required.");
+
   const payload = {
     model: DEFAULT_MODEL,
-    input: context,
-    system_instruction: SYSTEM_INSTRUCTIONS,
+    input: previousInteractionId
+      ? lastUserMessage.content
+      : `Preferred language: ${language || "English"}\nAge group: ${ageGroup || "not provided"}\n\nUser request:\n${lastUserMessage.content}`,
+    system_instruction: `${SYSTEM_INSTRUCTIONS}\nPreferred language: ${language || "English"}\nAge group: ${ageGroup || "not provided"}`,
+    store: true,
   };
   if (previousInteractionId) payload.previous_interaction_id = previousInteractionId;
 
   const { controller, clear } = timeoutSignal();
   try {
-    const response = await fetch(`${GEMINI_ENDPOINT}?key=${encodeURIComponent(apiKey)}`, {
+    const response = await fetch(GEMINI_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
       body: JSON.stringify(payload),
       signal: controller.signal,
     });
@@ -144,7 +152,7 @@ function deterministicFallback(message, language) {
     return "Never share an OTP, PIN, CVV or password. Even when a message sounds urgent, pause and verify through the organisation's official app or website.";
   }
 
-  if (/(scam|fraud|phishing|suspicious|fake|fraud|job)/i.test(lower)) {
+  if (/(scam|fraud|phishing|suspicious|fake|job)/i.test(lower)) {
     if (telugu) return "ఇది scam లేదా phishing సంకేతాలను కలిగి ఉండవచ్చు. link ను open చేయకండి, payment చేయకండి, OTP/share చేయకండి. CyberRakshak Safety Checker లో message లేదా URL ను check చేసి, అవసరమైతే official cybercrime reporting channel ను ఉపయోగించండి.";
     if (hindi) return "यह scam या phishing के संकेत हो सकते हैं। Link न खोलें, payment न करें और OTP साझा न करें। CyberRakshak Safety Checker में message या URL जांचें और जरूरत हो तो official cybercrime reporting channel का उपयोग करें।";
     return "This may contain scam or phishing signals. Do not open the link, pay money or share an OTP. Use the CyberRakshak Safety Checker for the message/URL and use an official cybercrime reporting channel when needed.";
@@ -159,24 +167,22 @@ function deterministicFallback(message, language) {
 
 async function chat({ messages, language, ageGroup, previousInteractionId }) {
   const normalised = normaliseMessages(messages);
-  if (!normalised.length) {
-    throw new Error("At least one message is required.");
-  }
+  if (!normalised.length) throw new Error("At least one message is required.");
 
   try {
-    const gemini = process.env.AI_PROVIDER !== "openrouter"
-      ? await callGemini({ messages: normalised, language, ageGroup, previousInteractionId })
-      : null;
-    if (gemini) return gemini;
+    if (process.env.AI_PROVIDER !== "openrouter") {
+      const gemini = await callGemini({ messages: normalised, language, ageGroup, previousInteractionId });
+      if (gemini) return gemini;
+    }
   } catch (error) {
     console.warn("Gemini provider unavailable:", error.message);
   }
 
   try {
-    const openRouter = process.env.AI_PROVIDER !== "gemini"
-      ? await callOpenRouter({ messages: normalised, language, ageGroup })
-      : null;
-    if (openRouter) return openRouter;
+    if (process.env.AI_PROVIDER !== "gemini") {
+      const openRouter = await callOpenRouter({ messages: normalised, language, ageGroup });
+      if (openRouter) return openRouter;
+    }
   } catch (error) {
     console.warn("OpenRouter provider unavailable:", error.message);
   }
