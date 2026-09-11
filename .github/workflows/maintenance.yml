@@ -1,0 +1,60 @@
+name: CyberRakshak Maintenance
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  verify:
+    name: Scheduled verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Backend install and tests
+        working-directory: backend
+        run: |
+          npm install
+          node -c server.js
+          npm test
+
+      - name: Frontend install, lint and build
+        working-directory: frontend
+        run: |
+          npm install
+          npm run lint
+          npm run build
+
+      - name: Dependency audit report
+        run: |
+          node -e "const fs=require('fs'); const roots=['.','backend','frontend']; let bad=0; for (const root of roots) { const f=root==='.'?'package.json':root+'/package.json'; if (!fs.existsSync(f)) continue; const p=JSON.parse(fs.readFileSync(f)); console.log(root+': '+(p.name||'package')+' '+(p.version||'')); } process.exit(bad);"
+
+  report-failure:
+    name: Report maintenance failure
+    needs: verify
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update maintenance issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Automated maintenance check failed"
+          body="The scheduled CyberRakshak verification workflow failed. Review the failed workflow run before the next production merge.\n\nWorkflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          existing=$(gh issue list --repo "${{ github.repository }}" --state open --search "in:title $title" --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "${{ github.repository }}" --body "$body"
+          else
+            gh issue create --repo "${{ github.repository }}" --title "$title" --body "$body"
+          fi

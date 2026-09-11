@@ -1,260 +1,89 @@
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
+const coreActions = [
+  { icon: "🔍", title: "Check Something", text: "Analyze a suspicious message or link before you act.", path: "/check", label: "Open checker" },
+  { icon: "🆘", title: "I Need Help", text: "See the safest next steps when money, accounts or identity may be at risk.", path: "/emergency-help", label: "Get help" },
+  { icon: "🎓", title: "Learn", text: "Build practical cyber-safety habits through short lessons.", path: "/learn", label: "Start learning" },
+  { icon: "⚠️", title: "Report a Scam", text: "Record an incident and understand the official reporting path.", path: "/report-scam", label: "Report" }
+];
+
+const checkModes = [
+  ["💬", "Messages", "SMS, WhatsApp, email and social-media text"],
+  ["🔗", "Links", "URL structure and suspicious link signals"],
+  ["💳", "Payments", "UPI and payment-request warning patterns"],
+  ["📱", "Telecom", "SIM-swap, eSIM and telecom scam awareness"]
+];
+
+const roadmap = ["Screenshot / OCR", "Voice & call analysis", "Deepfake awareness", "Live threat intelligence", "Custom ML", "Realtime alerts", "Flutter app", "School safety"];
+
 function Home() {
   const navigate = useNavigate();
 
-  const features = [
-    {
-      icon: "📚",
-      title: "Learn Cyber Safety",
-      description: "Comprehensive courses on cybersecurity topics",
-      action: "/learn",
-    },
-    {
-      icon: "🎯",
-      title: "Take Quizzes",
-      description: "Test your knowledge with interactive quizzes",
-      action: "/digital-literacy-quiz",
-    },
-    {
-      icon: "🆘",
-      title: "Emergency Help",
-      description: "Get immediate help and emergency contacts",
-      action: "/emergency-help",
-    },
-    {
-      icon: "⚠️",
-      title: "Report a Scam",
-      description: "Report scams and get a case number",
-      action: "/report-scam",
-    },
-  ];
-
-  const topicCards = [
-    {
-      icon: "💳",
-      title: "UPI & Payment Security",
-      description: "Learn how to protect your digital payments",
-      link: "/upi-safety",
-    },
-    {
-      icon: "🔐",
-      title: "Password Security",
-      description: "Create and manage strong passwords",
-      link: "/password-security",
-    },
-    {
-      icon: "💬",
-      title: "Social Media Safety",
-      description: "Stay safe on social media platforms",
-      link: "/social-media-safety",
-    },
-    {
-      icon: "🚨",
-      title: "Cyber Crime Awareness",
-      description: "Understand common cyber crimes",
-      link: "/cyber-crime-awareness",
-    },
-  ];
-
-  const stats = [
-    { number: "10K+", label: "Active Learners" },
-    { number: "50+", label: "Modules" },
-    { number: "100%", label: "Free Access" },
-    { number: "24/7", label: "AI Support" },
-  ];
-
   return (
-    <div className="home">
-      {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-content">
-          <h1>🛡️ CyberRakshak</h1>
-          <p className="hero-subtitle">Your Complete Guide to Cyber Security</p>
-          <p className="hero-description">
-            Learn how to protect yourself from cyber threats, scams, and online
-            dangers. Free, comprehensive cyber security education for everyone.
-          </p>
+    <div className="home simple-home">
+      <section className="home-hero">
+        <div className="home-hero-copy">
+          <span className="home-kicker">🛡️ CYBERRAKSHAK</span>
+          <h1>Before you click, <span>check.</span></h1>
+          <p className="home-lead">A calm, multilingual cyber-safety companion that helps you understand suspicious messages, make safer decisions and find the right next step.</p>
+          <div className="home-actions">
+            <button className="home-primary" type="button" onClick={() => navigate("/check")}>🔍 Check Something</button>
+            <button className="home-secondary" type="button" onClick={() => navigate("/emergency-help")}>🆘 I Need Help</button>
+          </div>
+          <p className="home-safety-note">We do not need your password, UPI PIN, transaction OTP or CVV to provide safety guidance.</p>
+        </div>
+        <div className="home-hero-card" aria-label="CyberRakshak safety journey">
+          <span>THE SIMPLE JOURNEY</span>
+          <strong>Check → Understand → Act → Report → Learn</strong>
+          <small>One step at a time. No crowded dashboard.</small>
+        </div>
+      </section>
 
-          <div className="hero-buttons">
-            <button className="btn-primary" onClick={() => navigate("/learn")}>
-              Start Learning
+      <section className="home-section home-start" aria-labelledby="start-title">
+        <div className="home-heading"><span className="home-kicker">START HERE</span><h2 id="start-title">Choose what you need</h2><p>Every card has one purpose and one clear next action.</p></div>
+        <div className="home-action-grid">
+          {coreActions.map((item) => (
+            <article className="home-action-card" key={item.title}>
+              <div className="home-card-icon" aria-hidden="true">{item.icon}</div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+              <button type="button" onClick={() => navigate(item.path)}>{item.label} →</button>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="home-section" aria-labelledby="checks-title">
+        <div className="home-heading"><span className="home-kicker">WHAT WE HANDLE</span><h2 id="checks-title">Real situations, not security jargon</h2><p>Start with a focused check and see the reasons behind the warning.</p></div>
+        <div className="home-topic-grid">
+          {checkModes.map(([icon, title, text]) => (
+            <button className="home-topic" type="button" key={title} onClick={() => navigate("/check")}>
+              <span aria-hidden="true">{icon}</span><strong>{title}</strong><small>{text}</small>
             </button>
-            <button
-              className="btn-secondary"
-              onClick={() => navigate("/emergency-help")}
-            >
-              Emergency Help
-            </button>
-          </div>
-        </div>
-
-        <div className="hero-image">
-          <div className="shield-icon">🛡️</div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="stats">
-        <div className="stats-container">
-          {stats.map((stat, index) => (
-            <div key={index} className="stat-card">
-              <div className="stat-number">{stat.number}</div>
-              <div className="stat-label">{stat.label}</div>
-            </div>
           ))}
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="features">
-        <h2>📋 Main Features</h2>
-        <p className="section-subtitle">
-          Everything you need to stay cyber safe
-        </p>
-
-        <div className="features-grid">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="feature-card"
-              onClick={() => navigate(feature.action)}
-            >
-              <div className="feature-icon">{feature.icon}</div>
-              <h3>{feature.title}</h3>
-              <p>{feature.description}</p>
-              <button className="feature-btn">Explore</button>
-            </div>
-          ))}
+      <section className="home-section home-difference" aria-labelledby="difference-title">
+        <div className="home-heading"><span className="home-kicker">WHY THIS APPROACH</span><h2 id="difference-title">Advanced underneath. Simple on the surface.</h2></div>
+        <div className="difference-list">
+          <div><b>1</b><span><strong>Explainable</strong> — show the warning signs and uncertainty instead of only giving a score.</span></div>
+          <div><b>2</b><span><strong>India-ready</strong> — UPI, telecom, KYC, fake jobs, impersonation and digital-arrest patterns are first-class scenarios.</span></div>
+          <div><b>3</b><span><strong>Privacy-aware</strong> — avoid asking users for secrets that are unnecessary for analysis.</span></div>
+          <div><b>4</b><span><strong>Action-oriented</strong> — connect detection to safer next steps, reporting guidance and learning.</span></div>
         </div>
       </section>
 
-      {/* Learning Topics Section */}
-      <section className="topics">
-        <h2>📖 Popular Learning Topics</h2>
-        <p className="section-subtitle">
-          Master essential cyber security skills
-        </p>
-
-        <div className="topics-grid">
-          {topicCards.map((topic, index) => (
-            <div
-              key={index}
-              className="topic-card"
-              onClick={() => navigate(topic.link)}
-            >
-              <div className="topic-icon">{topic.icon}</div>
-              <h3>{topic.title}</h3>
-              <p>{topic.description}</p>
-            </div>
-          ))}
-        </div>
+      <section className="home-section home-roadmap" aria-labelledby="roadmap-title">
+        <div className="home-heading"><span className="home-kicker">ROADMAP</span><h2 id="roadmap-title">What comes next</h2><p>Planned capabilities are clearly labelled until they pass implementation and production checks.</p></div>
+        <div className="roadmap-list">{roadmap.map((item) => <span key={item}>◌ {item}</span>)}</div>
       </section>
 
-      {/* Why Section */}
-      <section className="why">
-        <h2>Why CyberRakshak?</h2>
-
-        <div className="why-grid">
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Comprehensive Coverage</h3>
-            <p>
-              From basics to advanced topics, we cover everything about cyber
-              security
-            </p>
-          </div>
-
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Free for Everyone</h3>
-            <p>
-              Access all our learning materials and resources completely free
-            </p>
-          </div>
-
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Interactive Learning</h3>
-            <p>
-              Engage with interactive quizzes, case studies, and real-world
-              examples
-            </p>
-          </div>
-
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Expert Resources</h3>
-            <p>
-              Content reviewed by cyber security experts and government
-              advisories
-            </p>
-          </div>
-
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>24/7 Support</h3>
-            <p>Get instant answers from our AI chatbot anytime, anywhere</p>
-          </div>
-
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Emergency Help</h3>
-            <p>
-              Quick access to emergency contacts and resources in cyber
-              incidents
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="cta">
-        <h2>Ready to Stay Cyber Safe?</h2>
-        <p>
-          Join thousands of learners protecting themselves from cyber threats
-        </p>
-
-        <div className="cta-buttons">
-          <button className="btn-large" onClick={() => navigate("/learn")}>
-            Start Learning Now
-          </button>
-          <button
-            className="btn-large-outline"
-            onClick={() => navigate("/feedback")}
-          >
-            Send Feedback
-          </button>
-        </div>
-      </section>
-
-      {/* Quick Links Section */}
-      <section className="quick-links">
-        <h3>Quick Links</h3>
-        <div className="quick-links-grid">
-          <button className="quick-link-btn" onClick={() => navigate("/learn")}>
-            📚 Learn
-          </button>
-          <button
-            className="quick-link-btn"
-            onClick={() => navigate("/emergency-help")}
-          >
-            🆘 Emergency Help
-          </button>
-          <button
-            className="quick-link-btn"
-            onClick={() => navigate("/report-scam")}
-          >
-            ⚠️ Report Scam
-          </button>
-          <button
-            className="quick-link-btn"
-            onClick={() => navigate("/feedback")}
-          >
-            💬 Feedback
-          </button>
-        </div>
+      <section className="home-final">
+        <h2>Start with one safe decision.</h2>
+        <p>Check something suspicious or learn a safer habit.</p>
+        <div className="home-final-actions"><button type="button" onClick={() => navigate("/check")}>Open Safety Checker</button><button type="button" onClick={() => navigate("/learn")}>Explore Learning</button></div>
       </section>
     </div>
   );
