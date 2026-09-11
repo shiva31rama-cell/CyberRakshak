@@ -2,83 +2,89 @@ import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 const coreActions = [
-  { icon: "🔍", title: "Check Something", text: "Analyze a suspicious message or link before you act.", path: "/check" },
-  { icon: "🆘", title: "I May Have Been Scammed", text: "Open a simple incident-response checklist and official help guidance.", path: "/emergency-help" },
-  { icon: "🎓", title: "Learn Cyber Safety", text: "Learn through simple lessons, scenarios, and quizzes.", path: "/learn" },
-  { icon: "⚠️", title: "Report a Scam", text: "Submit a report and track your case safely.", path: "/report-scam" }
+  { icon: "🔍", title: "Check Something", text: "Analyze a suspicious message or link before you act.", path: "/check", label: "Open checker" },
+  { icon: "🆘", title: "I Need Help", text: "See the safest next steps when money, accounts or identity may be at risk.", path: "/emergency-help", label: "Get help" },
+  { icon: "🎓", title: "Learn", text: "Build practical cyber-safety habits through short lessons.", path: "/learn", label: "Start learning" },
+  { icon: "⚠️", title: "Report a Scam", text: "Record an incident and understand the official reporting path.", path: "/report-scam", label: "Report" }
 ];
 
 const checkModes = [
-  { icon: "💬", title: "Message", text: "SMS, WhatsApp, email or social-media text" },
-  { icon: "🔗", title: "Link", text: "Inspect a URL for structural warning signs" },
-  { icon: "📸", title: "Screenshot", text: "Preview it and prepare the text for analysis" },
-  { icon: "📱", title: "SIM Safety", text: "Learn about SIM swap, eSIM and telecom scams" }
+  ["💬", "Messages", "SMS, WhatsApp, email and social-media text"],
+  ["🔗", "Links", "URL structure and suspicious link signals"],
+  ["💳", "Payments", "UPI and payment-request warning patterns"],
+  ["📱", "Telecom", "SIM-swap, eSIM and telecom scam awareness"]
 ];
 
-const comingSoon = [
-  ["🎙️", "Voice CyberRakshak"],
-  ["🎭", "Deepfake Protection"],
-  ["📞", "Call Analysis"],
-  ["🗺️", "Live Threat Map"],
-  ["🔔", "Real-Time Alerts"],
-  ["🤖", "Advanced ML Detection"],
-  ["📱", "Flutter Mobile App"],
-  ["🏫", "School Safety Platform"]
-];
+const roadmap = ["Screenshot / OCR", "Voice & call analysis", "Deepfake awareness", "Live threat intelligence", "Custom ML", "Realtime alerts", "Flutter app", "School safety"];
 
 function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="home modern-home">
-      <section className="hero modern-hero">
-        <div className="hero-content">
-          <span className="home-eyebrow">🛡️ SIMPLE • PRIVATE • DEFENSIVE</span>
-          <h1>Something suspicious? <span>Let&apos;s check it.</span></h1>
-          <p className="hero-subtitle">CyberRakshak is a multilingual cyber-safety companion for ordinary people, students, families and seniors.</p>
-          <p className="hero-description">Understand the warning signs, make safer decisions, get incident guidance and learn how to avoid the same scam next time.</p>
-          <div className="hero-buttons">
-            <button className="btn-primary" onClick={() => navigate("/check")}>🔍 Check Something</button>
-            <button className="btn-secondary" onClick={() => navigate("/emergency-help")}>🆘 Need Help Now</button>
+    <div className="home simple-home">
+      <section className="home-hero">
+        <div className="home-hero-copy">
+          <span className="home-kicker">🛡️ CYBERRAKSHAK</span>
+          <h1>Before you click, <span>check.</span></h1>
+          <p className="home-lead">A calm, multilingual cyber-safety companion that helps you understand suspicious messages, make safer decisions and find the right next step.</p>
+          <div className="home-actions">
+            <button className="home-primary" type="button" onClick={() => navigate("/check")}>🔍 Check Something</button>
+            <button className="home-secondary" type="button" onClick={() => navigate("/emergency-help")}>🆘 I Need Help</button>
           </div>
-          <div className="hero-trust">No banking passwords • No UPI PINs • No transaction OTPs • No unnecessary biometric storage</div>
+          <p className="home-safety-note">We do not need your password, UPI PIN, transaction OTP or CVV to provide safety guidance.</p>
         </div>
-        <div className="hero-image" aria-hidden="true"><div className="shield-icon">🛡️</div><div className="hero-orbit orbit-one"/><div className="hero-orbit orbit-two"/></div>
-      </section>
-
-      <section className="features core-actions-section">
-        <div className="section-heading"><span className="home-eyebrow">START HERE</span><h2>What do you need right now?</h2><p>One clear action at a time. No technical knowledge required.</p></div>
-        <div className="features-grid">
-          {coreActions.map((item) => <button className="feature-card action-card" key={item.title} onClick={() => navigate(item.path)}><div className="feature-icon">{item.icon}</div><h3>{item.title}</h3><p>{item.text}</p><span className="feature-btn">Open →</span></button>)}
+        <div className="home-hero-card" aria-label="CyberRakshak safety journey">
+          <span>THE SIMPLE JOURNEY</span>
+          <strong>Check → Understand → Act → Report → Learn</strong>
+          <small>One step at a time. No crowded dashboard.</small>
         </div>
       </section>
 
-      <section className="stats modern-stats">
-        <div className="stats-container">
-          {[['🧠','Explainable','Why a situation looks risky'],['🌐','Multilingual','Designed for Indian users'],['🔐','Privacy-first','Collect only what is needed'],['⚡','Fast guidance','Clear next actions']].map(([icon,title,text]) => <div className="stat-card" key={title}><div className="stat-number">{icon}</div><div className="stat-label"><strong>{title}</strong><span>{text}</span></div></div>)}
+      <section className="home-section home-start" aria-labelledby="start-title">
+        <div className="home-heading"><span className="home-kicker">START HERE</span><h2 id="start-title">Choose what you need</h2><p>Every card has one purpose and one clear next action.</p></div>
+        <div className="home-action-grid">
+          {coreActions.map((item) => (
+            <article className="home-action-card" key={item.title}>
+              <div className="home-card-icon" aria-hidden="true">{item.icon}</div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+              <button type="button" onClick={() => navigate(item.path)}>{item.label} →</button>
+            </article>
+          ))}
         </div>
       </section>
 
-      <section className="topics check-section">
-        <div className="section-heading"><span className="home-eyebrow">SAFETY CHECKS</span><h2>Check the things people actually receive</h2><p>Modern scams move through messages, links, phones, payments and social platforms.</p></div>
-        <div className="topics-grid">
-          {checkModes.map((item) => <button className="topic-card" key={item.title} onClick={() => navigate('/check')}><div className="topic-icon">{item.icon}</div><h3>{item.title}</h3><p>{item.text}</p></button>)}
+      <section className="home-section" aria-labelledby="checks-title">
+        <div className="home-heading"><span className="home-kicker">WHAT WE HANDLE</span><h2 id="checks-title">Real situations, not security jargon</h2><p>Start with a focused check and see the reasons behind the warning.</p></div>
+        <div className="home-topic-grid">
+          {checkModes.map(([icon, title, text]) => (
+            <button className="home-topic" type="button" key={title} onClick={() => navigate("/check")}>
+              <span aria-hidden="true">{icon}</span><strong>{title}</strong><small>{text}</small>
+            </button>
+          ))}
         </div>
       </section>
 
-      <section className="why modern-why">
-        <div className="section-heading"><span className="home-eyebrow">BUILT DIFFERENTLY</span><h2>Protection should be understandable</h2></div>
-        <div className="why-grid">
-          {[['🧩','Understand first','We explain the red flags in simple words instead of expecting users to understand cybersecurity jargon.'],['🎯','Action over fear','We focus on safe next steps and official help rather than alarming the user.'],['🧠','Learn from the incident','Real-world scam patterns become personalized learning opportunities.'],['📱','India-ready','UPI, telecom, SIM, KYC, job, digital-arrest and impersonation scenarios are first-class use cases.'],['♻️','Honest status','Working features are clearly separated from planned capabilities.'],['🛡️','Defensive by design','The product never asks for passwords, UPI PINs, transaction OTPs or unnecessary sensitive secrets.']].map(([icon,title,text]) => <article className="why-card" key={title}><span className="why-icon">{icon}</span><h3>{title}</h3><p>{text}</p></article>)}
+      <section className="home-section home-difference" aria-labelledby="difference-title">
+        <div className="home-heading"><span className="home-kicker">WHY THIS APPROACH</span><h2 id="difference-title">Advanced underneath. Simple on the surface.</h2></div>
+        <div className="difference-list">
+          <div><b>1</b><span><strong>Explainable</strong> — show the warning signs and uncertainty instead of only giving a score.</span></div>
+          <div><b>2</b><span><strong>India-ready</strong> — UPI, telecom, KYC, fake jobs, impersonation and digital-arrest patterns are first-class scenarios.</span></div>
+          <div><b>3</b><span><strong>Privacy-aware</strong> — avoid asking users for secrets that are unnecessary for analysis.</span></div>
+          <div><b>4</b><span><strong>Action-oriented</strong> — connect detection to safer next steps, reporting guidance and learning.</span></div>
         </div>
       </section>
 
-      <section className="coming-home">
-        <div className="section-heading"><span className="home-eyebrow">ROADMAP</span><h2>🚀 Coming Soon</h2><p>These are planned capabilities, shown openly so users know what is next.</p></div>
-        <div className="coming-home-grid">{comingSoon.map(([icon,title]) => <div className="coming-home-card" key={title}><span>{icon}</span><div><strong>{title}</strong><small>COMING SOON</small></div></div>)}</div>
+      <section className="home-section home-roadmap" aria-labelledby="roadmap-title">
+        <div className="home-heading"><span className="home-kicker">ROADMAP</span><h2 id="roadmap-title">What comes next</h2><p>Planned capabilities are clearly labelled until they pass implementation and production checks.</p></div>
+        <div className="roadmap-list">{roadmap.map((item) => <span key={item}>◌ {item}</span>)}</div>
       </section>
 
-      <section className="cta modern-cta"><h2>Build safer digital habits, one decision at a time.</h2><p>Start with a check, learn the reason, and know what to do next.</p><div className="cta-buttons"><button className="btn-large" onClick={() => navigate('/check')}>Open Safety Checker</button><button className="btn-large-outline" onClick={() => navigate('/learn')}>Explore Learning</button></div></section>
+      <section className="home-final">
+        <h2>Start with one safe decision.</h2>
+        <p>Check something suspicious or learn a safer habit.</p>
+        <div className="home-final-actions"><button type="button" onClick={() => navigate("/check")}>Open Safety Checker</button><button type="button" onClick={() => navigate("/learn")}>Explore Learning</button></div>
+      </section>
     </div>
   );
 }
