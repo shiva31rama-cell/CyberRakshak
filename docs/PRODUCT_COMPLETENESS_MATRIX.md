@@ -20,6 +20,9 @@ This document is the single source of truth for the complete CyberRakshak produc
 | AI assistant | Implemented | Defensive chatbot API with configurable provider and safe fallback |
 | Emergency help | Implemented | Safety guidance and emergency resource navigation |
 | Personalization | Implemented | Self-declared age group and language stored locally |
+| India escalation guide | Implemented | Product guidance for official cybercrime, financial-fraud and telecom-safety channels |
+| Privacy baseline | Implemented | Data minimization, secret handling, retention and AI-safety requirements documented |
+| Accessibility baseline | Implemented | Keyboard, mobile, contrast, reduced-motion and plain-language acceptance checklist |
 
 ## Safety intelligence roadmap
 
@@ -31,13 +34,22 @@ This document is the single source of truth for the complete CyberRakshak produc
 | Digital-arrest impersonation detection | Implemented | Authority/urgency indicators |
 | SIM/eSIM takeover awareness | Implemented | Telecom-risk guidance |
 | Credential/OTP theft detection | Implemented | Credential and OTP request indicators |
-| Screenshot/OCR analysis | Planned | Extract text from user-provided screenshots and analyze locally/server-side with privacy controls |
+| Screenshot/OCR analysis | Planned | Extract text from user-provided screenshots and analyze with privacy controls |
 | Voice/call analysis | Planned | Consent-based analysis of user-provided call recordings; never automatic interception |
 | Deepfake awareness | Planned | Defensive media authenticity assessment with uncertainty reporting |
 | Live threat intelligence | Planned | Server-side feeds with provenance, caching and expiry |
 | Custom ML classifier | Planned | Evaluated model trained only on legally usable data |
 | Real-time alerts | Planned | WebSocket/event delivery for opted-in security events |
 | Flutter mobile client | Planned | Reuse the same API/security contract |
+
+## Realtime foundation
+
+| Area | Status | Capability |
+|---|---|---|
+| Event envelope | Implemented | Versioned event IDs, timestamps, actors and derived data |
+| Event safety rules | Implemented | No secrets; authorization and duplicate-tolerance requirements |
+| Browser realtime delivery | Planned | WebSockets/Socket.IO or equivalent after backend/database migration |
+| Durable event replay | Planned | Persisted event stream for audit/replay requirements |
 
 ## AI/ML safety requirements
 
@@ -93,5 +105,9 @@ A capability is considered production-ready only after:
 - CI passes
 - deployment configuration is documented
 - user-facing uncertainty/limitations are clear
+
+## Release gate
+
+Before merging a major upgrade to `main`, verify frontend lint/build, backend tests, dependency/security review, deployment configuration, API contracts, official-resource links, accessibility checks and all user-facing capability claims.
 
 This matrix deliberately distinguishes implemented functionality from validated future work. That distinction is part of CyberRakshak's safety and engineering quality.
