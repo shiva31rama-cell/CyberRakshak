@@ -1,48 +1,120 @@
 # CyberRakshak — Easy Guide
 
-This file is the quick reference for understanding and changing the project.
+This is the quick reference for understanding, running and changing the project without needing to remember the whole codebase.
 
-## What is CyberRakshak?
+## 1. What is CyberRakshak?
 
-CyberRakshak is a cyber-safety companion. A person can check something suspicious, understand the warning signs, take safer action, report an incident and learn from it.
+CyberRakshak is a cyber-safety and digital-literacy companion. A person can check something suspicious, understand warning signs, take a safer action, report an incident and learn from it.
 
-## The product idea
+The product principle is:
 
 `Check → Understand → Act → Report → Learn`
 
-## Why it is advanced
+## 2. Why the project is advanced
 
-The important part is not adding the most buttons. The advanced part is connecting several useful layers safely:
+The goal is not to make the screen complicated. The advanced part is the connection between multiple safe systems:
 
-- explainable safety analysis
-- India-specific scam scenarios
-- learning and quizzes
-- incident guidance and reporting
+- explainable scam/risk analysis
+- India-specific cyber-safety journeys
+- visual education with one focused image per core topic
+- official awareness-media links
+- quizzes and learning reinforcement
+- incident-response guidance
+- reporting and case tracking
 - administrative review
-- defensive AI assistance
-- privacy-aware design
-- a planned ML and realtime path
+- conversational AI Safety Copilot
+- privacy and accessibility rules
+- automated CI and scheduled maintenance
+- a planned PostgreSQL + realtime architecture
+- a planned ML/multimodal path with explicit safety gates
 
-## Why the UI is intentionally simple
+## 3. Why the UI is intentionally simple
 
-A person who is worried about a scam should not have to understand a dashboard. The screen should answer one question and present one main action.
+A worried user should not see every feature at once. Each page answers one main question and has one dominant action.
 
-That is why the navbar shows only the most important destinations. Secondary pages are under **More**, and individual routes are focused instead of putting everything on the home page.
+The navbar therefore exposes only the most important destinations. Secondary pages are under **More**. Learning and emergency journeys are split into focused pages rather than one giant dashboard.
 
-## Where to change things
+## 4. AI Safety Copilot
+
+The chatbot is now a product surface, not a decorative widget.
+
+### Current flow
+
+`React Copilot → /api/chat → Gemini free tier → OpenRouter free fallback → deterministic fallback`
+
+Provider credentials stay on the backend.
+
+### AI environment values
+
+In `backend/.env`:
+
+```text
+AI_PROVIDER=auto
+GEMINI_API_KEY=your-own-key
+GEMINI_MODEL=gemini-3.1-flash-lite
+OPENROUTER_API_KEY=optional-own-key
+OPENROUTER_MODEL=openrouter/free
+```
+
+Never paste a real API key into GitHub, frontend code or this guide.
+
+### AI features
+
+- multi-turn conversation
+- English/Telugu/Hindi selection
+- age-aware context
+- guided safety tools
+- learn mode
+- privacy mode
+- incident-response path
+- quiz mode
+- copy/regenerate
+- local conversation persistence
+- provider fallback
+
+The design intentionally keeps privileged operations in application code instead of giving the model unrestricted agency.
+
+See `docs/AI_CHATBOT_ARCHITECTURE.md` for the detailed workflow.
+
+## 5. Visual education foundation
+
+Each core learning card has one clear visual illustration. The detailed lesson remains on its own page so the learning center is not overloaded.
+
+Current core topics include:
+
+- Digital literacy
+- Password security
+- UPI/payment safety
+- Social media safety
+- Phishing/smishing
+- Device/app safety
+
+Expansion tracks cover AI/deepfake awareness, health/medical scam safety and human/online-abuse safety. Sensitive abuse topics are handled only through age-appropriate prevention, privacy and reporting guidance.
+
+Official awareness material is kept separate and labelled as external source material.
+
+## 6. Where to change things
 
 ### Frontend
 
-- `frontend/src/App.jsx` — routes and application structure
-- `frontend/src/App.css` — global design tokens and accessibility defaults
+- `frontend/src/App.jsx` — routes
+- `frontend/src/App.css` — global design
 - `frontend/src/components/Navbar/Navbar.jsx` — main navigation
-- `frontend/src/components/PageShell/PageShell.jsx` — shared page title/purpose framing
-- `frontend/src/pages/*` — individual features
+- `frontend/src/components/PageShell/PageShell.jsx` — common page frame
+- `frontend/src/components/Chatbot/Chatbot.jsx` — AI Copilot behavior/UI
+- `frontend/src/components/Chatbot/Chatbot.css` — AI Copilot styling
+- `frontend/src/services/chatService.js` — frontend AI API client
+- `frontend/src/pages/Learn/Learn.jsx` — visual learning center
+- `frontend/src/pages/Learn/Learn.css` — learning center design
+- `frontend/src/pages/*` — individual feature pages
+- `frontend/public/education/*` — one illustration per learning topic
 
 ### Backend
 
 - `backend/server.js` — Express application and API registration
-- `backend/routes/*` — API routes
+- `backend/routes/chat.js` — conversational AI endpoint
+- `backend/services/chatService.js` — provider routing, AI prompt, fallback logic
+- `backend/routes/*` — other API endpoints
 - `backend/controllers/*` — request handling
 - `backend/services/riskEngine.js` — explainable safety logic
 - `backend/models/*` — current database models
@@ -53,17 +125,7 @@ That is why the navbar shows only the most important destinations. Secondary pag
 - `ml/` — ML research foundation
 - `docs/DATASET_CATALOG.md` — dataset research
 
-### Documentation
-
-- `docs/DEVELOPMENT_GUIDE.md` — day-to-day development
-- `docs/UI_UX_SYSTEM.md` — UI rules
-- `docs/PRODUCT_COMPLETENESS_MATRIX.md` — full capability status
-- `docs/PRIVACY_AND_DATA_SAFETY.md` — privacy rules
-- `docs/INDIA_SAFETY_RESOURCES.md` — India escalation guidance
-- `docs/REALTIME_EVENT_CONTRACT.md` — realtime design
-- `docs/AUTOMATION_OPERATIONS.md` — automated maintenance
-
-## How to run
+## 7. How to run
 
 ### Backend
 
@@ -83,7 +145,7 @@ copy .env.example .env
 npm run dev
 ```
 
-## How to check for bugs
+## 8. How to test before pushing
 
 ```bash
 cd backend
@@ -95,20 +157,41 @@ npm run lint
 npm run build
 ```
 
-## How GitHub helps automatically
+## 9. Git workflow
 
-Pull requests run the normal checks. Scheduled maintenance repeats them without someone remembering to start the commands. When the maintenance workflow fails, it can open or update a GitHub issue with the run link. Dependabot can propose dependency updates.
+Create a feature branch from the latest `main`, make one logical change at a time, run the checks, then open a pull request.
+
+Do not push secrets or `.env` files.
+
+## 10. Automated maintenance
+
+GitHub Actions runs frontend lint/build and backend syntax/tests on pull requests and pushes to `main`.
+
+The scheduled maintenance workflow repeats the checks automatically and can create/update a GitHub issue when verification fails. Dependabot can propose dependency updates.
 
 Automation should detect and report predictable problems. Security-sensitive application changes should still be reviewed before merging.
 
-## Database direction
+## 11. Database direction
 
-The current application uses MongoDB/Mongoose. PostgreSQL is the target database architecture. Realtime features should be added after that migration is validated.
+The current application uses MongoDB/Mongoose. PostgreSQL is the target architecture. Realtime browser delivery should be implemented after the database migration is validated.
 
-## Important rule for every future change
+## 12. Common bug checklist
 
-Do not add a feature just because there is space on a page. Add it only when it improves a real user journey, then place it in the smallest sensible screen.
+When something breaks:
 
-## Project mindset
+1. Check the browser console.
+2. Check the backend terminal.
+3. Run `node -c server.js`.
+4. Run `npm test` in backend.
+5. Run `npm run lint` and `npm run build` in frontend.
+6. Confirm API URLs and environment variables.
+7. Check the newest GitHub Actions run.
+8. Read the failure before changing code.
 
-Build CyberRakshak as a product that is **simple for the user, explainable in its decisions, structured for developers and honest about what is still being built**.
+## 13. The rule for future additions
+
+Do not add a feature only because the page has space. Add it because it solves a real safety or learning problem, then put it in the smallest sensible screen.
+
+## 14. Product mindset
+
+Build CyberRakshak as a product that is **simple for the user, visual enough to teach, explainable in its decisions, structured for developers, privacy-aware and honest about what is still being validated**.
