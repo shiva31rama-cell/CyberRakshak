@@ -1,266 +1,105 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Learn.css";
 
+const modules = [
+  { id: "digital", title: "Digital Literacy Basics", icon: "📱", level: "beginner", description: "Learn safe everyday habits for phones, apps, websites and online identity.", lessons: 5, duration: "30 min", link: "/digital-literacy", image: "/education/digital-basics.svg", outcome: "Recognise safer digital choices" },
+  { id: "passwords", title: "Password Security", icon: "🔐", level: "beginner", description: "Build strong account-protection habits, passkeys awareness and recovery safety.", lessons: 6, duration: "25 min", link: "/password-security", image: "/education/password-safety.svg", outcome: "Protect your accounts" },
+  { id: "payments", title: "UPI & Payment Safety", icon: "💳", level: "beginner", description: "Understand payment requests, fake support calls, QR-code tricks and refund scams.", lessons: 8, duration: "35 min", link: "/upi-safety", image: "/education/payment-safety.svg", outcome: "Pause before paying" },
+  { id: "social", title: "Social Media Safety", icon: "💬", level: "intermediate", description: "Protect your identity, account, conversations and privacy on social platforms.", lessons: 7, duration: "30 min", link: "/social-media-safety", image: "/education/social-safety.svg", outcome: "Control what you share" },
+  { id: "phishing", title: "Phishing & Smishing", icon: "🎣", level: "intermediate", description: "Learn how fake links, urgent messages and impersonation attempts work.", lessons: 6, duration: "28 min", link: "/cyber-crime-awareness", image: "/education/phishing.svg", outcome: "Spot common red flags" },
+  { id: "device", title: "Device & App Safety", icon: "📲", level: "intermediate", description: "Learn safer update, app-permission, attachment and device-lock habits.", lessons: 6, duration: "28 min", link: "/digital-literacy", image: "/education/device-safety.svg", outcome: "Reduce device risk" },
+];
+
+const tracks = [
+  { icon: "🤖", title: "AI, Deepfake & Impersonation", text: "Understand how synthetic media and AI-assisted social engineering can mislead people.", state: "Coming soon", image: "/education/ai-deepfake.svg" },
+  { icon: "🧑‍⚕️", title: "Health & Medical Scam Safety", text: "Learn how to verify medical claims, payment requests, appointments and support messages.", state: "Coming soon", image: "/education/health-safety.svg" },
+  { icon: "🧠", title: "Human & Online Abuse Safety", text: "Build privacy, consent, boundary and reporting habits for harmful online interactions.", state: "Coming soon", image: "/education/human-online-safety.svg" },
+];
+
 function Learn() {
   const navigate = useNavigate();
-  const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+  const [level, setLevel] = useState("all");
+  const [query, setQuery] = useState("");
 
-  const modules = [
-    {
-      id: 1,
-      title: "Digital Literacy Basics",
-      icon: "📱",
-      difficulty: "beginner",
-      description: "Learn the basics of digital literacy and internet safety",
-      lessons: 5,
-      duration: "30 mins",
-      link: "/digital-literacy",
-      completed: false,
-    },
-    {
-      id: 2,
-      title: "Password Security",
-      icon: "🔐",
-      difficulty: "beginner",
-      description: "Master the art of creating and managing strong passwords",
-      lessons: 6,
-      duration: "25 mins",
-      link: "/password-security",
-      completed: false,
-    },
-    {
-      id: 3,
-      title: "UPI & Payment Safety",
-      icon: "💳",
-      difficulty: "beginner",
-      description: "Secure your digital payments and understand UPI safety",
-      lessons: 8,
-      duration: "35 mins",
-      link: "/upi-safety",
-      completed: false,
-    },
-    {
-      id: 4,
-      title: "Social Media Safety",
-      icon: "💬",
-      difficulty: "intermediate",
-      description: "Stay safe while using social media platforms",
-      lessons: 7,
-      duration: "30 mins",
-      link: "/social-media-safety",
-      completed: false,
-    },
-    {
-      id: 5,
-      title: "Cyber Crime Awareness",
-      icon: "🚨",
-      difficulty: "intermediate",
-      description: "Understand common cyber crimes and how to protect yourself",
-      lessons: 6,
-      duration: "28 mins",
-      link: "/cyber-crime-awareness",
-      completed: false,
-    },
-    {
-      id: 6,
-      title: "Emergency Response",
-      icon: "🆘",
-      difficulty: "advanced",
-      description: "Know what to do in a cyber security emergency",
-      lessons: 4,
-      duration: "20 mins",
-      link: "/emergency-help",
-      completed: false,
-    },
-  ];
-
-  const filteredModules =
-    selectedDifficulty === "all"
-      ? modules
-      : modules.filter((module) => module.difficulty === selectedDifficulty);
-
-  const completedModules = modules.filter((m) => m.completed).length;
-  const completionPercentage = Math.round(
-    (completedModules / modules.length) * 100,
-  );
-
-  const getDifficultyColor = (difficulty) => {
-    switch (difficulty) {
-      case "beginner":
-        return "#4caf50";
-      case "intermediate":
-        return "#f57c00";
-      case "advanced":
-        return "#f44336";
-      default:
-        return "#667eea";
-    }
-  };
-
-  const getDifficultyLabel = (difficulty) => {
-    return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
-  };
+  const filtered = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return modules.filter((module) => {
+      const levelMatch = level === "all" || module.level === level;
+      const queryMatch = !normalized || `${module.title} ${module.description}`.toLowerCase().includes(normalized);
+      return levelMatch && queryMatch;
+    });
+  }, [level, query]);
 
   return (
     <div className="learn-container">
-      <button className="back-button" onClick={() => navigate("/")}>
-        ← Back to Home
-      </button>
+      <section className="learn-hero">
+        <div>
+          <span className="learn-kicker">LEARN • SEE • PRACTISE</span>
+          <h1>Cyber safety should feel like learning, not reading a manual.</h1>
+          <p>Every core lesson is designed around one visual idea, one real-world scenario and one practical action. Open a topic when you are ready instead of loading everything onto one page.</p>
+        </div>
+        <div className="learn-hero-orbit" aria-hidden="true">🛡️</div>
+      </section>
 
-      {/* Header */}
-      <div className="learn-header">
-        <h1>📚 Learning Center</h1>
-        <p>Master cyber security with our comprehensive courses</p>
-      </div>
-
-      {/* Progress Section */}
-      <section className="progress-section">
-        <div className="progress-card">
-          <h3>Your Learning Progress</h3>
-          <div className="progress-stats">
-            <div className="stat">
-              <span className="stat-label">Modules Completed</span>
-              <span className="stat-value">{completedModules}</span>
-            </div>
-            <div className="stat">
-              <span className="stat-label">Total Modules</span>
-              <span className="stat-value">{modules.length}</span>
-            </div>
-            <div className="stat">
-              <span className="stat-label">Completion</span>
-              <span className="stat-value">{completionPercentage}%</span>
-            </div>
-          </div>
-
-          <div className="progress-bar-container">
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: `${completionPercentage}%` }}
-              ></div>
-            </div>
-            <p className="progress-text">
-              {completionPercentage === 100
-                ? "🎉 You've completed all modules!"
-                : `Keep learning! ${modules.length - completedModules} modules remaining`}
-            </p>
+      <section className="learning-command" aria-label="Learning controls">
+        <div>
+          <label htmlFor="learning-search">Find a lesson</label>
+          <input id="learning-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search phishing, UPI, passwords…" />
+        </div>
+        <div>
+          <span className="filter-label">Level</span>
+          <div className="level-tabs" role="tablist" aria-label="Filter learning level">
+            {["all", "beginner", "intermediate"].map((item) => (
+              <button key={item} type="button" className={level === item ? "active" : ""} onClick={() => setLevel(item)}>{item === "all" ? "All" : item[0].toUpperCase() + item.slice(1)}</button>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="filter-section">
-        <h3>Filter by Level</h3>
-        <div className="filter-buttons">
-          <button
-            className={`filter-btn ${selectedDifficulty === "all" ? "active" : ""}`}
-            onClick={() => setSelectedDifficulty("all")}
-          >
-            All Levels ({modules.length})
-          </button>
-          <button
-            className={`filter-btn ${
-              selectedDifficulty === "beginner" ? "active" : ""
-            }`}
-            onClick={() => setSelectedDifficulty("beginner")}
-          >
-            🟢 Beginner (
-            {modules.filter((m) => m.difficulty === "beginner").length})
-          </button>
-          <button
-            className={`filter-btn ${
-              selectedDifficulty === "intermediate" ? "active" : ""
-            }`}
-            onClick={() => setSelectedDifficulty("intermediate")}
-          >
-            🟡 Intermediate (
-            {modules.filter((m) => m.difficulty === "intermediate").length})
-          </button>
-          <button
-            className={`filter-btn ${
-              selectedDifficulty === "advanced" ? "active" : ""
-            }`}
-            onClick={() => setSelectedDifficulty("advanced")}
-          >
-            🔴 Advanced (
-            {modules.filter((m) => m.difficulty === "advanced").length})
-          </button>
+      <section className="learn-section">
+        <div className="section-title-row">
+          <div><span className="learn-kicker">CORE PATH</span><h2>Start with the skills you use every day</h2></div>
+          <span className="result-count">{filtered.length} lessons paths</span>
         </div>
-      </section>
 
-      {/* Modules Grid */}
-      <section className="modules-section">
-        <div className="modules-grid">
-          {filteredModules.map((module) => (
-            <div
-              key={module.id}
-              className="module-card"
-              onClick={() => navigate(module.link)}
-            >
-              <div className="module-header">
-                <span className="module-icon">{module.icon}</span>
-                <span
-                  className="module-difficulty"
-                  style={{
-                    backgroundColor: getDifficultyColor(module.difficulty),
-                  }}
-                >
-                  {getDifficultyLabel(module.difficulty)}
-                </span>
+        <div className="learning-grid">
+          {filtered.map((module) => (
+            <article className="learning-card" key={module.id}>
+              <img src={module.image} alt="" className="learning-image" loading="lazy" />
+              <div className="learning-card-body">
+                <div className="learning-card-top"><span className="learning-icon">{module.icon}</span><span className={`level-pill ${module.level}`}>{module.level}</span></div>
+                <h3>{module.title}</h3>
+                <p>{module.description}</p>
+                <div className="learning-outcome"><strong>🎯 Takeaway</strong><span>{module.outcome}</span></div>
+                <div className="learning-meta"><span>📖 {module.lessons} lessons</span><span>⏱️ {module.duration}</span></div>
+                <button type="button" onClick={() => navigate(module.link)} className="learning-open">Open lesson <span>→</span></button>
               </div>
-
-              <h3>{module.title}</h3>
-              <p className="module-description">{module.description}</p>
-
-              <div className="module-meta">
-                <span className="meta-item">📖 {module.lessons} Lessons</span>
-                <span className="meta-item">⏱️ {module.duration}</span>
-              </div>
-
-              {module.completed && (
-                <div className="completion-badge">✅ Completed</div>
-              )}
-
-              <button className="module-btn">Start Learning</button>
-            </div>
+            </article>
           ))}
         </div>
 
-        {filteredModules.length === 0 && (
-          <div className="no-modules">
-            <p>No modules found for selected level</p>
-          </div>
-        )}
+        {filtered.length === 0 && <div className="empty-learning"><strong>No matching lesson.</strong><span>Try another word or choose All.</span></div>}
       </section>
 
-      {/* Tips Section */}
-      <section className="tips-section">
-        <h2>💡 Learning Tips</h2>
-        <div className="tips-grid">
-          <div className="tip-card">
-            <span className="tip-icon">📖</span>
-            <h4>Read Carefully</h4>
-            <p>Take your time to read and understand each lesson thoroughly</p>
+      <section className="learning-media">
+        <div className="media-copy">
+          <span className="learn-kicker">SEE IT IN ACTION</span>
+          <h2>Videos, booklets and official awareness material</h2>
+          <p>Some topics are easier to understand by seeing the warning signs. We keep official external media separate from CyberRakshak's own explanations so the source is clear.</p>
+          <div className="media-actions">
+            <a href="https://www.cert-in.org.in/s2cMainServlet?pageid=digitalpayment" target="_blank" rel="noreferrer">▶ Digital Payment awareness</a>
+            <a href="https://cert-in.org.in/AwarenessBooklets.jsp" target="_blank" rel="noreferrer">📘 CERT-In awareness booklets</a>
+            <a href="https://cybercrime.gov.in/" target="_blank" rel="noreferrer">🇮🇳 I4C cyber awareness</a>
           </div>
+        </div>
+        <div className="media-preview" aria-hidden="true"><div className="play-button">▶</div><span>Visual learning layer</span></div>
+      </section>
 
-          <div className="tip-card">
-            <span className="tip-icon">✏️</span>
-            <h4>Take Notes</h4>
-            <p>Write down important points to help you remember better</p>
-          </div>
-
-          <div className="tip-card">
-            <span className="tip-icon">🎯</span>
-            <h4>Complete Quizzes</h4>
-            <p>Test your knowledge with quizzes to reinforce learning</p>
-          </div>
-
-          <div className="tip-card">
-            <span className="tip-icon">🔄</span>
-            <h4>Review Regularly</h4>
-            <p>Revisit modules to refresh your memory and stay updated</p>
-          </div>
+      <section className="learn-section">
+        <div className="section-title-row"><div><span className="learn-kicker">EXPANSION TRACKS</span><h2>More domains we are building carefully</h2></div><span className="result-count">Validated before release</span></div>
+        <div className="track-grid">
+          {tracks.map((track) => <article className="track-card" key={track.title}><img src={track.image} alt="" loading="lazy" /><div><span>{track.icon}</span><h3>{track.title}</h3><p>{track.text}</p><small>{track.state}</small></div></article>)}
         </div>
       </section>
     </div>
