@@ -1,252 +1,192 @@
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./EmergencyHelp.css";
+
+const emergencyContacts = [
+  {
+    key: "cyber",
+    title: "Cyber Crime Helpline",
+    number: "1930",
+    href: "tel:1930",
+    description: "For cyber financial fraud and cyber-crime reporting assistance.",
+    icon: "🛡️",
+    primary: true,
+  },
+  {
+    key: "police",
+    title: "Emergency Services",
+    number: "112",
+    href: "tel:112",
+    description: "Unified emergency response number for urgent situations in India.",
+    icon: "🚨",
+    primary: true,
+  },
+  {
+    key: "women",
+    title: "Women Helpline",
+    number: "181",
+    href: "tel:181",
+    description: "National women helpline listed by the Government of India.",
+    icon: "🤝",
+  },
+  {
+    key: "ambulance",
+    title: "Ambulance / Medical",
+    number: "102",
+    href: "tel:102",
+    description: "National ambulance service.",
+    icon: "🏥",
+  },
+  {
+    key: "fire",
+    title: "Fire Emergency",
+    number: "101",
+    href: "tel:101",
+    description: "Fire and rescue emergency line.",
+    icon: "🚒",
+  },
+];
 
 function EmergencyHelp() {
   const navigate = useNavigate();
-
-  const emergencyContacts = [
-    {
-      title: "Cyber Crime Helpline",
-      number: "1930",
-      description: "Report cyber crimes and get assistance from authorities",
-      icon: "📱",
-    },
-    {
-      title: "Police Emergency",
-      number: "100",
-      description: "General emergency services and crime reporting",
-      icon: "🚔",
-    },
-    {
-      title: "Women's Helpline",
-      number: "1091",
-      description: "Support for women facing harassment or abuse",
-      icon: "👩",
-    },
-    {
-      title: "Ambulance/Medical",
-      number: "102",
-      description: "Medical emergencies and ambulance services",
-      icon: "🚑",
-    },
-    {
-      title: "Fire Emergency",
-      number: "101",
-      description: "Fire department and firefighting services",
-      icon: "🚒",
-    },
-    {
-      title: "RBI Cyber Fraud",
-      number: "https://cybercrime.gov.in",
-      description: "Report cyber fraud to RBI and authorities",
-      icon: "🏦",
-    },
-  ];
+  const { t } = useLanguage();
 
   const quickActions = [
     {
-      title: "Report a Scam",
-      description: "Document and report fraudulent activities",
-      icon: "⚠️",
+      title: t("report"),
+      description: "Record what happened and review the official reporting path.",
+      icon: "📝",
       action: () => navigate("/report-scam"),
     },
     {
-      title: "Contact Authorities",
-      description: "File a formal complaint with cyber police",
-      icon: "📋",
-      action: () => {
-        window.open("https://cybercrime.gov.in", "_blank");
-      },
+      title: "National Cyber Crime Portal",
+      description: "Open the official Government of India cyber-crime reporting portal.",
+      icon: "🇮🇳",
+      href: "https://cybercrime.gov.in/",
     },
     {
-      title: "Bank Support",
-      description: "Contact your bank for compromised accounts",
-      icon: "🏦",
-      action: () => alert("Call your bank's customer service number"),
+      title: "Payment Safety",
+      description: "Review what to do when a payment, UPI or account is at risk.",
+      icon: "💳",
+      action: () => navigate("/upi-safety"),
     },
     {
-      title: "Learn Prevention",
-      description: "Learn how to prevent cyber crimes",
+      title: t("learn"),
+      description: "Learn how to recognise common scams before they cause harm.",
       icon: "📚",
       action: () => navigate("/learn"),
     },
   ];
 
   const stepsTake = [
-    {
-      number: 1,
-      title: "Stop the Activity",
-      description:
-        "Disconnect from the internet if you suspect an ongoing breach",
-    },
-    {
-      number: 2,
-      title: "Document Everything",
-      description: "Take screenshots of scam messages, emails, or websites",
-    },
-    {
-      number: 3,
-      title: "Change Passwords",
-      description: "Change passwords on all affected accounts immediately",
-    },
-    {
-      number: 4,
-      title: "Contact Your Bank",
-      description: "Inform your bank if financial accounts are compromised",
-    },
-    {
-      number: 5,
-      title: "File a Report",
-      description: "Report to cyber police and keep the case number",
-    },
-    {
-      number: 6,
-      title: "Monitor Accounts",
-      description: "Keep a close eye on your accounts for suspicious activity",
-    },
+    ["1", "Pause", "Stop replying, paying or following instructions until the claim is verified."],
+    ["2", "Protect accounts", "Change affected passwords and secure important accounts from a trusted device."],
+    ["3", "Contact your bank", "For a financial incident, use your bank's official app, website or verified support number."],
+    ["4", "Report quickly", "For financial cyber fraud, call 1930 and use the official cybercrime portal as appropriate."],
+    ["5", "Keep evidence", "Save messages, transaction references, phone numbers, URLs and timestamps needed for a complaint."],
+    ["6", "Monitor", "Watch the affected account, SIM and payment activity for further suspicious changes."],
   ];
 
   return (
     <div className="emergency-container">
-      <div className="emergency-header">
-        <h1>🚨 Emergency Help</h1>
-        <p>Get immediate assistance if you're a victim of cyber crime</p>
-      </div>
+      <section className="emergency-header">
+        <div className="emergency-header-icon" aria-hidden="true">🆘</div>
+        <div>
+          <span className="emergency-kicker">CYBERRAKSHAK • {t("emergency")}</span>
+          <h1>{t("needHelp")}</h1>
+          <p>Use the actions below to reach the right official channel without hunting through the internet.</p>
+        </div>
+      </section>
 
       <div className="emergency-content">
-        {/* Quick Actions */}
+        <section className="emergency-priority" aria-label="Priority help">
+          <div>
+            <span className="emergency-kicker">START HERE</span>
+            <h2>Need immediate help?</h2>
+            <p>For cyber financial fraud, contact 1930 as soon as possible. For an immediate emergency, use 112.</p>
+          </div>
+          <div className="priority-actions">
+            <a className="priority-button primary" href="tel:1930"><span>📞</span><span><strong>1930</strong><small>{t("callNow")}</small></span></a>
+            <a className="priority-button secondary" href="tel:112"><span>🚨</span><span><strong>112</strong><small>{t("callNow")}</small></span></a>
+          </div>
+        </section>
+
         <section className="quick-actions-section">
-          <h2>Quick Actions</h2>
+          <div className="section-heading">
+            <span className="emergency-kicker">QUICK ACTIONS</span>
+            <h2>Take the right next step</h2>
+          </div>
           <div className="quick-actions-grid">
-            {quickActions.map((action, index) => (
-              <button
-                key={index}
-                className="quick-action-btn"
-                onClick={action.action}
-              >
-                <span className="action-icon">{action.icon}</span>
-                <h3>{action.title}</h3>
-                <p>{action.description}</p>
+            {quickActions.map((item) => item.href ? (
+              <a key={item.title} className="quick-action-card" href={item.href} target="_blank" rel="noopener noreferrer">
+                <span className="action-icon" aria-hidden="true">{item.icon}</span>
+                <strong>{item.title}</strong>
+                <p>{item.description}</p>
+                <span className="action-link">Open official site →</span>
+              </a>
+            ) : (
+              <button key={item.title} type="button" className="quick-action-card" onClick={item.action}>
+                <span className="action-icon" aria-hidden="true">{item.icon}</span>
+                <strong>{item.title}</strong>
+                <p>{item.description}</p>
+                <span className="action-link">Continue →</span>
               </button>
             ))}
           </div>
         </section>
 
-        {/* Emergency Contacts */}
         <section className="emergency-contacts-section">
-          <h2>📞 Emergency Contacts</h2>
+          <div className="section-heading">
+            <span className="emergency-kicker">{t("emergencyContacts")}</span>
+            <h2>Tap a number to call</h2>
+            <p>Phone actions use the device dialer on supported phones. On desktop, your operating system or calling app may handle the action.</p>
+          </div>
           <div className="contacts-grid">
-            {emergencyContacts.map((contact, index) => (
-              <div key={index} className="contact-card">
-                <span className="contact-icon">{contact.icon}</span>
+            {emergencyContacts.map((contact) => (
+              <article key={contact.key} className={`contact-card ${contact.primary ? "primary-contact" : ""}`}>
+                <div className="contact-top"><span className="contact-icon" aria-hidden="true">{contact.icon}</span>{contact.primary ? <span className="priority-pill">Priority</span> : null}</div>
                 <h3>{contact.title}</h3>
                 <p className="contact-desc">{contact.description}</p>
-                <p className="contact-number">
-                  {contact.number.startsWith("http") ? (
-                    <a
-                      href={contact.number}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {contact.number}
-                    </a>
-                  ) : (
-                    <a href={`tel:${contact.number}`}>{contact.number}</a>
-                  )}
-                </p>
-              </div>
+                <a className="contact-call" href={contact.href}><span>{contact.number}</span><span>↗</span></a>
+              </article>
             ))}
           </div>
         </section>
 
-        {/* Steps to Take */}
         <section className="steps-section">
-          <h2>📋 Steps to Take If You're a Victim</h2>
+          <div className="section-heading">
+            <span className="emergency-kicker">WHEN SOMETHING HAPPENED</span>
+            <h2>What to do next</h2>
+          </div>
           <div className="steps-grid">
-            {stepsTake.map((step, index) => (
-              <div key={index} className="step-card">
-                <div className="step-number">{step.number}</div>
-                <h3>{step.title}</h3>
-                <p>{step.description}</p>
-              </div>
+            {stepsTake.map(([number, title, description]) => (
+              <article key={number} className="step-card">
+                <span className="step-number">{number}</span>
+                <div><h3>{title}</h3><p>{description}</p></div>
+              </article>
             ))}
           </div>
         </section>
 
-        {/* Important Information */}
-        <section className="info-section">
-          <div className="info-box warning">
-            <h3>⚠️ Important Warning</h3>
-            <p>
-              <strong>Never pay money in advance</strong> to anyone claiming to
-              be from a government agency or bank. Legitimate authorities don't
-              demand payment via gift cards, cryptocurrency, or wire transfers.
-            </p>
+        <section className="official-box">
+          <div>
+            <span className="emergency-kicker">OFFICIAL SOURCES</span>
+            <h2>Use trusted government channels</h2>
+            <p>CyberRakshak guides you, but official agencies handle complaints and emergency response.</p>
           </div>
-
-          <div className="info-box tip">
-            <h3>💡 Did You Know?</h3>
-            <p>
-              Cyber criminals often impersonate government officials or police.
-              If you receive suspicious calls or messages, hang up and call the
-              official number directly from a trusted source.
-            </p>
-          </div>
-
-          <div className="info-box help">
-            <h3>🤝 Getting Help</h3>
-            <p>
-              Don't hesitate to reach out for help. Cyber crime is not your
-              fault. Contact local authorities, your bank, or NGOs that provide
-              victim support. Mental health support is also important – talk to
-              someone you trust.
-            </p>
+          <div className="official-links">
+            <a href="https://cybercrime.gov.in/" target="_blank" rel="noopener noreferrer">🇮🇳 National Cyber Crime Reporting Portal</a>
+            <a href="https://www.cert-in.org.in/" target="_blank" rel="noopener noreferrer">🛡️ CERT-In</a>
+            <a href="https://www.sancharsaathi.gov.in/" target="_blank" rel="noopener noreferrer">📱 Sanchar Saathi</a>
           </div>
         </section>
 
-        {/* Useful Resources */}
-        <section className="resources-section">
-          <h2>📚 Useful Resources</h2>
-          <div className="resources-list">
-            <a
-              href="https://cybercrime.gov.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="resource-link"
-            >
-              🌐 Indian Cyber Crime Coordination Centre
-            </a>
-            <a
-              href="https://www.ncsc.gov.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="resource-link"
-            >
-              🛡️ National Cyber Security Centre of India
-            </a>
-            <a
-              href="https://www.identitytheft.gov"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="resource-link"
-            >
-              🆔 Identity Theft Resources
-            </a>
-            <a
-              href="https://www.consumer.ftc.gov/articles/how-recognize-and-report-spam-text-messages"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="resource-link"
-            >
-              📞 How to Report Spam
-            </a>
-          </div>
+        <section className="safety-note">
+          <strong>🔐 CyberRakshak rule:</strong> We will never ask you to paste a password, OTP, UPI PIN, CVV, recovery code or authentication token into the app for safety guidance.
         </section>
       </div>
 
-      <button className="back-home-btn" onClick={() => navigate("/")}>
-        ← Back to Home
-      </button>
+      <button className="back-home-btn" type="button" onClick={() => navigate("/")}>← {t("home")}</button>
     </div>
   );
 }
