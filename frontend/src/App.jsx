@@ -4,7 +4,6 @@ import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
 import ErrorBoundary from "./components/ErrorBoundary";
 
-// Pages
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -14,9 +13,10 @@ import DigitalLiteracyQuiz from "./pages/DigitalLiteracyQuiz/DigitalLiteracyQuiz
 import EmergencyHelp from "./pages/EmergencyHelp/EmergencyHelp";
 import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
+import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import ScamAnalyzer from "./pages/ScamAnalyzer/ScamAnalyzer";
 
-// Learning Modules
 import UPISafety from "./pages/LearningModules/UPISafety";
 import CyberCrimeAwareness from "./pages/LearningModules/CyberCrimeAwareness";
 import SocialMediaSafety from "./pages/LearningModules/SocialMediaSafety";
@@ -33,6 +33,7 @@ function App() {
           <main className="app-main">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/check" element={<ScamAnalyzer />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/learn" element={<Learn />} />
@@ -45,6 +46,7 @@ function App() {
               <Route path="/emergency-help" element={<EmergencyHelp />} />
               <Route path="/report-scam" element={<ScamSolutions />} />
               <Route path="/feedback" element={<Feedback />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
