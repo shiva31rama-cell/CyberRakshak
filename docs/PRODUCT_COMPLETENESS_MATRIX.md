@@ -10,14 +10,14 @@ This is the product source of truth. Implemented capabilities are separated from
 |---|---|---|
 | Home | Implemented | Simple entry points into checking, learning, emergency help and reporting |
 | Safety Checker | Implemented | Explainable message and URL risk analysis |
-| Learning | Implemented | Cyber-safety learning modules |
+| Learning | Implemented | Visual learning center with focused modules and topic illustrations |
 | Quizzes | Implemented | Scenario-based learning checks and results |
 | Authentication | Implemented | Registration/login with role-aware access |
 | Scam reporting | Implemented | Scam submission and case workflow |
 | Case tracking | Implemented | Privacy-limited case lookup |
 | Feedback | Implemented | User feedback workflow |
 | Admin SOC | Implemented | Authorized administration of reports, analytics and feedback |
-| AI assistant | Implemented | Defensive assistant with configurable provider and fallback |
+| AI Safety Copilot | Implemented | Multi-turn defensive assistant with guided tools, multilingual context, provider fallback and local conversation persistence |
 | Emergency help | Implemented | Incident-response guidance |
 | Personalization | Implemented | Self-declared preferences stored locally |
 | Unified page template | Implemented | Shared page framing, title, purpose and accessibility entry point |
@@ -27,6 +27,22 @@ This is the product source of truth. Implemented capabilities are separated from
 | Accessibility baseline | Implemented | Mobile, keyboard, contrast, motion and plain-language checks |
 | Maintenance automation | Implemented | Scheduled verification and failure issue reporting |
 | Dependency update proposals | Implemented | Dependabot configuration for root/backend/frontend manifests |
+
+## Education foundation
+
+| Domain | Status | Current implementation |
+|---|---|---|
+| Digital literacy | Implemented | Dedicated lesson page + visual entry image |
+| Password/account safety | Implemented | Dedicated lesson page + visual entry image |
+| UPI/payment safety | Implemented | Dedicated lesson page + visual entry image |
+| Social-media safety | Implemented | Dedicated lesson page + visual entry image |
+| Phishing/smishing | Implemented | Cybercrime learning path + visual entry image |
+| Device/app safety | Implemented | Visual learning path |
+| AI/deepfake awareness | Planned | Visual expansion track; defensive and uncertainty-aware |
+| Health/medical scam safety | Planned | Visual expansion track focused on verification and privacy |
+| Human/online-abuse safety | Planned | Age-appropriate prevention, privacy and reporting guidance |
+| Official video/media library | Implemented | Clearly labelled links to official awareness media |
+| Screenshot-based visual lessons | Planned | Privacy-aware OCR/vision after security review |
 
 ## Safety intelligence roadmap
 
@@ -46,15 +62,6 @@ This is the product source of truth. Implemented capabilities are separated from
 | Real-time alerts | Planned | Authorized event delivery for opted-in users |
 | Flutter mobile client | Planned | Reuse the API/security contract |
 
-## Realtime foundation
-
-| Area | Status | Capability |
-|---|---|---|
-| Event envelope | Implemented | Versioned event IDs, timestamps and actors |
-| Event safety | Implemented | No secrets and explicit authorization requirements |
-| Browser realtime delivery | Planned | WebSockets/Socket.IO after database/backend migration |
-| Durable replay | Planned | Persisted event stream where audit/replay is required |
-
 ## AI/ML safety requirements
 
 1. Never expose API keys to the frontend.
@@ -65,6 +72,7 @@ This is the product source of truth. Implemented capabilities are separated from
 6. Report uncertainty and retain deterministic fallback behavior.
 7. Minimize data sent to external AI providers.
 8. Apply rate and input-size limits.
+9. Treat model output as advisory; application code retains control over privileged actions.
 
 ## Production gates
 
