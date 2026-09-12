@@ -17,8 +17,15 @@ export const getAuthHeaders = () => {
 
 export const apiRequest = async (path, options = {}) => {
   const controller = new AbortController();
-  const timeoutMs = Number(options.timeoutMs) > 0 ? Number(options.timeoutMs) : DEFAULT_TIMEOUT_MS;
-  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  const timeoutMs =
+    Number(options.timeoutMs) > 0
+      ? Number(options.timeoutMs)
+      : DEFAULT_TIMEOUT_MS;
+
+  const timeoutId = window.setTimeout(
+    () => controller.abort(),
+    timeoutMs
+  );
 
   const headers = {
     ...(options.body instanceof FormData
@@ -28,7 +35,8 @@ export const apiRequest = async (path, options = {}) => {
     ...(options.headers || {}),
   };
 
-  const { timeoutMs: _timeout, ...fetchOptions } = options;
+  const fetchOptions = { ...options };
+  delete fetchOptions.timeoutMs;
 
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -39,6 +47,7 @@ export const apiRequest = async (path, options = {}) => {
 
     const text = await response.text();
     let data = null;
+
     try {
       data = text ? JSON.parse(text) : null;
     } catch {
@@ -51,17 +60,28 @@ export const apiRequest = async (path, options = {}) => {
         localStorage.removeItem("user");
         window.dispatchEvent(new Event("cyberrakshak:auth-changed"));
       }
-      throw new Error(data?.message || `Request failed (${response.status})`);
+
+      throw new Error(
+        data?.message || `Request failed (${response.status})`
+      );
     }
 
     return data;
   } catch (error) {
     if (error?.name === "AbortError") {
-      throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)} seconds`);
+      throw new Error(
+        `Request timed out after ${Math.round(timeoutMs / 1000)} seconds`,
+        { cause: error }
+      );
     }
+
     if (error instanceof TypeError) {
-      throw new Error("Unable to reach the CyberRakshak server. Check your connection and try again.");
+      throw new Error(
+        "Unable to reach the CyberRakshak server. Check your connection and try again.",
+        { cause: error }
+      );
     }
+
     throw error;
   } finally {
     window.clearTimeout(timeoutId);
