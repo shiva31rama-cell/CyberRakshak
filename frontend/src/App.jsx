@@ -3,8 +3,9 @@ import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
 import ErrorBoundary from "./components/ErrorBoundary";
+import PageShell from "./components/PageShell/PageShell";
+import { LanguageProvider } from "./i18n/LanguageContext";
 
-// Pages
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -14,9 +15,12 @@ import DigitalLiteracyQuiz from "./pages/DigitalLiteracyQuiz/DigitalLiteracyQuiz
 import EmergencyHelp from "./pages/EmergencyHelp/EmergencyHelp";
 import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
+import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import ScamAnalyzer from "./pages/ScamAnalyzer/ScamAnalyzer";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
-// Learning Modules
 import UPISafety from "./pages/LearningModules/UPISafety";
 import CyberCrimeAwareness from "./pages/LearningModules/CyberCrimeAwareness";
 import SocialMediaSafety from "./pages/LearningModules/SocialMediaSafety";
@@ -27,31 +31,39 @@ import "./App.css";
 function App() {
   return (
     <BrowserRouter>
-      <ErrorBoundary>
-        <div className="app">
-          <Navbar />
-          <main className="app-main">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/learn" element={<Learn />} />
-              <Route path="/digital-literacy" element={<DigitalLiteracy />} />
-              <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
-              <Route path="/upi-safety" element={<UPISafety />} />
-              <Route path="/cyber-crime-awareness" element={<CyberCrimeAwareness />} />
-              <Route path="/social-media-safety" element={<SocialMediaSafety />} />
-              <Route path="/password-security" element={<PasswordSecurity />} />
-              <Route path="/emergency-help" element={<EmergencyHelp />} />
-              <Route path="/report-scam" element={<ScamSolutions />} />
-              <Route path="/feedback" element={<Feedback />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-          <Chatbot />
-        </div>
-      </ErrorBoundary>
+      <LanguageProvider>
+        <ErrorBoundary>
+          <div className="app">
+            <Navbar />
+            <main className="app-main">
+              <PageShell>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/check" element={<ScamAnalyzer />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/learn" element={<Learn />} />
+                  <Route path="/digital-literacy" element={<DigitalLiteracy />} />
+                  <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
+                  <Route path="/upi-safety" element={<UPISafety />} />
+                  <Route path="/cyber-crime-awareness" element={<CyberCrimeAwareness />} />
+                  <Route path="/social-media-safety" element={<SocialMediaSafety />} />
+                  <Route path="/password-security" element={<PasswordSecurity />} />
+                  <Route path="/emergency-help" element={<EmergencyHelp />} />
+                  <Route path="/report-scam" element={<ScamSolutions />} />
+                  <Route path="/feedback" element={<Feedback />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </PageShell>
+            </main>
+            <Footer />
+            <Chatbot />
+          </div>
+        </ErrorBoundary>
+      </LanguageProvider>
     </BrowserRouter>
   );
 }
