@@ -9,12 +9,14 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
   const [userName, setUserName] = useState(() => getStoredUser()?.name || "");
+  const [isAdmin, setIsAdmin] = useState(() => getStoredUser()?.role === "admin");
 
   useEffect(() => {
     const syncAuth = () => {
       const user = getStoredUser();
       setIsLoggedIn(isAuthenticated());
       setUserName(user?.name || "");
+      setIsAdmin(user?.role === "admin");
     };
 
     syncAuth();
@@ -31,10 +33,11 @@ function Navbar() {
     try {
       await logout();
     } catch {
-      // The local session is cleared by authService even if the API is unavailable.
+      // Local session is cleared by authService even if the API is unavailable.
     } finally {
       setIsLoggedIn(false);
       setUserName("");
+      setIsAdmin(false);
       setIsOpen(false);
       window.dispatchEvent(new Event("cyberrakshak:auth-changed"));
       navigate("/");
@@ -61,6 +64,7 @@ function Navbar() {
           <button className={`nav-link ${location.pathname === "/emergency-help" ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>Emergency</button>
           <button className={`nav-link ${location.pathname === "/report-scam" ? "active" : ""}`} onClick={() => handleNavClick("/report-scam")}>Report Scam</button>
           <button className={`nav-link ${location.pathname === "/feedback" ? "active" : ""}`} onClick={() => handleNavClick("/feedback")}>Feedback</button>
+          {isAdmin && <button className={`nav-link ${location.pathname === "/admin" ? "active" : ""}`} onClick={() => handleNavClick("/admin")}>Admin</button>}
 
           {isLoggedIn ? (
             <div className="user-menu">

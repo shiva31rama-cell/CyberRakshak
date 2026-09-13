@@ -19,23 +19,30 @@ const scamReportSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide reporter name"],
       trim: true,
+      maxlength: [100, "Reporter name cannot exceed 100 characters"],
     },
     reporterPhone: {
       type: String,
       required: false,
       trim: true,
+      maxlength: [25, "Reporter phone cannot exceed 25 characters"],
     },
     scamType: {
       type: String,
       enum: [
-        "phishing",
-        "fake-job",
-        "romance-scam",
-        "investment-fraud",
-        "upi-fraud",
-        "sms-scam",
-        "call-fraud",
-        "other",
+        "UPI Fraud",
+        "Fake Call/SMS",
+        "Online Shopping Fraud",
+        "Job Scam",
+        "Dating Scam",
+        "Investment Fraud",
+        "Phishing",
+        "Tech Support Scam",
+        "Prize/Lottery Scam",
+        "Government Impersonation",
+        "Banking Fraud",
+        "Insurance Scam",
+        "Other",
       ],
       required: [true, "Please select a scam type"],
     },
@@ -44,10 +51,12 @@ const scamReportSchema = new mongoose.Schema(
       required: [true, "Please provide scam description"],
       minlength: 20,
       maxlength: 2000,
+      trim: true,
     },
     suspectDetails: {
       type: String,
       trim: true,
+      maxlength: 1000,
     },
     amountLost: {
       type: Number,
@@ -73,10 +82,12 @@ const scamReportSchema = new mongoose.Schema(
       type: String,
       unique: true,
       sparse: true,
+      index: true,
     },
     reportedAt: {
       type: Date,
       default: Date.now,
+      index: true,
     },
   },
   {
@@ -84,7 +95,6 @@ const scamReportSchema = new mongoose.Schema(
   }
 );
 
-// Generate case number before saving
 scamReportSchema.pre("save", async function (next) {
   if (!this.caseNumber) {
     const count = await mongoose.model("ScamReport").countDocuments();
