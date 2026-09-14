@@ -28,9 +28,19 @@ const authLimiter = rateLimit({
   message: { success: false, message: "Too many authentication requests. Please try again later." },
 });
 
+const chatLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 60,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many chat requests. Please try again later." },
+});
+
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
+app.use("/api/chat", chatLimiter);
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/chat", require("./routes/chat"));
 app.use("/api/quiz", require("./routes/quiz"));
 app.use("/api/feedback", require("./routes/feedback"));
 app.use("/api/scam-report", require("./routes/scamReport"));
