@@ -12,6 +12,7 @@ import android.widget.TextView
 class MainActivity : Activity() {
     private lateinit var status: TextView
     private lateinit var latest: TextView
+    private var latestSnapshot: WarningStore.Snapshot? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,21 +47,24 @@ class MainActivity : Activity() {
             text = "Open notification access settings"
             setOnClickListener { startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }
         }
+        val shareButton = Button(this).apply {
+            text = "Share latest safety signal"
+            setOnClickListener { shareLatestSignal() }
+        }
 
         root.addView(title)
         root.addView(description)
         root.addView(status)
         root.addView(latest)
         root.addView(settingsButton)
+        root.addView(shareButton)
         setContentView(root)
     }
 
     private fun refreshState() {
         status.text = "Protection works only after you explicitly enable Notification Access in Android settings."
-        val snapshot = WarningStore.latest(this)
-        latest.text = if (snapshot == null) {
-            "No safety warning has been recorded on this device yet."
-        } else {
+        latestSnapshot = WarningStore.latest(this)
+        latest.text = latestSnapshot?.let { snapshot ->
             buildString {
                 append("Latest local safety signal: ${snapshot.level.uppercase()} (${snapshot.score}/100)\n")
                 append("From: ${snapshot.packageName}\n")
@@ -68,6 +72,23 @@ class MainActivity : Activity() {
                 append("Detected: ${WarningStore.ageLabel(snapshot)}\n")
                 snapshot.reasons.take(4).forEach { append("• $it\n") }
             }
+        } ?: "No safety warning has been recorded on this device yet."
+    }
+
+    private fun shareLatestSignal() {
+        val snapshot = latestSnapshot ?: return
+        val shareText = buildString {
+            append("CyberRakshak safety signal\n")
+            append("Risk: ${snapshot.level.uppercase()} (${snapshot.score}/100)\n")
+            append("Source app: ${snapshot.packageName}\n")
+            if (snapshot.title.isNotBlank()) append("Notification title: ${snapshot.title}\n")
+            append("Reasons:\n")
+            snapshot.reasons.take(4).forEach { append("- $it\n") }
+            append("\nThis is a local safety signal, not proof that the message is malicious. Check the original content separately in CyberRakshak.")
         }
+        startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
+        }, "Share safety signal"))
     }
 }
