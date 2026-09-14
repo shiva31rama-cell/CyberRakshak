@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: cyberrakshak-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://cyberrakshak-web.onrender.com
+      - key: APP_PUBLIC_URL
+        value: https://cyberrakshak-web.onrender.com
+      - key: AI_API_URL
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_MODEL
+        value: openrouter/free
+
+  - type: web
+    name: cyberrakshak-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    autoDeployTrigger: checksPass
+    pullRequestPreviewsEnabled: true
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://cyberrakshak-api.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
