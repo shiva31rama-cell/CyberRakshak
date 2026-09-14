@@ -28,22 +28,44 @@ const authLimiter = rateLimit({
   message: { success: false, message: "Too many authentication requests. Please try again later." },
 });
 
+const analysisLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many analysis requests. Please try again shortly." },
+});
+
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/quiz", require("./routes/quiz"));
 app.use("/api/feedback", require("./routes/feedback"));
 app.use("/api/scam-report", require("./routes/scamReport"));
+app.use("/api/analyze", analysisLimiter, require("./routes/analyze"));
 
-app.get("/", (req, res) => res.json({ success: true, message: "CyberRakshak Backend Running Successfully 🚀", version: "1.1.0" }));
-app.get("/health", (req, res) => res.json({ success: true, status: "ok", service: "CyberRakshak API" }));
+app.get("/", (req, res) => res.json({
+  success: true,
+  message: "CyberRakshak Backend Running Successfully 🚀",
+  version: "2.0.0",
+}));
+
+app.get("/health", (req, res) => res.json({
+  success: true,
+  status: "ok",
+  service: "CyberRakshak API",
+  version: "2.0.0",
+}));
 
 app.use((req, res) => res.status(404).json({ success: false, message: "Route not found" }));
 app.use((err, req, res, next) => {
   console.error(err);
   if (res.headersSent) return next(err);
   const status = err.status || err.statusCode || 500;
-  res.status(status).json({ success: false, message: status >= 500 ? "Internal server error" : err.message });
+  res.status(status).json({
+    success: false,
+    message: status >= 500 ? "Internal server error" : err.message,
+  });
 });
 
 const start = async () => {
