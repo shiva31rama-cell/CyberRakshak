@@ -12,6 +12,17 @@ const formatEvidenceMatches = (item) => {
   return [...indicators, ...signals];
 };
 
+const recoveryScenarioFor = (assessment) => {
+  const categories = new Set(assessment?.categories || []);
+  if (categories.has("payment_fraud") || categories.has("upi_fraud")) return "paid";
+  if (categories.has("malicious_app")) return "installed";
+  if (categories.has("account_takeover")) return "account";
+  if (categories.has("malicious_attachment")) return "clicked";
+  if (categories.has("phishing") || categories.has("malicious_link")) return "clicked";
+  if (assessment?.riskLevel === "critical" || assessment?.riskLevel === "high") return "message";
+  return "message";
+};
+
 function CheckCenter() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -46,6 +57,20 @@ function CheckCenter() {
   const level = assessment?.riskLevel || "info";
   const [headline, explanation] = copy.risk[level] || copy.risk.info;
 
+  const openRecovery = () => {
+    navigate("/incidents", {
+      state: {
+        suggestedScenario: recoveryScenarioFor(assessment),
+        assessmentSummary: assessment ? {
+          riskLevel: assessment.riskLevel,
+          score: assessment.score,
+          categories: assessment.categories,
+          evidenceCount: assessment.evidence?.length || 0,
+        } : null,
+      },
+    });
+  };
+
   return (
     <div className="check-center">
       <header className="check-header">
@@ -76,7 +101,7 @@ function CheckCenter() {
               const matches = formatEvidenceMatches(item);
               return <article key={item.threatId || item.title}><strong>{item.title}</strong><small>{String(item.severity || "info").toUpperCase()} • {item.confidence ?? 0}% confidence</small>{matches.length > 0 && <div className="indicator-list">{matches.map((match) => <span key={match}>{match}</span>)}</div>}</article>;
             })}</div>}
-            <div className="next-actions"><span className="result-label">{copy.next}</span><p>{assessment.recommendation || assessment.actionPlan?.steps?.[0] || "Pause and verify the request through an independent official channel."}</p><button type="button" onClick={() => navigate("/incidents")}>{copy.incident}</button></div>
+            <div className="next-actions"><span className="result-label">{copy.next}</span><p>{assessment.recommendation || assessment.actionPlan?.steps?.[0] || "Pause and verify the request through an independent official channel."}</p><button type="button" onClick={openRecovery}>{copy.incident}</button></div>
           </>}
         </aside>
       </main>
