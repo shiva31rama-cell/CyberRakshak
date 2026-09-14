@@ -10,7 +10,6 @@ import ThreatRadar from "./pages/ThreatRadar/ThreatRadar";
 import ThreatIntelDashboard from "./pages/ThreatIntelDashboard/ThreatIntelDashboard";
 import MultimodalCheck from "./pages/MultimodalCheck/MultimodalCheck";
 import Learn2 from "./pages/Learn/Learn2";
-
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Learn from "./pages/Learn/Learn";
@@ -20,49 +19,50 @@ import EmergencyHelp from "./pages/EmergencyHelp/EmergencyHelp";
 import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
 import NotFound from "./pages/NotFound";
-
 import UPISafety from "./pages/LearningModules/UPISafety";
 import CyberCrimeAwareness from "./pages/LearningModules/CyberCrimeAwareness";
 import SocialMediaSafety from "./pages/LearningModules/SocialMediaSafety";
 import PasswordSecurity from "./pages/LearningModules/PasswordSecurity";
-
+import { LanguageProvider } from "./i18n/LanguageContext";
 import "./App.css";
 
 function App() {
   return (
-    <BrowserRouter>
-      <ErrorBoundary>
-        <div className="app">
-          <Navbar />
-          <main className="app-main">
-            <Routes>
-              <Route path="/" element={<SafetyHome />} />
-              <Route path="/check" element={<CheckCenter />} />
-              <Route path="/check/image" element={<MultimodalCheck />} />
-              <Route path="/threats" element={<ThreatRadar />} />
-              <Route path="/intelligence" element={<ThreatIntelDashboard />} />
-              <Route path="/incidents" element={<IncidentMode />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/learn" element={<Learn2 />} />
-              <Route path="/learn/legacy" element={<Learn />} />
-              <Route path="/digital-literacy" element={<DigitalLiteracy />} />
-              <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
-              <Route path="/upi-safety" element={<UPISafety />} />
-              <Route path="/cyber-crime-awareness" element={<CyberCrimeAwareness />} />
-              <Route path="/social-media-safety" element={<SocialMediaSafety />} />
-              <Route path="/password-security" element={<PasswordSecurity />} />
-              <Route path="/emergency-help" element={<EmergencyHelp />} />
-              <Route path="/report-scam" element={<ScamSolutions />} />
-              <Route path="/feedback" element={<Feedback />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-          <Chatbot />
-        </div>
-      </ErrorBoundary>
-    </BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
+        <ErrorBoundary>
+          <div className="app">
+            <Navbar />
+            <main className="app-main">
+              <Routes>
+                <Route path="/" element={<SafetyHome />} />
+                <Route path="/check" element={<CheckCenter />} />
+                <Route path="/check/image" element={<MultimodalCheck />} />
+                <Route path="/threats" element={<ThreatRadar />} />
+                <Route path="/intelligence" element={<ThreatIntelDashboard />} />
+                <Route path="/incidents" element={<IncidentMode />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/learn" element={<Learn2 />} />
+                <Route path="/learn/legacy" element={<Learn />} />
+                <Route path="/digital-literacy" element={<DigitalLiteracy />} />
+                <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
+                <Route path="/upi-safety" element={<UPISafety />} />
+                <Route path="/cyber-crime-awareness" element={<CyberCrimeAwareness />} />
+                <Route path="/social-media-safety" element={<SocialMediaSafety />} />
+                <Route path="/password-security" element={<PasswordSecurity />} />
+                <Route path="/emergency-help" element={<EmergencyHelp />} />
+                <Route path="/report-scam" element={<ScamSolutions />} />
+                <Route path="/feedback" element={<Feedback />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+            <Chatbot />
+          </div>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }
 
