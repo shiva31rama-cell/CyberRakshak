@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const mongoose = require("mongoose");
 
 const scamReportSchema = new mongoose.Schema(
@@ -14,16 +15,21 @@ const scamReportSchema = new mongoose.Schema(
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
         "Please provide a valid email",
       ],
+      trim: true,
+      lowercase: true,
+      maxlength: 160,
     },
     reporterName: {
       type: String,
       required: [true, "Please provide reporter name"],
       trim: true,
+      maxlength: 120,
     },
     reporterPhone: {
       type: String,
       required: false,
       trim: true,
+      maxlength: 40,
     },
     scamType: {
       type: String,
@@ -44,10 +50,12 @@ const scamReportSchema = new mongoose.Schema(
       required: [true, "Please provide scam description"],
       minlength: 20,
       maxlength: 2000,
+      trim: true,
     },
     suspectDetails: {
       type: String,
       trim: true,
+      maxlength: 2000,
     },
     amountLost: {
       type: Number,
@@ -73,6 +81,7 @@ const scamReportSchema = new mongoose.Schema(
       type: String,
       unique: true,
       sparse: true,
+      index: true,
     },
     reportedAt: {
       type: Date,
@@ -81,14 +90,13 @@ const scamReportSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-// Generate case number before saving
-scamReportSchema.pre("save", async function (next) {
+scamReportSchema.pre("save", function generateCaseNumber(next) {
   if (!this.caseNumber) {
-    const count = await mongoose.model("ScamReport").countDocuments();
-    this.caseNumber = `CASE-${Date.now()}-${count + 1}`;
+    const suffix = crypto.randomBytes(4).toString("hex").toUpperCase();
+    this.caseNumber = `CASE-${Date.now()}-${suffix}`;
   }
   next();
 });
