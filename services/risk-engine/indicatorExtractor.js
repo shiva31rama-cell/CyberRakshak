@@ -9,8 +9,7 @@ const MD5_PATTERN = /\b[a-f0-9]{32}\b/gi;
 
 const unique = (values) => [...new Set(values)];
 
-const stripTrailingPunctuation = (value) =>
-  value.replace(/[),.;!?]+$/g, "");
+const stripTrailingPunctuation = (value) => value.replace(/[),.;!?]+$/g, "");
 
 const extractIndicators = (input) => {
   const text = String(input ?? "").slice(0, 12000);
@@ -20,7 +19,9 @@ const extractIndicators = (input) => {
   const phones = unique(
     (text.match(PHONE_PATTERN) || []).map((value) => value.replace(/[\s-]/g, "")),
   );
-  const upis = unique((text.match(UPI_PATTERN) || []).map((value) => value.toLowerCase()));
+  const upis = unique((text.match(UPI_PATTERN) || [])
+    .map((value) => value.toLowerCase())
+    .filter((value) => !emails.includes(value)));
   const hashes = unique([
     ...(text.match(SHA256_PATTERN) || []).map((value) => ({ type: "sha256", value })),
     ...(text.match(SHA1_PATTERN) || []).map((value) => ({ type: "sha1", value })),
@@ -31,7 +32,11 @@ const extractIndicators = (input) => {
   for (const value of emails) indicators.push({ type: "email", value });
   for (const value of phones) indicators.push({ type: "phone", value });
   for (const value of upis) indicators.push({ type: "upi", value });
-  for (const value of hashes) indicators.push({ type: "hash", value: value.value, algorithm: value.type });
+  for (const hash of hashes) indicators.push({
+    type: "hash",
+    value: hash.value,
+    algorithm: hash.type,
+  });
 
   const urlDomains = urls.map((url) => {
     try {
