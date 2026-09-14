@@ -1,66 +1,119 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./IncidentMode.css";
 
-const SCENARIOS = [
-  { id: "clicked", title: "I clicked a suspicious link", text: "You opened a link and are unsure what happened." },
-  { id: "paid", title: "I sent money or approved a payment", text: "A UPI, card or bank payment may have gone to the wrong person." },
-  { id: "shared", title: "I shared sensitive information", text: "You shared a password, OTP, identity detail or banking information." },
-  { id: "installed", title: "I installed a suspicious app", text: "An unfamiliar APK or app was installed or requested unusual access." },
-  { id: "account", title: "My account may be compromised", text: "You see unexpected logins, messages, settings or transactions." },
-  { id: "message", title: "I received a suspicious message", text: "Nothing has happened yet, but the message looks suspicious." },
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+
+const FALLBACK_SCENARIOS = [
+  { id: "clicked", title: "I clicked a suspicious link", urgency: "high", summary: "You opened a link and are unsure what happened." },
+  { id: "paid", title: "I sent money or approved a payment", urgency: "critical", summary: "A UPI, card or bank payment may have gone to the wrong person." },
+  { id: "shared", title: "I shared sensitive information", urgency: "critical", summary: "You shared a password, OTP, identity detail or banking information." },
+  { id: "installed", title: "I installed a suspicious app", urgency: "critical", summary: "An unfamiliar APK or app was installed or requested unusual access." },
+  { id: "account", title: "My account may be compromised", urgency: "critical", summary: "You see unexpected logins, messages, settings or transactions." },
+  { id: "message", title: "I received a suspicious message", urgency: "caution", summary: "Nothing has happened yet, but the message looks suspicious." },
 ];
 
-const ACTIONS = {
-  clicked: ["Stop interacting with the page or sender.", "Do not enter passwords, OTPs, card details or UPI PINs.", "If you entered a password, change it from the service's official app or website.", "Check important accounts for unexpected activity."],
-  paid: ["Do not send another payment to 'reverse' or 'unlock' the transaction.", "Contact your bank or payment provider through its official channel immediately.", "For suspected financial cyber fraud in India, use the official 1930 / cybercrime reporting route.", "Keep transaction IDs, screenshots and messages as evidence."],
-  shared: ["Stop further communication with the requester.", "Change any exposed password from the official service.", "Never share another OTP, PIN or verification code to 'fix' the situation.", "Watch accounts connected to the information you shared."],
-  installed: ["Do not grant additional permissions to the app.", "Disconnect from sensitive accounts on the device while you assess what happened.", "Use your device's official security controls to review and remove an untrusted app.", "Check financial and account activity for anything unexpected."],
-  account: ["Use the service's official security page or app, not a link from a message.", "Change the password and review active sessions where the service supports it.", "Turn on stronger sign-in protection where available.", "Tell trusted contacts if messages may have been sent from your account."],
-  message: ["Do not reply, click, pay or share verification codes.", "Verify the claim through an independent official channel.", "Save the message if you may need to report it.", "Run it through Check Center for a structured evidence review."],
-};
-
 function IncidentMode() {
+  const [scenarios, setScenarios] = useState(FALLBACK_SCENARIOS);
   const [scenario, setScenario] = useState("");
-  const steps = useMemo(() => ACTIONS[scenario] || [], [scenario]);
+  const [plan, setPlan] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    fetch(`${API_BASE}/incidents/scenarios`)
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("Unable to load recovery scenarios")))
+      .then((data) => { if (active && data.scenarios?.length) setScenarios(data.scenarios); })
+      .catch(() => {})
+      .finally(() => {});
+    return () => { active = false; };
+  }, []);
+
+  const selectScenario = async (id) => {
+    setScenario(id);
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch(`${API_BASE}/incidents/${encodeURIComponent(id)}`);
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message || "Unable to load the recovery plan");
+      setPlan(data.plan);
+    } catch (requestError) {
+      setPlan(null);
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const urgencyLabel = useMemo(() => {
+    if (!plan) return "";
+    return plan.urgency === "critical" ? "Act now" : plan.urgency === "high" ? "Act soon" : "Stay cautious";
+  }, [plan]);
 
   return (
     <div className="incident-mode">
       <header className="incident-header">
-        <span>INCIDENT MODE</span>
+        <span>INCIDENT MODE · RECOVERY</span>
         <h1>Something happened. Let’s make the next move safer.</h1>
-        <p>You do not need to diagnose the scam first. Choose what happened and follow the ordered recovery path.</p>
+        <p>You do not need to diagnose the scam first. Choose what happened and CyberRakshak will give you an ordered recovery path.</p>
       </header>
 
       <section className="incident-grid" aria-label="Choose what happened">
-        {SCENARIOS.map((item) => (
-          <button key={item.id} type="button" className={scenario === item.id ? "incident-choice active" : "incident-choice"} onClick={() => setScenario(item.id)}>
+        {scenarios.map((item) => (
+          <button key={item.id} type="button" className={scenario === item.id ? "incident-choice active" : "incident-choice"} onClick={() => selectScenario(item.id)} aria-pressed={scenario === item.id}>
+            <span className={`incident-severity ${item.urgency || "caution"}`}>{item.urgency || "caution"}</span>
             <strong>{item.title}</strong>
-            <span>{item.text}</span>
+            <span>{item.summary || item.text}</span>
           </button>
         ))}
       </section>
 
-      {steps.length > 0 && (
-        <section className="recovery-panel" aria-live="polite">
+      {loading && <div className="recovery-loading" role="status">Building your recovery checklist…</div>}
+      {error && <div className="recovery-error" role="alert">{error}</div>}
+
+      {plan && !loading && (
+        <section className={`recovery-panel ${plan.urgency}`} aria-live="polite">
           <div className="recovery-heading">
-            <span>NEXT SAFEST STEPS</span>
-            <strong>Do these in order</strong>
+            <div>
+              <span>NEXT SAFEST STEPS · {urgencyLabel.toUpperCase()}</span>
+              <strong>{plan.title}</strong>
+            </div>
           </div>
-          <ol>
-            {steps.map((step) => <li key={step}>{step}</li>)}
-          </ol>
+          <p className="recovery-summary">{plan.summary}</p>
+
+          <div className="recovery-columns">
+            <div>
+              <h2>1. Act now</h2>
+              <ol>{plan.immediate.map((step) => <li key={step}>{step}</li>)}</ol>
+            </div>
+            <div>
+              <h2>2. Check & preserve</h2>
+              <ol>{plan.verify.map((step) => <li key={step}>{step}</li>)}</ol>
+            </div>
+          </div>
+
+          <div className="recovery-resources">
+            <h2>Official help</h2>
+            {plan.resources.map((resource) => (
+              <a key={resource.id} href={resource.url} target="_blank" rel="noreferrer">
+                <strong>{resource.label}</strong>
+                <span>{resource.note}</span>
+              </a>
+            ))}
+          </div>
+
           <div className="recovery-links">
-            <Link to="/emergency-help">Open official emergency resources →</Link>
-            <Link to="/check">Check the original message or link →</Link>
-            <Link to="/report-scam">Report / document the incident →</Link>
+            <Link to="/check">Check the original message, link or identifier →</Link>
+            <Link to="/report-scam">Document / report the incident →</Link>
           </div>
         </section>
       )}
 
       <aside className="incident-note">
-        <strong>Privacy reminder</strong>
-        <p>Do not post passwords, OTPs, PINs, full card numbers or recovery codes into CyberRakshak. A safety tool should never need those secrets.</p>
+        <strong>Privacy first</strong>
+        <p>Do not submit passwords, OTPs, PINs, full card numbers or recovery codes. CyberRakshak does not need those secrets to guide recovery.</p>
       </aside>
     </div>
   );
