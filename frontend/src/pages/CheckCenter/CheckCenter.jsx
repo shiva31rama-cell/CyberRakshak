@@ -6,6 +6,12 @@ import "./CheckCenter.css";
 
 const INPUTS = ["message", "url", "upi", "phone", "email", "qr_payload"];
 
+const formatEvidenceMatches = (item) => {
+  const indicators = (item.matchedIndicators || []).map((match) => `${match.type || "indicator"}: ${match.value}`);
+  const signals = (item.matchedSignals || []).map((match) => `signal: ${match}`);
+  return [...indicators, ...signals];
+};
+
 function CheckCenter() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -66,12 +72,16 @@ function CheckCenter() {
             <h2>{headline}</h2><p>{explanation}</p>
             {assessment.reasons?.length > 0 && <div className="evidence-block"><span className="result-label">{copy.why}</span><ul>{assessment.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></div>}
             {assessment.indicators?.length > 0 && <div className="evidence-block"><span className="result-label">{copy.identifiers}</span><div className="indicator-list">{assessment.indicators.map((indicator) => <span key={`${indicator.type}-${indicator.value}`}>{indicator.type}: {indicator.value}</span>)}</div></div>}
-            {assessment.evidence?.length > 0 && <div className="evidence-block"><span className="result-label">{copy.evidence}</span>{assessment.evidence.map((item) => <article key={item.threatId}><strong>{item.title}</strong><small>{item.severity.toUpperCase()} • matched: {item.matches.join(", ")}</small></article>)}</div>}
-            <div className="next-actions"><span className="result-label">{copy.next}</span><p>{assessment.recommendation || "Pause and verify the request through an independent official channel."}</p><button type="button" onClick={() => navigate("/incidents")}>{copy.incident}</button></div>
+            {assessment.evidence?.length > 0 && <div className="evidence-block"><span className="result-label">{copy.evidence}</span>{assessment.evidence.map((item) => {
+              const matches = formatEvidenceMatches(item);
+              return <article key={item.threatId || item.title}><strong>{item.title}</strong><small>{String(item.severity || "info").toUpperCase()} • {item.confidence ?? 0}% confidence</small>{matches.length > 0 && <div className="indicator-list">{matches.map((match) => <span key={match}>{match}</span>)}</div>}</article>;
+            })}</div>}
+            <div className="next-actions"><span className="result-label">{copy.next}</span><p>{assessment.recommendation || assessment.actionPlan?.steps?.[0] || "Pause and verify the request through an independent official channel."}</p><button type="button" onClick={() => navigate("/incidents")}>{copy.incident}</button></div>
           </>}
         </aside>
       </main>
     </div>
   );
 }
+
 export default CheckCenter;
