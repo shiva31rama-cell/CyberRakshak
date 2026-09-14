@@ -11,32 +11,39 @@ const unique = (values) => [...new Set(values)];
 
 const stripTrailingPunctuation = (value) => value.replace(/[),.;!?]+$/g, "");
 
+const normalizeIndianPhone = (value) => {
+  const compact = value.replace(/[\s-]/g, "");
+  if (compact.startsWith("+91")) return compact;
+  if (/^[6-9]\d{9}$/.test(compact)) return `+91${compact}`;
+  return compact;
+};
+
 const extractIndicators = (input) => {
   const text = String(input ?? "").slice(0, 12000);
   const indicators = [];
   const urls = unique((text.match(URL_PATTERN) || []).map(stripTrailingPunctuation));
   const emails = unique((text.match(EMAIL_PATTERN) || []).map((value) => value.toLowerCase()));
   const phones = unique(
-    (text.match(PHONE_PATTERN) || []).map((value) => value.replace(/[\s-]/g, "")),
+    (text.match(PHONE_PATTERN) || []).map(normalizeIndianPhone),
   );
-  const upis = unique((text.match(UPI_PATTERN) || [])
-    .map((value) => value.toLowerCase())
-    .filter((value) => !emails.includes(value)));
+  const upis = unique(
+    (text.match(UPI_PATTERN) || [])
+      .map((value) => value.toLowerCase())
+      .filter((value) => !emails.includes(value)),
+  );
   const hashes = unique([
-    ...(text.match(SHA256_PATTERN) || []).map((value) => ({ type: "sha256", value })),
-    ...(text.match(SHA1_PATTERN) || []).map((value) => ({ type: "sha1", value })),
-    ...(text.match(MD5_PATTERN) || []).map((value) => ({ type: "md5", value })),
+    ...(text.match(SHA256_PATTERN) || []).map((value) => ({ type: "sha256", value: value.toLowerCase() })),
+    ...(text.match(SHA1_PATTERN) || []).map((value) => ({ type: "sha1", value: value.toLowerCase() })),
+    ...(text.match(MD5_PATTERN) || []).map((value) => ({ type: "md5", value: value.toLowerCase() })),
   ]);
 
   for (const value of urls) indicators.push({ type: "url", value });
   for (const value of emails) indicators.push({ type: "email", value });
   for (const value of phones) indicators.push({ type: "phone", value });
   for (const value of upis) indicators.push({ type: "upi", value });
-  for (const hash of hashes) indicators.push({
-    type: "hash",
-    value: hash.value,
-    algorithm: hash.type,
-  });
+  for (const hash of hashes) {
+    indicators.push({ type: "hash", value: hash.value, algorithm: hash.type });
+  }
 
   const urlDomains = urls.map((url) => {
     try {
@@ -57,4 +64,4 @@ const extractIndicators = (input) => {
   return indicators;
 };
 
-module.exports = { extractIndicators };
+module.exports = { extractIndicators, normalizeIndianPhone };
