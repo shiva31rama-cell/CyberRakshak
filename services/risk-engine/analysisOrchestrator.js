@@ -1,11 +1,11 @@
 const { analyzeText } = require("./localRiskEngine");
 const { extractIndicators } = require("./indicatorExtractor");
 const { getAllThreats } = require("./threatCatalog");
+const { correlateThreats } = require("./threatCorrelation");
 const { resolveSourceReferences } = require("./sourceRegistry");
 const { createActionPlan } = require("./actionPlanner");
 
 const MAX_INPUT_LENGTH = 12000;
-
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
 const levelFromScore = (score) => {
@@ -16,37 +16,18 @@ const levelFromScore = (score) => {
   return "info";
 };
 
-const indicatorKey = (indicator) => `${indicator.type}:${String(indicator.value).toLowerCase()}`;
-
-const buildIndicatorIndex = (indicators) =>
-  new Set(indicators.map(indicatorKey));
-
-const normalizeThreatIndicator = (indicator) => {
-  if (typeof indicator === "string") return { type: null, value: indicator };
-  if (indicator && typeof indicator === "object") {
-    return { type: indicator.type || null, value: indicator.value || indicator.description || "" };
-  }
-  return { type: null, value: "" };
-};
-
-const findThreatMatches = (threat, extracted) => {
-  const index = buildIndicatorIndex(extracted);
-  const values = new Set(extracted.map((indicator) => String(indicator.value).toLowerCase()));
-
-  return (threat.indicators || [])
-    .map(normalizeThreatIndicator)
-    .filter(({ type, value }) => {
-      if (!value) return false;
-      const normalized = String(value).toLowerCase();
-      return (type && index.has(`${type}:${normalized}`)) || values.has(normalized);
-    });
-};
-
-const scoreBoostForSeverity = (severity) => {
-  if (severity === "critical") return 45;
-  if (severity === "high") return 30;
-  if (severity === "medium") return 15;
-  return 5;
+const scoreBoostForEvidence = (evidence) => {
+  const severityBoost = {
+    critical: 40,
+    high: 28,
+    medium: 15,
+    low: 5,
+    info: 0,
+  }[evidence.severity] ?? 0;
+  const confidenceBoost = Math.round((evidence.confidence || 0) / 20);
+  const indicatorBoost = Math.min((evidence.matchedIndicators || []).length * 8, 16);
+  const signalBoost = Math.min((evidence.matchedSignals || []).length * 3, 9);
+  return severityBoost + confidenceBoost + indicatorBoost + signalBoost;
 };
 
 const analyze = ({ text = "", inputType = "text" } = {}) => {
@@ -60,36 +41,21 @@ const analyze = ({ text = "", inputType = "text" } = {}) => {
       indicators: [],
       evidence: [],
       sourceReferences: [],
+      verifiedSources: [],
     };
-    return {
-      ...assessment,
-      actionPlan: createActionPlan(assessment),
-    };
+    return { ...assessment, actionPlan: createActionPlan(assessment) };
   }
 
-  const evidence = [];
-
-  for (const threat of getAllThreats()) {
-    const matches = findThreatMatches(threat, extracted);
-
-    if (matches.length > 0) {
-      evidence.push({
-        threatId: threat.id,
-        title: threat.title,
-        severity: threat.severity,
-        matches,
-        sourceReferences: threat.sources || [],
-        confidence: threat.confidence ?? null,
-        publishedAt: threat.publishedAt ?? null,
-        updatedAt: threat.updatedAt ?? null,
-      });
-    }
-  }
+  const evidence = correlateThreats({
+    text: safeText,
+    indicators: extracted,
+    categories: local.categories,
+    threats: getAllThreats(),
+  });
 
   const evidenceBoost = evidence.length > 0
-    ? Math.max(...evidence.map((item) => scoreBoostForSeverity(item.severity)))
+    ? Math.min(evidence.reduce((total, item) => total + scoreBoostForEvidence(item), 0), 70)
     : 0;
-
   const score = clamp(local.score + evidenceBoost, 0, 100);
   const riskLevel = levelFromScore(score);
   const sourceReferences = [
@@ -109,10 +75,14 @@ const analyze = ({ text = "", inputType = "text" } = {}) => {
     verifiedSources: resolveSourceReferences(sourceReferences),
   };
 
-  return {
-    ...assessment,
-    actionPlan: createActionPlan(assessment),
-  };
+  if (evidence.length > 0) {
+    const evidenceReasons = evidence.slice(0, 3).map((item) =>
+      `Matched threat intelligence: ${item.title} (${item.severity}, ${item.confidence}% confidence).`
+    );
+    assessment.reasons = [...new Set([...(assessment.reasons || []), ...evidenceReasons])];
+  }
+
+  return { ...assessment, actionPlan: createActionPlan(assessment) };
 };
 
-module.exports = { analyze, levelFromScore };
+module.exports = { analyze, levelFromScore, scoreBoostForEvidence };
