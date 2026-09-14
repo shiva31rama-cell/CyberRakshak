@@ -1,0 +1,90 @@
+[
+  {
+    "id": "upi-collect-request",
+    "title": "A payment request is not a payment receipt",
+    "category": "payments",
+    "severity": "high",
+    "language": "en",
+    "durationMinutes": 3,
+    "scenario": "Someone says you will receive money and asks you to approve a UPI request or enter your UPI PIN.",
+    "redFlags": [
+      "You are told to enter a UPI PIN to receive money.",
+      "The sender creates urgency or asks you to act immediately.",
+      "The payment purpose does not match what you expected."
+    ],
+    "safeAction": "Stop and verify the payment independently. A UPI PIN is used to authorise payments, not to receive money.",
+    "checkQuestion": "What should you do when someone says a UPI PIN is needed to receive money?",
+    "answers": [
+      { "id": "a", "text": "Enter the PIN quickly", "correct": false },
+      { "id": "b", "text": "Stop and verify the request", "correct": true },
+      { "id": "c", "text": "Forward the request to friends", "correct": false }
+    ],
+    "sourceIds": ["i4c-ncrp", "npci-official"]
+  },
+  {
+    "id": "malicious-apk",
+    "title": "Unknown APKs can turn a simple message into a device risk",
+    "category": "mobile",
+    "severity": "critical",
+    "language": "en",
+    "durationMinutes": 3,
+    "scenario": "A message asks you to install an APK for a refund, delivery update, job, fine or account verification.",
+    "redFlags": [
+      "The app comes from a message or an unfamiliar website.",
+      "The sender asks you to enable unusual permissions.",
+      "The reason for installation is urgent or threatening."
+    ],
+    "safeAction": "Do not install an APK from an untrusted message. Verify the service through its official app or website instead.",
+    "checkQuestion": "What is the safest response to an unexpected APK link?",
+    "answers": [
+      { "id": "a", "text": "Install it if the message looks official", "correct": false },
+      { "id": "b", "text": "Verify independently and avoid the APK", "correct": true },
+      { "id": "c", "text": "Disable device security first", "correct": false }
+    ],
+    "sourceIds": ["cert-in", "i4c-ncrp"]
+  },
+  {
+    "id": "ai-impersonation",
+    "title": "A familiar voice or image can still be fake",
+    "category": "ai-scams",
+    "severity": "high",
+    "language": "en",
+    "durationMinutes": 3,
+    "scenario": "A caller or message appears to be from a known person and asks for urgent money, credentials or secrecy.",
+    "redFlags": [
+      "The request is unusually urgent or secretive.",
+      "The identity is based mainly on a voice, video or profile image.",
+      "The requester discourages independent verification."
+    ],
+    "safeAction": "Use a trusted contact method you already know to verify the person's identity before taking action.",
+    "checkQuestion": "What is a strong way to verify an urgent request from a familiar person?",
+    "answers": [
+      { "id": "a", "text": "Trust the voice immediately", "correct": false },
+      { "id": "b", "text": "Verify through an independent trusted channel", "correct": true },
+      { "id": "c", "text": "Share an OTP to confirm identity", "correct": false }
+    ],
+    "sourceIds": ["cert-in", "i4c-ncrp"]
+  },
+  {
+    "id": "phishing-urgency",
+    "title": "Urgency is a signal to slow down",
+    "category": "messages",
+    "severity": "high",
+    "language": "en",
+    "durationMinutes": 2,
+    "scenario": "A message claims your account, delivery, job, bank service or government service will be affected unless you act now.",
+    "redFlags": [
+      "A deadline is used to pressure you.",
+      "A link asks for login or payment information.",
+      "The message mixes authority with fear or reward."
+    ],
+    "safeAction": "Do not use the supplied link. Open the official service yourself and verify the claim.",
+    "checkQuestion": "What should urgency make you do?",
+    "answers": [
+      { "id": "a", "text": "Slow down and verify", "correct": true },
+      { "id": "b", "text": "Share an OTP", "correct": false },
+      { "id": "c", "text": "Pay first and investigate later", "correct": false }
+    ],
+    "sourceIds": ["cert-in", "i4c-ncrp"]
+  }
+]
