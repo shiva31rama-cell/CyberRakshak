@@ -28,9 +28,9 @@ test("extracts common cryptographic hash formats", () => {
   assert.ok(result.some((item) => item.type === "hash" && item.algorithm === "sha1"));
 });
 
-test("normalizes Indian phone numbers", () => {
+test("normalizes Indian phone numbers consistently", () => {
   const result = extractIndicators("Call +91 98765-43210 or 9123456789");
 
   assert.ok(result.some((item) => item.type === "phone" && item.value === "+919876543210"));
-  assert.ok(result.some((item) => item.type === "phone" && item.value === "9123456789"));
+  assert.ok(result.some((item) => item.type === "phone" && item.value === "+919123456789"));
 });
