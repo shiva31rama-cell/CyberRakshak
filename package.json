@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test tests/unit/*.test.js",
+    "validate:content": "node scripts/validate-content.js"
   },
   "repository": {
     "type": "git",
@@ -14,10 +15,6 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/shiva31rama-cell/CyberRakshak/issues"
-  },
-  "homepage": "https://github.com/shiva31rama-cell/CyberRakshak#readme",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
