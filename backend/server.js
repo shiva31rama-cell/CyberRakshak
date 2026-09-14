@@ -55,21 +55,35 @@ const chatLimiter = rateLimit({
   },
 });
 
+const analyzerLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many analysis requests. Please try again shortly.",
+  },
+});
+
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 app.use("/api/chat", chatLimiter);
+app.use("/api/scam/analyze", analyzerLimiter);
+app.use("/api/scam/analyze-url", analyzerLimiter);
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/quiz", require("./routes/quiz"));
 app.use("/api/feedback", require("./routes/feedback"));
 app.use("/api/scam-report", require("./routes/scamReport"));
+app.use("/api/scam", require("./routes/scam"));
 app.use("/api/chat", require("./routes/chat"));
 
 app.get("/", (req, res) =>
   res.json({
     success: true,
     message: "CyberRakshak Backend Running Successfully 🚀",
-    version: "1.2.0",
+    version: "1.3.0",
   })
 );
 
