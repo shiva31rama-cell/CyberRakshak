@@ -26,6 +26,7 @@ const explanationLimiter = rateLimit({ windowMs: 60 * 1000, limit: 12, standardH
 const threatLimiter = rateLimit({ windowMs: 60 * 1000, limit: 60, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many threat intelligence requests. Please try again shortly." } });
 const multimodalLimiter = rateLimit({ windowMs: 60 * 1000, limit: 8, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many image analysis requests. Please try again shortly." } });
 const incidentLimiter = rateLimit({ windowMs: 60 * 1000, limit: 60, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many incident requests. Please try again shortly." } });
+const intelligenceLimiter = rateLimit({ windowMs: 60 * 1000, limit: 30, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many intelligence requests. Please try again shortly." } });
 
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
@@ -38,6 +39,7 @@ app.use("/api/explain", explanationLimiter, require("./routes/explain"));
 app.use("/api/threats", threatLimiter, require("./routes/threats"));
 app.use("/api/multimodal", multimodalLimiter, require("./routes/multimodal"));
 app.use("/api/incidents", incidentLimiter, require("./routes/incidents"));
+app.use("/api/intelligence", intelligenceLimiter, require("./routes/intelligence"));
 
 app.get("/", (req, res) => res.json({ success: true, message: "CyberRakshak Backend Running Successfully 🚀", version: "2.0.0" }));
 app.get("/health", (req, res) => res.json({ success: true, status: "ok", service: "CyberRakshak API", version: "2.0.0" }));
