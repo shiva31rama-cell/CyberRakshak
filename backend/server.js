@@ -44,6 +44,14 @@ const explanationLimiter = rateLimit({
   message: { success: false, message: "Too many AI explanation requests. Please try again shortly." },
 });
 
+const threatLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 60,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many threat intelligence requests. Please try again shortly." },
+});
+
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 app.use("/api/auth", require("./routes/auth"));
@@ -52,6 +60,7 @@ app.use("/api/feedback", require("./routes/feedback"));
 app.use("/api/scam-report", require("./routes/scamReport"));
 app.use("/api/analyze", analysisLimiter, require("./routes/analyze"));
 app.use("/api/explain", explanationLimiter, require("./routes/explain"));
+app.use("/api/threats", threatLimiter, require("./routes/threats"));
 
 app.get("/", (req, res) => res.json({
   success: true,
