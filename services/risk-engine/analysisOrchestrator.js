@@ -13,11 +13,21 @@ const levelFromScore = (score) => {
 };
 
 const indicatorValues = (indicators) =>
-  new Set(indicators.map((indicator) => indicator.value.toLowerCase()));
+  new Set(indicators.map((indicator) => String(indicator.value).toLowerCase()));
 
 const analyze = ({ text = "", inputType = "text" } = {}) => {
   const local = analyzeText(text, inputType);
   const extracted = extractIndicators(text);
+
+  if (!String(text ?? "").trim()) {
+    return {
+      ...local,
+      indicators: [],
+      evidence: [],
+      sourceReferences: [],
+    };
+  }
+
   const knownIndicators = indicatorValues(extracted);
   const evidence = [];
 
@@ -46,7 +56,7 @@ const analyze = ({ text = "", inputType = "text" } = {}) => {
       }))
     : 0;
 
-  const score = clamp(Math.max(local.score, local.score + evidenceBoost), 0, 100);
+  const score = clamp(local.score + evidenceBoost, 0, 100);
 
   return {
     ...local,
@@ -63,4 +73,4 @@ const analyze = ({ text = "", inputType = "text" } = {}) => {
   };
 };
 
-module.exports = { analyze };
+module.exports = { analyze, levelFromScore };
