@@ -1,0 +1,26 @@
+{
+  "version": "2.0",
+  "description": "Shared content contract for multilingual CyberRakshak educational records.",
+  "supportedLanguages": ["en", "te"],
+  "defaultLanguage": "en",
+  "localizableFields": ["title", "scenario", "redFlags", "safeAction", "checkQuestion", "answers"],
+  "lesson": {
+    "required": ["id", "title", "category", "severity", "durationMinutes", "scenario", "redFlags", "safeAction", "checkQuestion", "answers", "sourceIds"],
+    "title": { "type": "localizedString" },
+    "scenario": { "type": "localizedString" },
+    "redFlags": { "type": "localizedStringArray" },
+    "safeAction": { "type": "localizedString" },
+    "checkQuestion": { "type": "localizedString" },
+    "answers": { "type": "localizedAnswerArray", "answerFields": ["id", "text", "correct"] }
+  },
+  "localizedStringExample": {
+    "en": "English text",
+    "te": "తెలుగు టెక్స్ట్"
+  },
+  "rules": [
+    "Every localizable field must provide English content.",
+    "Telugu content should preserve the safety meaning rather than translate identifiers, source IDs, URLs or category IDs.",
+    "Correct-answer flags are language-independent.",
+    "Unknown requested languages fall back to English."
+  ]
+}
