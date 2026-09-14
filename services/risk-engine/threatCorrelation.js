@@ -43,11 +43,19 @@ const signalMatches = (text, signals) => {
   });
 };
 
+const normalizeForExactMatch = (value, type) => {
+  const normalized = normalize(value).replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  if (type === "domain") return normalized.replace(/^www\./, "");
+  return normalized;
+};
+
 const indicatorMatches = (extractedIndicators, threatIndicators) => {
   const extracted = extractedIndicators.map(normalizeIndicator).filter((indicator) => indicator.value);
+
   return threatIndicators.filter((candidate) => extracted.some((indicator) => {
     const sameType = !candidate.type || !indicator.type || candidate.type === indicator.type;
-    return sameType && normalize(candidate.value) === normalize(indicator.value);
+    if (!sameType) return false;
+    return normalizeForExactMatch(candidate.value, candidate.type) === normalizeForExactMatch(indicator.value, indicator.type || candidate.type);
   }));
 };
 
@@ -69,10 +77,10 @@ const resolveRankedSources = (threat) => {
 };
 
 const confidenceFromEvidence = ({ indicatorCount, signalCount, categoryMatched, rankedSources }) => {
-  let confidence = 35;
-  confidence += Math.min(indicatorCount * 30, 60);
-  confidence += Math.min(signalCount * 12, 24);
-  if (categoryMatched) confidence += 10;
+  let confidence = 25;
+  confidence += Math.min(indicatorCount * 35, 70);
+  confidence += Math.min(signalCount * 10, 20);
+  if (categoryMatched) confidence += 5;
   if (rankedSources.some((source) => source.tierRank === 1)) confidence += 10;
   return Math.min(confidence, 100);
 };
@@ -85,8 +93,7 @@ const correlateThreats = ({ text = "", indicators = [], categories = [], threats
     const matchedSignals = signalMatches(text, getThreatSignals(threat));
     const categoryMatched = categoryMatch(categories, threat);
 
-    // Category compatibility is context, not proof. Require a direct IOC or
-    // behavioral-signal match before creating threat evidence.
+    // A category is contextual evidence only; it can never create a threat match by itself.
     if (matchedIndicators.length === 0 && matchedSignals.length === 0) continue;
 
     const rankedSources = resolveRankedSources(threat);
