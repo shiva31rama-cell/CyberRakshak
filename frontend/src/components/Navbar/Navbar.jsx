@@ -63,11 +63,11 @@ function Navbar() {
   };
 
   const primaryLinks = [
-    ["/", "home"],
-    ["/check", "check"],
-    ["/learn", "learn"],
-    ["/emergency-help", "emergency"],
-    ["/report-scam", "report"],
+    ["/", "home", "⌂"],
+    ["/check", "check", "✓"],
+    ["/learn", "learn", "▤"],
+    ["/emergency-help", "emergency", "⚠"],
+    ["/report-scam", "report", "⚑"],
   ];
 
   return (
@@ -134,6 +134,17 @@ function Navbar() {
                   ))}
                 </div>
               </div>
+              {isLoggedIn ? (
+                <>
+                  <div className="mobile-account-name">Hi, {userName || "User"}</div>
+                  <button type="button" onClick={handleLogout}>{t("logout")}</button>
+                </>
+              ) : (
+                <>
+                  <button type="button" onClick={() => handleNavClick("/login")}>{t("login")}</button>
+                  <button type="button" onClick={() => handleNavClick("/register")}>{t("register")}</button>
+                </>
+              )}
             </div>
           </div>
 
@@ -149,6 +160,30 @@ function Navbar() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="mobile-bottom-nav" aria-label="Mobile navigation">
+        {primaryLinks.map(([path, labelKey, icon]) => (
+          <button
+            type="button"
+            key={path}
+            className={`mobile-bottom-link ${location.pathname === path ? "active" : ""}`}
+            onClick={() => handleNavClick(path)}
+            aria-current={location.pathname === path ? "page" : undefined}
+          >
+            <span className="mobile-bottom-icon" aria-hidden="true">{icon}</span>
+            <span>{t(labelKey)}</span>
+          </button>
+        ))}
+        <button
+          type="button"
+          className={`mobile-bottom-link ${isMoreOpen ? "active" : ""}`}
+          onClick={() => setIsMoreOpen((open) => !open)}
+          aria-expanded={isMoreOpen}
+        >
+          <span className="mobile-bottom-icon" aria-hidden="true">•••</span>
+          <span>{t("more")}</span>
+        </button>
       </div>
     </nav>
   );
