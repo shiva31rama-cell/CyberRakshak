@@ -64,4 +64,10 @@ test("chat rejects an oversized message", async () => {
 
   assert.equal(response.statusCode, 400);
   assert.equal(response.payload.success, false);
+  assert.equal(response.payload.message, "Message is too long");
+});
+
+test("the Express application loads all registered routes", () => {
+  const app = require("../server");
+  assert.equal(typeof app, "function");
 });
