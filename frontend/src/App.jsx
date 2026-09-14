@@ -3,9 +3,9 @@ import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
 import ErrorBoundary from "./components/ErrorBoundary";
+import SafetyHome from "./pages/SafetyHome/SafetyHome";
 
-// Pages
-import Home from "./pages/Home/Home";
+// Existing pages kept available while CyberRakshak 2.0 replaces the product surface.
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Learn from "./pages/Learn/Learn";
@@ -16,7 +16,6 @@ import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
 import NotFound from "./pages/NotFound";
 
-// Learning Modules
 import UPISafety from "./pages/LearningModules/UPISafety";
 import CyberCrimeAwareness from "./pages/LearningModules/CyberCrimeAwareness";
 import SocialMediaSafety from "./pages/LearningModules/SocialMediaSafety";
@@ -32,7 +31,7 @@ function App() {
           <Navbar />
           <main className="app-main">
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<SafetyHome />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/learn" element={<Learn />} />
