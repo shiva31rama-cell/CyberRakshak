@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { apiRequest } from "../../services/api";
+import { consumeLatestSharedText } from "../../services/shareInbox";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CheckCenter.css";
 
@@ -32,25 +33,50 @@ function CheckCenter() {
   const [assessment, setAssessment] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sharedImport, setSharedImport] = useState(false);
 
   useEffect(() => {
     if (location.state?.inputType) setInputType(location.state.inputType);
     if (typeof location.state?.text === "string") setText(location.state.text);
   }, [location.state]);
 
+  useEffect(() => {
+    if (!location.search.includes("share=1")) return;
+    let cancelled = false;
+    const loadSharedSignal = async () => {
+      try {
+        const shared = await consumeLatestSharedText();
+        if (cancelled || !shared) return;
+        const imported = [shared.title, shared.text, shared.url].filter(Boolean).join("\n").slice(0, 12000);
+        setInputType("message");
+        setText(imported);
+        setSharedImport(true);
+        window.history.replaceState({}, "", "/check");
+      } catch {
+        if (!cancelled) setError(telugu ? "షేర్ చేసిన భద్రతా సంకేతాన్ని చదవలేకపోయాము." : "The shared safety signal could not be imported.");
+      }
+    };
+    loadSharedSignal();
+    return () => { cancelled = true; };
+  }, [location.search, telugu]);
+
   const selected = useMemo(() => copy.inputs[inputType] || copy.inputs.message, [copy, inputType]);
 
-  const submit = async (event) => {
-    event.preventDefault();
-    const clean = text.trim();
+  const runAnalysis = async (value = text, type = inputType) => {
+    const clean = String(value || "").trim();
     if (!clean) { setError(copy.errorEmpty); return; }
     setLoading(true); setError(""); setAssessment(null);
     try {
-      const result = await apiRequest("/analyze", { method: "POST", body: JSON.stringify({ text: clean, inputType }) });
+      const result = await apiRequest("/analyze", { method: "POST", body: JSON.stringify({ text: clean, inputType: type }) });
       setAssessment(result.assessment);
     } catch (requestError) {
       setError(requestError.message || copy.errorGeneric);
     } finally { setLoading(false); }
+  };
+
+  const submit = async (event) => {
+    event.preventDefault();
+    await runAnalysis();
   };
 
   const level = assessment?.riskLevel || "info";
@@ -76,10 +102,14 @@ function CheckCenter() {
         <button type="button" className="back-link" onClick={() => navigate(-1)}>{copy.back}</button>
         <div><span className="check-eyebrow">{copy.eyebrow}</span><h1>{copy.title}</h1><p>{copy.intro}</p></div>
       </header>
+      {sharedImport && <div className="share-import-banner" role="status">
+        <strong>{telugu ? "Android భద్రతా సంకేతం దిగుమతి అయింది" : "Android safety signal imported"}</strong>
+        <span>{telugu ? "ఇది స్థానికంగా గుర్తించిన సంకేతం మాత్రమే. అసలు సందేశం/కంటెంట్‌ను మీరు స్వయంగా ఇక్కడ ధృవీకరించండి." : "This is a local signal, not proof that the original message is malicious. Review the original content here before acting."}</span>
+      </div>}
       <main className="check-layout">
         <section className="check-workspace">
           <div className="input-tabs" role="tablist" aria-label={telugu ? "ఏం చెక్ చేస్తున్నారు?" : "What are you checking?"}>
-            {INPUTS.map((id) => <button key={id} type="button" className={inputType === id ? "is-active" : ""} onClick={() => { setInputType(id); setAssessment(null); setError(""); }} title={copy.inputs[id][1]}>{copy.inputs[id][0]}</button>)}
+            {INPUTS.map((id) => <button key={id} type="button" className={inputType === id ? "is-active" : ""} onClick={() => { setInputType(id); setAssessment(null); setError(""); }}>{copy.inputs[id][0]}</button>)}
           </div>
           <form onSubmit={submit}>
             <label htmlFor="safety-input">{selected[0]} {copy.labelSuffix}</label>
