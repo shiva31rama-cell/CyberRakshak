@@ -32,7 +32,7 @@ services:
     name: cyberrakshak-web
     runtime: static
     rootDir: frontend
-    buildCommand: npm ci && npm run build
+    buildCommand: npm install --no-audit --no-fund && npm run build
     staticPublishPath: dist
     autoDeployTrigger: checksPass
     pullRequestPreviewsEnabled: true
