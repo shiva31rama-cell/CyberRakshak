@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "node --test tests/unit/*.test.js",
-    "validate:content": "node scripts/validate-content.js"
+    "validate:content": "node scripts/validate-content.js",
+    "security:audit": "node scripts/security-audit.js"
   },
   "repository": {
     "type": "git",
