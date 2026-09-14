@@ -1,0 +1,45 @@
+{
+  "i4c": {
+    "name": "Indian Cybercrime Coordination Centre",
+    "url": "https://i4c.mha.gov.in/",
+    "sourceType": "government",
+    "verification": "verified",
+    "region": "IN"
+  },
+  "ncrp": {
+    "name": "National Cyber Crime Reporting Portal",
+    "url": "https://www.cybercrime.gov.in/",
+    "sourceType": "government",
+    "verification": "verified",
+    "region": "IN",
+    "notes": "Suspect repository data is complaint-derived and should not be treated as a complete or definitive attribution."
+  },
+  "cert-in": {
+    "name": "Indian Computer Emergency Response Team",
+    "url": "https://www.cert-in.org.in/",
+    "sourceType": "government",
+    "verification": "verified",
+    "region": "IN"
+  },
+  "rbi": {
+    "name": "Reserve Bank of India",
+    "url": "https://www.rbi.org.in/",
+    "sourceType": "regulator",
+    "verification": "verified",
+    "region": "IN"
+  },
+  "npci": {
+    "name": "National Payments Corporation of India",
+    "url": "https://www.npci.org.in/",
+    "sourceType": "official_vendor",
+    "verification": "verified",
+    "region": "IN"
+  },
+  "sanchar-saathi": {
+    "name": "Sanchar Saathi",
+    "url": "https://www.sancharsaathi.gov.in/",
+    "sourceType": "government",
+    "verification": "verified",
+    "region": "IN"
+  }
+}

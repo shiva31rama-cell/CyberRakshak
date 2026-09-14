@@ -1,0 +1,36 @@
+{
+  "id": "cert-in-whatsapp-attachments-2026",
+  "title": "Malware campaign through WhatsApp attachments",
+  "category": "malicious_app",
+  "severity": "high",
+  "status": "active",
+  "summary": "CERT-In reported a large-scale campaign targeting WhatsApp Desktop and WhatsApp Web users with malicious attachments distributed through compromised accounts.",
+  "indicators": [
+    {
+      "type": "attachment",
+      "description": "Unexpected attachments received from a compromised or familiar account should be treated cautiously."
+    },
+    {
+      "type": "sender_compromise",
+      "description": "A message can appear trustworthy when it originates from an account that has itself been compromised."
+    }
+  ],
+  "actions": [
+    "Do not open unexpected attachments.",
+    "Verify unusual requests through an independent channel.",
+    "Keep operating systems and applications updated.",
+    "Report suspected cybercrime through official channels when appropriate."
+  ],
+  "publishedAt": "2026-06-25T00:00:00Z",
+  "updatedAt": "2026-09-14T00:00:00Z",
+  "region": "IN",
+  "confidence": 0.97,
+  "sources": [
+    {
+      "name": "CERT-In",
+      "url": "https://www.cert-in.org.in/s2cMainServlet?pageid=PUBWEL03",
+      "sourceType": "government",
+      "verification": "verified"
+    }
+  ]
+}
