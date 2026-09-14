@@ -5,21 +5,46 @@
   "defaultLanguage": "en",
   "localizableFields": ["title", "scenario", "redFlags", "safeAction", "checkQuestion", "answers"],
   "lesson": {
-    "required": ["id", "title", "category", "severity", "durationMinutes", "scenario", "redFlags", "safeAction", "checkQuestion", "answers", "sourceIds"],
-    "title": { "type": "localizedString" },
-    "scenario": { "type": "localizedString" },
-    "redFlags": { "type": "localizedStringArray" },
-    "safeAction": { "type": "localizedString" },
-    "checkQuestion": { "type": "localizedString" },
-    "answers": { "type": "localizedAnswerArray", "answerFields": ["id", "text", "correct"] }
+    "required": ["id", "category", "severity", "durationMinutes", "sourceIds", "en"],
+    "properties": {
+      "id": { "type": "string" },
+      "category": { "type": "string" },
+      "severity": { "enum": ["critical", "high", "medium", "low", "info"] },
+      "durationMinutes": { "type": "integer", "minimum": 1, "maximum": 60 },
+      "sourceIds": { "type": "array", "items": { "type": "string" } },
+      "en": { "$ref": "#/$defs/languageContent" },
+      "te": { "$ref": "#/$defs/languageContent" }
+    }
   },
-  "localizedStringExample": {
-    "en": "English text",
-    "te": "తెలుగు టెక్స్ట్"
+  "$defs": {
+    "languageContent": {
+      "type": "object",
+      "required": ["title", "scenario", "redFlags", "safeAction", "checkQuestion", "answers"],
+      "properties": {
+        "title": { "type": "string" },
+        "scenario": { "type": "string" },
+        "redFlags": { "type": "array", "items": { "type": "string" } },
+        "safeAction": { "type": "string" },
+        "checkQuestion": { "type": "string" },
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "text", "correct"],
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "correct": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
   },
   "rules": [
-    "Every localizable field must provide English content.",
-    "Telugu content should preserve the safety meaning rather than translate identifiers, source IDs, URLs or category IDs.",
+    "Every lesson must provide English content.",
+    "Telugu content is optional at the record level and falls back to English when absent.",
+    "Telugu content should preserve safety meaning rather than translate identifiers, source IDs, URLs or category IDs.",
     "Correct-answer flags are language-independent.",
     "Unknown requested languages fall back to English."
   ]
