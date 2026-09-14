@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 
 dotenv.config();
@@ -72,15 +73,17 @@ app.get("/", (req, res) =>
   })
 );
 
-app.get("/health", (req, res) =>
-  res.json({
-    success: true,
-    status: "ok",
+app.get("/health", (req, res) => {
+  const databaseConnected = mongoose.connection.readyState === 1;
+
+  res.status(databaseConnected ? 200 : 503).json({
+    success: databaseConnected,
+    status: databaseConnected ? "ok" : "degraded",
     service: "CyberRakshak API",
-    database: "connected",
+    database: databaseConnected ? "connected" : "disconnected",
     timestamp: new Date().toISOString(),
-  })
-);
+  });
+});
 
 app.use((req, res) =>
   res.status(404).json({ success: false, message: "Route not found" })
