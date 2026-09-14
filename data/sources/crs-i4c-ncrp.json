@@ -1,0 +1,10 @@
+{
+  "id": "crs-i4c-ncrp",
+  "name": "National Cyber Crime Reporting Portal",
+  "url": "https://www.cybercrime.gov.in/",
+  "sourceType": "government",
+  "verification": "verified",
+  "region": "IN",
+  "authority": "Indian Cybercrime Coordination Centre",
+  "notes": "Official reporting and cyber-safety resource. Complaint-derived suspect information must be treated as a signal, not proof of maliciousness."
+}

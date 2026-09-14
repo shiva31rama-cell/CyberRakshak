@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "sourceTypes": [
+    "government",
+    "regulator",
+    "official_vendor",
+    "academic",
+    "security_research",
+    "reputable_media",
+    "official_social",
+    "public_repository",
+    "community"
+  ],
+  "verificationStates": [
+    "verified",
+    "partially_verified",
+    "unverified",
+    "deprecated"
+  ],
+  "riskLevels": [
+    "critical",
+    "high",
+    "medium",
+    "low",
+    "info",
+    "unknown"
+  ],
+  "indicatorTypes": [
+    "url",
+    "domain",
+    "phone",
+    "email",
+    "upi",
+    "package",
+    "hash",
+    "qr_payload",
+    "keyword",
+    "behavior"
+  ]
+}
