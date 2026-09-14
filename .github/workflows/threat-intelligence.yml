@@ -23,6 +23,9 @@ jobs:
       - name: Ingest CERT-In advisories
         run: node scripts/ingest-certin.js
 
+      - name: Validate content and provenance
+        run: node scripts/validate-content.js
+
       - name: Commit refreshed intelligence
         run: |
           if git diff --quiet -- data/threats/ingested/cert-in-latest.json; then
