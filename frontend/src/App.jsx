@@ -4,8 +4,8 @@ import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
 import ErrorBoundary from "./components/ErrorBoundary";
 import SafetyHome from "./pages/SafetyHome/SafetyHome";
+import CheckCenter from "./pages/CheckCenter/CheckCenter";
 
-// Existing pages kept available while CyberRakshak 2.0 replaces the product surface.
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Learn from "./pages/Learn/Learn";
@@ -32,6 +32,7 @@ function App() {
           <main className="app-main">
             <Routes>
               <Route path="/" element={<SafetyHome />} />
+              <Route path="/check" element={<CheckCenter />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/learn" element={<Learn />} />
