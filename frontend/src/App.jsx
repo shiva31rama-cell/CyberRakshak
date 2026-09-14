@@ -7,6 +7,7 @@ import SafetyHome from "./pages/SafetyHome/SafetyHome";
 import CheckCenter from "./pages/CheckCenter/CheckCenter";
 import IncidentMode from "./pages/IncidentMode/IncidentMode";
 import ThreatRadar from "./pages/ThreatRadar/ThreatRadar";
+import ThreatIntelDashboard from "./pages/ThreatIntelDashboard/ThreatIntelDashboard";
 import MultimodalCheck from "./pages/MultimodalCheck/MultimodalCheck";
 import Learn2 from "./pages/Learn/Learn2";
 
@@ -39,6 +40,7 @@ function App() {
               <Route path="/check" element={<CheckCenter />} />
               <Route path="/check/image" element={<MultimodalCheck />} />
               <Route path="/threats" element={<ThreatRadar />} />
+              <Route path="/intelligence" element={<ThreatIntelDashboard />} />
               <Route path="/incidents" element={<IncidentMode />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
