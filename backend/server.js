@@ -17,40 +17,14 @@ app.use(cors({
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
-app.use(express.json({ limit: "100kb" }));
+app.use(express.json({ limit: "3mb" }));
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 50,
-  standardHeaders: "draft-8",
-  legacyHeaders: false,
-  message: { success: false, message: "Too many authentication requests. Please try again later." },
-});
-
-const analysisLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 30,
-  standardHeaders: "draft-8",
-  legacyHeaders: false,
-  message: { success: false, message: "Too many analysis requests. Please try again shortly." },
-});
-
-const explanationLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 12,
-  standardHeaders: "draft-8",
-  legacyHeaders: false,
-  message: { success: false, message: "Too many AI explanation requests. Please try again shortly." },
-});
-
-const threatLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 60,
-  standardHeaders: "draft-8",
-  legacyHeaders: false,
-  message: { success: false, message: "Too many threat intelligence requests. Please try again shortly." },
-});
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 50, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many authentication requests. Please try again later." } });
+const analysisLimiter = rateLimit({ windowMs: 60 * 1000, limit: 30, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many analysis requests. Please try again shortly." } });
+const explanationLimiter = rateLimit({ windowMs: 60 * 1000, limit: 12, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many AI explanation requests. Please try again shortly." } });
+const threatLimiter = rateLimit({ windowMs: 60 * 1000, limit: 60, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many threat intelligence requests. Please try again shortly." } });
+const multimodalLimiter = rateLimit({ windowMs: 60 * 1000, limit: 8, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many image analysis requests. Please try again shortly." } });
 
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
@@ -61,29 +35,16 @@ app.use("/api/scam-report", require("./routes/scamReport"));
 app.use("/api/analyze", analysisLimiter, require("./routes/analyze"));
 app.use("/api/explain", explanationLimiter, require("./routes/explain"));
 app.use("/api/threats", threatLimiter, require("./routes/threats"));
+app.use("/api/multimodal", multimodalLimiter, require("./routes/multimodal"));
 
-app.get("/", (req, res) => res.json({
-  success: true,
-  message: "CyberRakshak Backend Running Successfully 🚀",
-  version: "2.0.0",
-}));
-
-app.get("/health", (req, res) => res.json({
-  success: true,
-  status: "ok",
-  service: "CyberRakshak API",
-  version: "2.0.0",
-}));
-
+app.get("/", (req, res) => res.json({ success: true, message: "CyberRakshak Backend Running Successfully 🚀", version: "2.0.0" }));
+app.get("/health", (req, res) => res.json({ success: true, status: "ok", service: "CyberRakshak API", version: "2.0.0" }));
 app.use((req, res) => res.status(404).json({ success: false, message: "Route not found" }));
 app.use((err, req, res, next) => {
   console.error(err);
   if (res.headersSent) return next(err);
   const status = err.status || err.statusCode || 500;
-  res.status(status).json({
-    success: false,
-    message: status >= 500 ? "Internal server error" : err.message,
-  });
+  res.status(status).json({ success: false, message: status >= 500 ? "Internal server error" : err.message });
 });
 
 const start = async () => {
@@ -96,6 +57,5 @@ const start = async () => {
   }
 };
 
-if (require.main === module) start();
-
+if (require.main === "module") start();
 module.exports = app;
