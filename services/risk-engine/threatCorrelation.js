@@ -10,10 +10,7 @@ const normalize = (value) => String(value ?? "")
 const normalizeIndicator = (indicator) => {
   if (typeof indicator === "string") return { type: null, value: indicator };
   if (indicator && typeof indicator === "object") {
-    return {
-      type: indicator.type || null,
-      value: indicator.value || indicator.description || "",
-    };
+    return { type: indicator.type || null, value: indicator.value || indicator.description || "" };
   }
   return { type: null, value: "" };
 };
@@ -48,7 +45,6 @@ const signalMatches = (text, signals) => {
 
 const indicatorMatches = (extractedIndicators, threatIndicators) => {
   const extracted = extractedIndicators.map(normalizeIndicator).filter((indicator) => indicator.value);
-
   return threatIndicators.filter((candidate) => extracted.some((indicator) => {
     const sameType = !candidate.type || !indicator.type || candidate.type === indicator.type;
     return sameType && normalize(candidate.value) === normalize(indicator.value);
@@ -56,26 +52,19 @@ const indicatorMatches = (extractedIndicators, threatIndicators) => {
 };
 
 const categoryMatch = (categories, threat) => {
-  const threatCategories = [
-    ...(threat.categories || []),
-    threat.category,
-  ].filter(Boolean).map(normalize);
+  const threatCategories = [...(threat.categories || []), threat.category]
+    .filter(Boolean).map(normalize);
   const localCategories = (categories || []).map(normalize);
   return threatCategories.some((category) => localCategories.includes(category));
 };
 
 const resolveRankedSources = (threat) => {
-  const refs = [
-    ...(threat.sources || []),
-    ...(threat.sourceReferences || []),
-  ];
-
+  const refs = [...(threat.sources || []), ...(threat.sourceReferences || [])];
   const sources = refs.map((ref) => {
     if (typeof ref === "string") return getSource(ref);
     if (ref && typeof ref === "object") return ref;
     return null;
   }).filter(Boolean);
-
   return rankSources(sources).slice(0, 5);
 };
 
@@ -96,7 +85,9 @@ const correlateThreats = ({ text = "", indicators = [], categories = [], threats
     const matchedSignals = signalMatches(text, getThreatSignals(threat));
     const categoryMatched = categoryMatch(categories, threat);
 
-    if (matchedIndicators.length === 0 && matchedSignals.length === 0 && !categoryMatched) continue;
+    // Category compatibility is context, not proof. Require a direct IOC or
+    // behavioral-signal match before creating threat evidence.
+    if (matchedIndicators.length === 0 && matchedSignals.length === 0) continue;
 
     const rankedSources = resolveRankedSources(threat);
     const confidence = confidenceFromEvidence({
