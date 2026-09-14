@@ -1,135 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../../services/api";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./ThreatRadar.css";
 
 const CATEGORIES = ["all", "payments", "mobile", "phishing", "social-engineering", "malware", "identity"];
-
-const severityMeta = {
-  critical: { label: "Critical", icon: "⛔" },
-  high: { label: "High", icon: "🔴" },
-  medium: { label: "Medium", icon: "🟠" },
-  low: { label: "Low", icon: "🟡" },
-  info: { label: "Info", icon: "🔵" },
-};
-
-const ThreatRadar = () => {
-  const [threats, setThreats] = useState([]);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
-  const [selected, setSelected] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const params = new URLSearchParams();
-        if (query.trim()) params.set("q", query.trim());
-        if (category !== "all") params.set("category", category);
-        params.set("limit", "20");
-        const data = await apiRequest(`/threats?${params.toString()}`);
-        if (active) setThreats(data.threats || []);
-      } catch (err) {
-        if (active) setError(err.message || "Unable to load threat intelligence.");
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-
-    const timer = window.setTimeout(load, 250);
-    return () => {
-      active = false;
-      window.clearTimeout(timer);
-    };
-  }, [query, category]);
-
-  const summary = useMemo(() => threats.reduce((acc, threat) => {
-    acc[threat.severity] = (acc[threat.severity] || 0) + 1;
-    return acc;
-  }, {}), [threats]);
-
-  const openThreat = async (threat) => {
-    try {
-      const data = await apiRequest(`/threats/${encodeURIComponent(threat.threatId || threat.id)}`);
-      setSelected(data.threat || threat);
-    } catch {
-      setSelected(threat);
-    }
-  };
-
-  return (
-    <section className="threat-radar-page">
-      <div className="threat-radar-hero">
-        <div>
-          <span className="eyebrow">CYBERRAKSHAK 2.0 · THREAT INTELLIGENCE</span>
-          <h1>Know what is targeting people <span>right now.</span></h1>
-          <p>Explore verified cyber-safety intelligence and understand the warning signs before you click, pay, install, or share.</p>
-        </div>
-        <Link className="radar-check" to="/check">Check something →</Link>
-      </div>
-
-      <div className="radar-stats" aria-label="Threat summary">
-        <div><strong>{threats.length}</strong><span>Visible threats</span></div>
-        <div><strong>{summary.critical || 0}</strong><span>Critical</span></div>
-        <div><strong>{summary.high || 0}</strong><span>High risk</span></div>
-        <div><strong>{new Set(threats.flatMap((item) => (item.sources || []).map((source) => source.id))).size}</strong><span>Sources</span></div>
-      </div>
-
-      <div className="radar-controls">
-        <label className="radar-search">
-          <span>⌕</span>
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search threats, scams, malware..." aria-label="Search threats" />
-        </label>
-        <div className="category-scroll" role="group" aria-label="Threat categories">
-          {CATEGORIES.map((item) => (
-            <button key={item} className={category === item ? "active" : ""} onClick={() => setCategory(item)}>{item.replace("-", " ")}</button>
-          ))}
-        </div>
-      </div>
-
-      {error && <div className="radar-error" role="alert">⚠️ {error}</div>}
-
-      {loading ? (
-        <div className="radar-loading">Loading current intelligence…</div>
-      ) : threats.length === 0 ? (
-        <div className="radar-empty"><strong>No matching threats found.</strong><span>Try a broader search or another category.</span></div>
-      ) : (
-        <div className="threat-grid">
-          {threats.map((threat) => {
-            const meta = severityMeta[threat.severity] || severityMeta.info;
-            return (
-              <button className={`threat-card severity-${threat.severity}`} key={threat.threatId || threat.id} onClick={() => openThreat(threat)}>
-                <div className="threat-card-top"><span className="severity-pill">{meta.icon} {meta.label}</span><span>{threat.category}</span></div>
-                <h2>{threat.title}</h2>
-                <p>{threat.description}</p>
-                <div className="threat-card-bottom"><span>{threat.sources?.length || 0} source{threat.sources?.length === 1 ? "" : "s"}</span><span>{threat.sourceConfidence ?? 0}% confidence</span></div>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {selected && (
-        <div className="threat-modal-backdrop" role="presentation" onClick={() => setSelected(null)}>
-          <article className="threat-modal" role="dialog" aria-modal="true" aria-label={selected.title} onClick={(event) => event.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelected(null)} aria-label="Close threat details">×</button>
-            <span className="severity-pill">{(severityMeta[selected.severity] || severityMeta.info).icon} {(severityMeta[selected.severity] || severityMeta.info).label}</span>
-            <h2>{selected.title}</h2>
-            <p className="modal-description">{selected.description}</p>
-            <h3>What to watch for</h3>
-            <ul>{(selected.indicators || selected.matchedIndicators || []).slice(0, 8).map((indicator, index) => <li key={`${index}-${String(indicator)}`}>{typeof indicator === "string" ? indicator : indicator.value || indicator.description}</li>)}</ul>
-            <h3>Trusted sources</h3>
-            <div className="source-list">{(selected.sources || []).map((source) => <div key={source.id}><strong>{source.name}</strong><span>Tier {source.tier} · {source.confidence ?? 0}% confidence</span></div>)}</div>
-            <Link className="modal-action" to="/check">Check a message or link →</Link>
-          </article>
-        </div>
-      )}
-    </section>
-  );
-};
-
+const severityMeta = { critical: ["Critical", "⛔"], high: ["High", "🔴"], medium: ["Medium", "🟠"], low: ["Low", "🟡"], info: ["Info", "🔵"] };
+function ThreatRadar() {
+  const { language } = useLanguage(); const te = language === "te";
+  const [threats, setThreats] = useState([]); const [query, setQuery] = useState(""); const [category, setCategory] = useState("all"); const [selected, setSelected] = useState(null); const [loading, setLoading] = useState(true); const [error, setError] = useState("");
+  useEffect(() => { let active = true; const load = async () => { setLoading(true); setError(""); try { const p = new URLSearchParams(); if (query.trim()) p.set("q", query.trim()); if (category !== "all") p.set("category", category); p.set("limit", "20"); const data = await apiRequest(`/threats?${p}`); if (active) setThreats(data.threats || []); } catch (e) { if (active) setError(e.message || (te ? "థ్రెట్ సమాచారం లోడ్ కాలేదు." : "Unable to load threat intelligence.")); } finally { if (active) setLoading(false); } }; const timer = window.setTimeout(load, 250); return () => { active = false; window.clearTimeout(timer); }; }, [query, category, te]);
+  const summary = useMemo(() => threats.reduce((a, t) => { a[t.severity] = (a[t.severity] || 0) + 1; return a; }, {}), [threats]);
+  const openThreat = async (threat) => { try { const data = await apiRequest(`/threats/${encodeURIComponent(threat.threatId || threat.id)}`); setSelected(data.threat || threat); } catch { setSelected(threat); } };
+  return <section className="threat-radar-page"><div className="threat-radar-hero"><div><span className="eyebrow">CYBERRAKSHAK 2.0 · {te ? "థ్రెట్ ఇంటెలిజెన్స్" : "THREAT INTELLIGENCE"}</span><h1>{te ? <>ఇప్పుడు ప్రజలను లక్ష్యంగా చేసేది ఏమిటో <span>తెలుసుకోండి.</span></> : <>Know what is targeting people <span>right now.</span></>}</h1><p>{te ? "మీరు క్లిక్ చేయడానికి, చెల్లించడానికి, ఇన్‌స్టాల్ చేయడానికి లేదా సమాచారం పంచుకోవడానికి ముందు ధృవీకరించిన సైబర్ భద్రతా సమాచారాన్ని అర్థం చేసుకోండి." : "Explore verified cyber-safety intelligence and understand the warning signs before you click, pay, install, or share."}</p></div><Link className="radar-check" to="/check">{te ? "ఏదైనా చెక్ చేయండి →" : "Check something →"}</Link></div>
+  <div className="radar-stats"><div><strong>{threats.length}</strong><span>{te ? "కనిపించే థ్రెట్‌లు" : "Visible threats"}</span></div><div><strong>{summary.critical || 0}</strong><span>{te ? "క్రిటికల్" : "Critical"}</span></div><div><strong>{summary.high || 0}</strong><span>{te ? "అధిక ప్రమాదం" : "High risk"}</span></div><div><strong>{new Set(threats.flatMap((i) => (i.sources || []).map((s) => s.id))).size}</strong><span>{te ? "వనరులు" : "Sources"}</span></div></div>
+  <div className="radar-controls"><label className="radar-search"><span>⌕</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={te ? "థ్రెట్‌లు, స్కామ్‌లు, మాల్వేర్ వెతకండి..." : "Search threats, scams, malware..."} aria-label={te ? "థ్రెట్‌లను వెతకండి" : "Search threats"} /></label><div className="category-scroll" role="group" aria-label="Threat categories">{CATEGORIES.map((item) => <button key={item} className={category === item ? "active" : ""} onClick={() => setCategory(item)}>{item === "all" ? (te ? "అన్నీ" : "all") : item.replace("-", " ")}</button>)}</div></div>
+  {error && <div className="radar-error" role="alert">⚠️ {error}</div>}{loading ? <div className="radar-loading">{te ? "ప్రస్తుత ఇంటెలిజెన్స్ లోడ్ అవుతోంది…" : "Loading current intelligence…"}</div> : threats.length === 0 ? <div className="radar-empty"><strong>{te ? "సరిపోలే థ్రెట్‌లు లేవు." : "No matching threats found."}</strong><span>{te ? "విస్తృత సెర్చ్ లేదా మరో కేటగిరీ ప్రయత్నించండి." : "Try a broader search or another category."}</span></div> : <div className="threat-grid">{threats.map((threat) => { const meta = severityMeta[threat.severity] || severityMeta.info; return <button className={`threat-card severity-${threat.severity}`} key={threat.threatId || threat.id} onClick={() => openThreat(threat)}><div className="threat-card-top"><span className="severity-pill">{meta[1]} {te ? ({ critical: "క్రిటికల్", high: "అధిక", medium: "మధ్యస్థ", low: "తక్కువ", info: "సమాచారం" }[threat.severity] || "సమాచారం") : meta[0]}</span><span>{threat.category}</span></div><h2>{threat.title}</h2><p>{threat.description}</p><div className="threat-card-bottom"><span>{threat.sources?.length || 0} {te ? "వనరులు" : `source${threat.sources?.length === 1 ? "" : "s"}`}</span><span>{threat.sourceConfidence ?? 0}% {te ? "నమ్మకం" : "confidence"}</span></div></button>; })}</div>}
+  {selected && <div className="threat-modal-backdrop" role="presentation" onClick={() => setSelected(null)}><article className="threat-modal" role="dialog" aria-modal="true" aria-label={selected.title} onClick={(e) => e.stopPropagation()}><button className="modal-close" onClick={() => setSelected(null)} aria-label="Close">×</button><span className="severity-pill">{(severityMeta[selected.severity] || severityMeta.info)[1]} {(severityMeta[selected.severity] || severityMeta.info)[0]}</span><h2>{selected.title}</h2><p className="modal-description">{selected.description}</p><h3>{te ? "గమనించాల్సిన సంకేతాలు" : "What to watch for"}</h3><ul>{(selected.indicators || selected.matchedIndicators || []).slice(0, 8).map((i, n) => <li key={`${n}-${String(i)}`}>{typeof i === "string" ? i : i.value || i.description}</li>)}</ul><h3>{te ? "విశ్వసనీయ వనరులు" : "Trusted sources"}</h3><div className="source-list">{(selected.sources || []).map((s) => <div key={s.id}><strong>{s.name}</strong><span>Tier {s.tier} · {s.confidence ?? 0}% confidence</span></div>)}</div><Link className="modal-action" to="/check">{te ? "మెసేజ్ లేదా లింక్ చెక్ చేయండి →" : "Check a message or link →"}</Link></article></div>}</section>;
+}
 export default ThreatRadar;
