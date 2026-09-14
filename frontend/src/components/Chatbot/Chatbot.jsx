@@ -1,187 +1,177 @@
 import { useState } from "react";
+import { sendChatMessage } from "../../services/chatService";
 import "./Chatbot.css";
+
+const createMessage = (sender, text) => ({
+  id: `${sender}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  text,
+  sender,
+  timestamp: new Date(),
+});
+
+const fallbackReply = (text) => {
+  const value = String(text || "").toLowerCase();
+  if (value.includes("otp")) {
+    return "🔑 Never share an OTP. Legitimate support teams do not need your OTP to receive or release a payment.";
+  }
+  if (value.includes("upi")) {
+    return "💳 Verify the recipient and amount before approving a UPI payment. Your UPI PIN authorizes a payment; never share it or enter it to receive money.";
+  }
+  if (value.includes("phish")) {
+    return "⚠️ Check the sender and website address independently. Avoid unexpected links or attachments and never enter secrets from a suspicious message.";
+  }
+  if (value.includes("password")) {
+    return "🔐 Use a unique password for important accounts and enable multi-factor authentication where available. Never share your password.";
+  }
+  return "I can help with phishing, scams, OTP/UPI safety, passwords, account security and safe next steps. Please do not share passwords, OTPs, PINs, CVVs or recovery codes.";
+};
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "Hello! I'm CyberRakshak AI Assistant. How can I help you stay safe online?",
-      sender: "bot",
-      timestamp: new Date(),
-    },
+    createMessage(
+      "bot",
+      "Hello! I'm CyberRakshak. I can help you understand suspicious messages, scams and safer next steps."
+    ),
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const predefinedResponses = {
-    hello: "👋 Hello! I'm here to help you with cyber security questions.",
-    password:
-      "🔐 Strong passwords should be at least 12 characters, include uppercase, lowercase, numbers, and symbols. Never share your password!",
-    phishing:
-      "⚠️ Phishing emails try to trick you into revealing personal info. Never click links from unknown senders and verify email addresses carefully.",
-    otp: "🔑 Never share your OTP (One-Time Password) with anyone, including bank employees or support staff!",
-    scam: "🚨 If you've been scammed, report it immediately. Use our Report Scam feature for assistance.",
-    upi: "💳 UPI Safety: Always verify the recipient before sending money. Don't share your UPI PIN with anyone.",
-    social:
-      "📱 Social Media Safety: Enable 2FA, don't accept friend requests from strangers, and be careful what you share.",
-    default:
-      "I'm still learning! Please visit our Learning Center or Emergency Help section for more information.",
-  };
+  const askAssistant = async (text) => {
+    const trimmed = text.trim();
+    if (!trimmed || isLoading) return;
 
-  const generateResponse = (userMessage) => {
-    const messageLower = userMessage.toLowerCase();
-
-    for (const [key, response] of Object.entries(predefinedResponses)) {
-      if (messageLower.includes(key)) {
-        return response;
-      }
-    }
-
-    return predefinedResponses.default;
-  };
-
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-
-    if (!inputValue.trim()) return;
-
-    // Add user message
-    const userMessage = {
-      id: messages.length + 1,
-      text: inputValue,
-      sender: "user",
-      timestamp: new Date(),
-    };
-
-    setMessages([...messages, userMessage]);
+    const userMessage = createMessage("user", trimmed);
+    const nextMessages = [...messages, userMessage];
+    setMessages(nextMessages);
     setInputValue("");
     setIsLoading(true);
 
-    // Simulate bot response delay
-    setTimeout(() => {
-      const botResponse = {
-        id: messages.length + 2,
-        text: generateResponse(inputValue),
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botResponse]);
+    try {
+      const apiMessages = nextMessages
+        .filter((message) => message.sender === "user" || message.sender === "bot")
+        .slice(-12)
+        .map((message) => ({
+          role: message.sender === "user" ? "user" : "assistant",
+          content: message.text,
+        }));
+
+      const data = await sendChatMessage(apiMessages);
+      const reply = data?.reply?.trim() || fallbackReply(trimmed);
+      setMessages((current) => [...current, createMessage("bot", reply)]);
+    } catch (error) {
+      console.error("CyberRakshak chat request failed", error);
+      setMessages((current) => [
+        ...current,
+        createMessage("bot", fallbackReply(trimmed)),
+      ]);
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
+  };
+
+  const handleSendMessage = (event) => {
+    event.preventDefault();
+    void askAssistant(inputValue);
   };
 
   const handleQuickQuestion = (question) => {
-    const userMessage = {
-      id: messages.length + 1,
-      text: question,
-      sender: "user",
-      timestamp: new Date(),
-    };
-
-    setMessages([...messages, userMessage]);
-    setIsLoading(true);
-
-    setTimeout(() => {
-      const botResponse = {
-        id: messages.length + 2,
-        text: generateResponse(question),
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botResponse]);
-      setIsLoading(false);
-    }, 500);
+    void askAssistant(question);
   };
 
   return (
     <>
-      {/* Chatbot Floating Button */}
-      <div
+      <button
+        type="button"
         className={`chatbot-container ${isOpen ? "open" : ""}`}
-        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-controls="cyberrakshak-chat-window"
+        aria-label={isOpen ? "Close CyberRakshak assistant" : "Open CyberRakshak assistant"}
+        onClick={() => setIsOpen((current) => !current)}
       >
-        <div className="chatbot-toggle">{isOpen ? "✖️" : "💬"}</div>
+        <span className="chatbot-toggle" aria-hidden="true">
+          {isOpen ? "✖️" : "💬"}
+        </span>
+      </button>
 
-        {/* Chatbot Window */}
-        <div className={`chatbot-window ${isOpen ? "active" : ""}`}>
-          <div className="chatbot-header">
-            <h3>🤖 CyberRakshak AI</h3>
-            <p>Always here to help</p>
-          </div>
+      <section
+        id="cyberrakshak-chat-window"
+        className={`chatbot-window ${isOpen ? "active" : ""}`}
+        aria-label="CyberRakshak AI assistant"
+        aria-hidden={!isOpen}
+      >
+        <div className="chatbot-header">
+          <h3>🤖 CyberRakshak</h3>
+          <p>Cyber-safety guidance, with a local fallback</p>
+        </div>
 
-          <div className="chatbot-messages">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`message ${message.sender === "user" ? "user" : "bot"}`}
-              >
-                <div className="message-content">{message.text}</div>
-                <span className="message-time">
-                  {message.timestamp.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+        <div className="chatbot-messages" aria-live="polite">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`message ${message.sender === "user" ? "user" : "bot"}`}
+            >
+              <div className="message-content">{message.text}</div>
+              <span className="message-time">
+                {message.timestamp.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="message bot">
+              <div className="message-content" aria-label="Assistant is thinking">
+                <span className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
                 </span>
               </div>
-            ))}
-
-            {isLoading && (
-              <div className="message bot">
-                <div className="message-content">
-                  <span className="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Quick Questions */}
-          {messages.length === 1 && (
-            <div className="quick-questions">
-              <p>Quick questions:</p>
-              <button
-                onClick={() => handleQuickQuestion("Tell me about passwords")}
-              >
-                🔐 Password Safety
-              </button>
-              <button onClick={() => handleQuickQuestion("What is phishing?")}>
-                ⚠️ Phishing
-              </button>
-              <button onClick={() => handleQuickQuestion("OTP safety")}>
-                🔑 OTP Safety
-              </button>
-              <button
-                onClick={() => handleQuickQuestion("Social media safety")}
-              >
-                📱 Social Media
-              </button>
             </div>
           )}
-
-          {/* Message Input */}
-          <form onSubmit={handleSendMessage} className="chatbot-input-form">
-            <input
-              type="text"
-              placeholder="Ask a question..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              disabled={isLoading}
-              className="chatbot-input"
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !inputValue.trim()}
-              className="chatbot-send-btn"
-            >
-              Send
-            </button>
-          </form>
         </div>
-      </div>
+
+        {messages.length === 1 && (
+          <div className="quick-questions">
+            <p>Try one:</p>
+            <button type="button" onClick={() => handleQuickQuestion("How do I spot phishing?")}>
+              ⚠️ Phishing
+            </button>
+            <button type="button" onClick={() => handleQuickQuestion("How should I protect my OTP?")}>
+              🔑 OTP safety
+            </button>
+            <button type="button" onClick={() => handleQuickQuestion("How can I stay safe with UPI?")}>
+              💳 UPI safety
+            </button>
+            <button type="button" onClick={() => handleQuickQuestion("How should I protect my passwords?")}>
+              🔐 Passwords
+            </button>
+          </div>
+        )}
+
+        <form onSubmit={handleSendMessage} className="chatbot-input-form">
+          <input
+            type="text"
+            placeholder="Ask a cyber-safety question…"
+            value={inputValue}
+            onChange={(event) => setInputValue(event.target.value)}
+            disabled={isLoading}
+            maxLength={2000}
+            className="chatbot-input"
+            aria-label="Ask CyberRakshak a question"
+          />
+          <button
+            type="submit"
+            disabled={isLoading || !inputValue.trim()}
+            className="chatbot-send-btn"
+          >
+            Send
+          </button>
+        </form>
+      </section>
     </>
   );
 }
