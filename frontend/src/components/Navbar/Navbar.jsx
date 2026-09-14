@@ -56,6 +56,9 @@ function Navbar() {
 
         <div className={`nav-menu ${isOpen ? "active" : ""}`}>
           <button className={`nav-link ${location.pathname === "/" ? "active" : ""}`} onClick={() => handleNavClick("/")}>Home</button>
+          <button className={`nav-link ${location.pathname === "/check" ? "active" : ""}`} onClick={() => handleNavClick("/check")}>Check</button>
+          <button className={`nav-link ${location.pathname === "/threats" ? "active" : ""}`} onClick={() => handleNavClick("/threats")}>Threats</button>
+          <button className={`nav-link ${location.pathname === "/intelligence" ? "active" : ""}`} onClick={() => handleNavClick("/intelligence")}>Intelligence</button>
           <button className={`nav-link ${location.pathname === "/learn" ? "active" : ""}`} onClick={() => handleNavClick("/learn")}>Learn</button>
           <button className={`nav-link ${location.pathname === "/digital-literacy-quiz" ? "active" : ""}`} onClick={() => handleNavClick("/digital-literacy-quiz")}>Quiz</button>
           <button className={`nav-link ${location.pathname === "/emergency-help" ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>Emergency</button>
