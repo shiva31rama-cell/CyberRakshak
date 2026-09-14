@@ -2,60 +2,27 @@ import { createContext, useContext, useMemo, useState } from "react";
 
 const STORAGE_KEY = "cyberrakshak-language";
 
-const translations = {
+const checkCopy = {
   en: {
-    nav: { home: "Home", learn: "Learn", quiz: "Quiz", emergency: "Emergency", report: "Report Scam", feedback: "Feedback", intelligence: "Intelligence", threats: "Threat Radar", check: "Check", incidents: "Incident Mode", login: "Login", register: "Register", logout: "Logout" },
-    language: "Language",
-    home: {
-      eyebrow: "CYBERRAKSHAK 2.0",
-      title1: "Before you click.", title2: "Before you pay.", title3: "Before you trust.",
-      lead: "A privacy-first digital safety layer for messages, links, payments, notifications and the moments when something suddenly feels wrong.",
-      principles: ["Local-first", "India-ready", "Evidence-led"],
-      checkNow: "CHECK SOMETHING NOW", pasteLabel: "Paste the thing that feels suspicious", placeholder: "Example: ‘Your account will be blocked. Send OTP immediately…’", checkSafely: "Check safely", alreadyTitle: "Already clicked, paid, shared something or installed an app?", alreadyText: "Start Incident Mode. It gives you a calm, ordered recovery path instead of making you guess what to do next.", openIncident: "Open Incident Mode",
-      whatChanging: "What’s changing around you?", explore: "Explore Threat Radar →", learnEyebrow: "LEARN WITHOUT THE LECTURE", learnTitle: "One real scenario at a time.", learnText: "Short, visual lessons built around what people actually see: fake KYC notices, payment requests, job offers, deepfake pressure and suspicious app prompts.", learningHub: "Open Learning Hub →",
-      checks: { message: "Message", messageHint: "Paste SMS, WhatsApp, email or DM text", link: "Link", linkHint: "Check a suspicious URL before opening it", upi: "UPI / payment", upiHint: "Review a UPI ID or payment request", phone: "Phone", phoneHint: "Check an unfamiliar Indian number", qr: "QR / screenshot", qrHint: "Use import/share on your device", incident: "I already acted", incidentHint: "Get the next safest steps" },
-      detect: "Signals across messages, links, identifiers and notifications", understand: "Plain-language reasons instead of scary black-box scores", act: "Clear next steps with verified official resources"
-    }
+    back: "← Back", eyebrow: "SAFETY CHECK CENTER", title: "Make the next decision with evidence.", intro: "Paste a message, link, payment identifier, phone number or email. CyberRakshak checks local safety signals first and then correlates them with available threat intelligence.", labelSuffix: "to check", placeholder: "Paste {item} here…", count: "{count}/12,000", submit: "Analyze safely", checking: "Analyzing…", clear: "Clear", paste: "Paste", privacy: "Privacy-first: the browser sends only the text you submit. Never paste OTPs, PINs, CVVs, passwords or full card numbers.", emptyReady: "READY WHEN YOU ARE", emptyTitle: "Your decision panel will appear here.", emptyText: "You will see the risk level, reasons, matched intelligence, verified sources and the safest next step.", assessment: "ASSESSMENT", why: "Why this result", identifiers: "Detected identifiers", evidence: "Threat intelligence", next: "NEXT SAFEST ACTION", incident: "Open Incident Mode", verified: "Verified sources", inputAria: "What are you checking?", errorEmpty: "Add something to check first.", errorGeneric: "The safety check could not be completed. Please try again.", risk: { critical: ["Stop. Strong risk signals detected.", "Do not continue the request until you independently verify it."], high: ["Pause. Several strong warning signals were found.", "Verify the person, organisation or payment request through an official channel."], medium: ["Be careful. Some suspicious signals were found.", "Slow down and verify the important details before acting."], low: ["Low-risk signals found.", "No strong match was detected, but stay alert and verify unexpected requests."], info: ["No strong threat signal detected.", "A clean result is not a guarantee. Continue using normal safety checks."] }, inputs: { message: ["Message", "SMS, WhatsApp, email or DM text"], url: ["Link", "Suspicious URL"], upi: ["UPI / payment", "UPI ID or payment request"], phone: ["Phone", "Indian phone number"], email: ["Email", "Email address"], qr_payload: ["QR payload", "Decoded QR text or URL"] }
   },
   te: {
-    nav: { home: "హోమ్", learn: "నేర్చుకోండి", quiz: "క్విజ్", emergency: "అత్యవసరం", report: "స్కామ్ రిపోర్ట్", feedback: "ఫీడ్‌బ్యాక్", intelligence: "ఇంటెలిజెన్స్", threats: "థ్రెట్ రాడార్", check: "చెక్", incidents: "ఇన్సిడెంట్ మోడ్", login: "లాగిన్", register: "రిజిస్టర్", logout: "లాగౌట్" },
-    language: "భాష",
-    home: {
-      eyebrow: "CYBERRAKSHAK 2.0",
-      title1: "క్లిక్ చేసే ముందు.", title2: "డబ్బు పంపే ముందు.", title3: "నమ్మే ముందు.",
-      lead: "మెసేజ్‌లు, లింక్‌లు, చెల్లింపులు, నోటిఫికేషన్‌లు మరియు ఏదైనా అనుమానంగా అనిపించే సమయంలో మీ గోప్యతను ముందుగా ఉంచే డిజిటల్ భద్రతా సహాయకం.",
-      principles: ["లోకల్-ఫస్ట్", "భారతదేశానికి సిద్ధం", "ఆధారాలపై ఆధారితం"],
-      checkNow: "ఇప్పుడే ఏదైనా చెక్ చేయండి", pasteLabel: "అనుమానంగా అనిపించినదాన్ని ఇక్కడ పెట్టండి", placeholder: "ఉదాహరణ: ‘మీ ఖాతా బ్లాక్ అవుతుంది. వెంటనే OTP పంపండి…’", checkSafely: "సురక్షితంగా చెక్ చేయండి", alreadyTitle: "ఇప్పటికే క్లిక్ చేశారా, డబ్బు పంపారా, సమాచారం పంచుకున్నారా లేదా యాప్ ఇన్‌స్టాల్ చేశారా?", alreadyText: "ఇన్సిడెంట్ మోడ్‌ను ప్రారంభించండి. తర్వాత ఏమి చేయాలో ప్రశాంతంగా, క్రమంగా చూపిస్తుంది.", openIncident: "ఇన్సిడెంట్ మోడ్ తెరవండి",
-      whatChanging: "మీ చుట్టూ ఏమి మారుతోంది?", explore: "థ్రెట్ రాడార్ చూడండి →", learnEyebrow: "లెక్చర్ లేకుండా నేర్చుకోండి", learnTitle: "ఒక్కసారి ఒక నిజమైన పరిస్థితి.", learnText: "నకిలీ KYC నోటీసులు, చెల్లింపు అభ్యర్థనలు, ఉద్యోగ ఆఫర్లు, డీప్‌ఫేక్ ఒత్తిడి మరియు అనుమానాస్పద యాప్ సందేశాలపై చిన్న, సులభమైన పాఠాలు.", learningHub: "లెర్నింగ్ హబ్ తెరవండి →",
-      checks: { message: "మెసేజ్", messageHint: "SMS, WhatsApp, ఇమెయిల్ లేదా DM టెక్స్ట్ పెట్టండి", link: "లింక్", linkHint: "ఓపెన్ చేసే ముందు అనుమానాస్పద URL చెక్ చేయండి", upi: "UPI / చెల్లింపు", upiHint: "UPI ID లేదా చెల్లింపు అభ్యర్థనను పరిశీలించండి", phone: "ఫోన్", phoneHint: "తెలియని భారతీయ నంబర్‌ను చెక్ చేయండి", qr: "QR / స్క్రీన్‌షాట్", qrHint: "మీ పరికరంలో import/share ఉపయోగించండి", incident: "నేను ఇప్పటికే చర్య తీసుకున్నాను", incidentHint: "తర్వాత తీసుకోవాల్సిన సురక్షితమైన చర్యలు పొందండి" },
-      detect: "మెసేజ్‌లు, లింక్‌లు, గుర్తింపులు మరియు నోటిఫికేషన్‌లలో ప్రమాద సంకేతాలను గుర్తిస్తుంది", understand: "భయపెట్టే స్కోర్లకు బదులుగా సులభమైన కారణాలను వివరిస్తుంది", act: "ధృవీకరించిన అధికారిక వనరులతో స్పష్టమైన తదుపరి చర్యలను చూపిస్తుంది"
-    }
+    back: "← వెనక్కి", eyebrow: "సేఫ్టీ చెక్ సెంటర్", title: "ఆధారాలతో తదుపరి నిర్ణయం తీసుకోండి.", intro: "మెసేజ్, లింక్, చెల్లింపు గుర్తింపు, ఫోన్ నంబర్ లేదా ఇమెయిల్‌ను పెట్టండి. CyberRakshak ముందుగా లోకల్ సేఫ్టీ సిగ్నల్స్‌ను, తర్వాత అందుబాటులో ఉన్న థ్రెట్ ఇంటెలిజెన్స్‌ను పరిశీలిస్తుంది.", labelSuffix: "చెక్ చేయండి", placeholder: "{item} ఇక్కడ పెట్టండి…", count: "{count}/12,000", submit: "సురక్షితంగా విశ్లేషించండి", checking: "విశ్లేషిస్తోంది…", clear: "క్లియర్", paste: "పేస్ట్", privacy: "గోప్యతకు ప్రాధాన్యం: మీరు సబ్మిట్ చేసిన టెక్స్ట్ మాత్రమే పంపబడుతుంది. OTP, PIN, CVV, పాస్‌వర్డ్ లేదా పూర్తి కార్డ్ నంబర్‌లను ఎప్పుడూ పెట్టవద్దు.", emptyReady: "మీ కోసం సిద్ధంగా ఉంది", emptyTitle: "మీ నిర్ణయ ప్యానెల్ ఇక్కడ కనిపిస్తుంది.", emptyText: "రిస్క్ స్థాయి, కారణాలు, సరిపోలిన ఇంటెలిజెన్స్, ధృవీకరించిన మూలాలు మరియు సురక్షితమైన తదుపరి చర్య కనిపిస్తాయి.", assessment: "అసెస్‌మెంట్", why: "ఈ ఫలితం ఎందుకు వచ్చింది", identifiers: "గుర్తించిన వివరాలు", evidence: "థ్రెట్ ఇంటెలిజెన్స్", next: "తదుపరి సురక్షిత చర్య", incident: "ఇన్సిడెంట్ మోడ్ తెరవండి", verified: "ధృవీకరించిన మూలాలు", inputAria: "ఏం చెక్ చేస్తున్నారు?", errorEmpty: "ముందుగా చెక్ చేయాల్సిన సమాచారాన్ని పెట్టండి.", errorGeneric: "సేఫ్టీ చెక్ పూర్తి కాలేదు. మళ్లీ ప్రయత్నించండి.", risk: { critical: ["ఆపండి. బలమైన ప్రమాద సంకేతాలు కనిపించాయి.", "స్వతంత్రంగా ధృవీకరించే వరకు ఈ అభ్యర్థనను కొనసాగించవద్దు."], high: ["ఆగండి. అనేక బలమైన హెచ్చరిక సంకేతాలు కనిపించాయి.", "అధికారిక ఛానల్ ద్వారా వ్యక్తి, సంస్థ లేదా చెల్లింపు అభ్యర్థనను ధృవీకరించండి."], medium: ["జాగ్రత్త. కొన్ని అనుమానాస్పద సంకేతాలు కనిపించాయి.", "చర్య తీసుకునే ముందు ముఖ్యమైన వివరాలను నెమ్మదిగా ధృవీకరించండి."], low: ["తక్కువ రిస్క్ సంకేతాలు కనిపించాయి.", "బలమైన మ్యాచ్ కనిపించలేదు, అయినా ఊహించని అభ్యర్థనలను ధృవీకరించండి."], info: ["బలమైన ప్రమాద సంకేతం కనిపించలేదు.", "క్లీన్ ఫలితం హామీ కాదు. సాధారణ భద్రతా జాగ్రత్తలను కొనసాగించండి."] }, inputs: { message: ["మెసేజ్", "SMS, WhatsApp, ఇమెయిల్ లేదా DM టెక్స్ట్"], url: ["లింక్", "అనుమానాస్పద URL"], upi: ["UPI / చెల్లింపు", "UPI ID లేదా చెల్లింపు అభ్యర్థన"], phone: ["ఫోన్", "భారతీయ ఫోన్ నంబర్"], email: ["ఇమెయిల్", "ఇమెయిల్ అడ్రస్"], qr_payload: ["QR payload", "డీకోడ్ చేసిన QR టెక్స్ట్ లేదా URL"] }
+  }
+};
+
+const translations = {
+  en: {
+    nav: { home: "Home", learn: "Learn", quiz: "Quiz", emergency: "Emergency", report: "Report Scam", feedback: "Feedback", intelligence: "Intelligence", threats: "Threat Radar", check: "Check", incidents: "Incident Mode", login: "Login", register: "Register", logout: "Logout" }, language: "Language", check: checkCopy.en,
+    home: { eyebrow: "CYBERRAKSHAK 2.0", title1: "Before you click.", title2: "Before you pay.", title3: "Before you trust.", lead: "A privacy-first digital safety layer for messages, links, payments, notifications and the moments when something suddenly feels wrong.", principles: ["Local-first", "India-ready", "Evidence-led"], checkNow: "CHECK SOMETHING NOW", pasteLabel: "Paste the thing that feels suspicious", placeholder: "Example: ‘Your account will be blocked. Send OTP immediately…’", checkSafely: "Check safely", alreadyTitle: "Already clicked, paid, shared something or installed an app?", alreadyText: "Start Incident Mode. It gives you a calm, ordered recovery path instead of making you guess what to do next.", openIncident: "Open Incident Mode", whatChanging: "What’s changing around you?", explore: "Explore Threat Radar →", learnEyebrow: "LEARN WITHOUT THE LECTURE", learnTitle: "One real scenario at a time.", learnText: "Short, visual lessons built around what people actually see: fake KYC notices, payment requests, job offers, deepfake pressure and suspicious app prompts.", learningHub: "Open Learning Hub →", checks: { message: "Message", messageHint: "Paste SMS, WhatsApp, email or DM text", link: "Link", linkHint: "Check a suspicious URL before opening it", upi: "UPI / payment", upiHint: "Review a UPI ID or payment request", phone: "Phone", phoneHint: "Check an unfamiliar Indian number", qr: "QR / screenshot", qrHint: "Use import/share on your device", incident: "I already acted", incidentHint: "Get the next safest steps" }, detect: "Signals across messages, links, identifiers and notifications", understand: "Plain-language reasons instead of scary black-box scores", act: "Clear next steps with verified official resources" }
+  },
+  te: {
+    nav: { home: "హోమ్", learn: "నేర్చుకోండి", quiz: "క్విజ్", emergency: "అత్యవసరం", report: "స్కామ్ రిపోర్ట్", feedback: "ఫీడ్‌బ్యాక్", intelligence: "ఇంటెలిజెన్స్", threats: "థ్రెట్ రాడార్", check: "చెక్", incidents: "ఇన్సిడెంట్ మోడ్", login: "లాగిన్", register: "రిజిస్టర్", logout: "లాగౌట్" }, language: "భాష", check: checkCopy.te,
+    home: { eyebrow: "CYBERRAKSHAK 2.0", title1: "క్లిక్ చేసే ముందు.", title2: "డబ్బు పంపే ముందు.", title3: "నమ్మే ముందు.", lead: "మెసేజ్‌లు, లింక్‌లు, చెల్లింపులు, నోటిఫికేషన్‌లు మరియు ఏదైనా అనుమానంగా అనిపించే సమయంలో మీ గోప్యతను ముందుగా ఉంచే డిజిటల్ భద్రతా సహాయకం.", principles: ["లోకల్-ఫస్ట్", "భారతదేశానికి సిద్ధం", "ఆధారాలపై ఆధారితం"], checkNow: "ఇప్పుడే ఏదైనా చెక్ చేయండి", pasteLabel: "అనుమానంగా అనిపించినదాన్ని ఇక్కడ పెట్టండి", placeholder: "ఉదాహరణ: ‘మీ ఖాతా బ్లాక్ అవుతుంది. వెంటనే OTP పంపండి…’", checkSafely: "సురక్షితంగా చెక్ చేయండి", alreadyTitle: "ఇప్పటికే క్లిక్ చేశారా, డబ్బు పంపారా, సమాచారం పంచుకున్నారా లేదా యాప్ ఇన్‌స్టాల్ చేశారా?", alreadyText: "ఇన్సిడెంట్ మోడ్‌ను ప్రారంభించండి. తర్వాత ఏమి చేయాలో ప్రశాంతంగా, క్రమంగా చూపిస్తుంది.", openIncident: "ఇన్సిడెంట్ మోడ్ తెరవండి", whatChanging: "మీ చుట్టూ ఏమి మారుతోంది?", explore: "థ్రెట్ రాడార్ చూడండి →", learnEyebrow: "లెక్చర్ లేకుండా నేర్చుకోండి", learnTitle: "ఒక్కసారి ఒక నిజమైన పరిస్థితి.", learnText: "నకిలీ KYC నోటీసులు, చెల్లింపు అభ్యర్థనలు, ఉద్యోగ ఆఫర్లు, డీప్‌ఫేక్ ఒత్తిడి మరియు అనుమానాస్పద యాప్ సందేశాలపై చిన్న, సులభమైన పాఠాలు.", learningHub: "లెర్నింగ్ హబ్ తెరవండి →", checks: { message: "మెసేజ్", messageHint: "SMS, WhatsApp, ఇమెయిల్ లేదా DM టెక్స్ట్ పెట్టండి", link: "లింక్", linkHint: "ఓపెన్ చేసే ముందు అనుమానాస్పద URL చెక్ చేయండి", upi: "UPI / చెల్లింపు", upiHint: "UPI ID లేదా చెల్లింపు అభ్యర్థనను పరిశీలించండి", phone: "ఫోన్", phoneHint: "తెలియని భారతీయ నంబర్‌ను చెక్ చేయండి", qr: "QR / స్క్రీన్‌షాట్", qrHint: "మీ పరికరంలో import/share ఉపయోగించండి", incident: "నేను ఇప్పటికే చర్య తీసుకున్నాను", incidentHint: "తర్వాత తీసుకోవాల్సిన సురక్షితమైన చర్యలు పొందండి" }, detect: "మెసేజ్‌లు, లింక్‌లు, గుర్తింపులు మరియు నోటిఫికేషన్‌లలో ప్రమాద సంకేతాలను గుర్తిస్తుంది", understand: "భయపెట్టే స్కోర్లకు బదులుగా సులభమైన కారణాలను వివరిస్తుంది", act: "ధృవీకరించిన అధికారిక వనరులతో స్పష్టమైన తదుపరి చర్యలను చూపిస్తుంది" }
   }
 };
 
 const LanguageContext = createContext(null);
-
-function getInitialLanguage() {
-  if (typeof window === "undefined") return "en";
-  return window.localStorage.getItem(STORAGE_KEY) === "te" ? "te" : "en";
-}
-
-export function LanguageProvider({ children }) {
-  const [language, setLanguageState] = useState(getInitialLanguage);
-
-  const setLanguage = (next) => {
-    const value = next === "te" ? "te" : "en";
-    setLanguageState(value);
-    window.localStorage.setItem(STORAGE_KEY, value);
-    document.documentElement.lang = value;
-  };
-
-  const value = useMemo(() => ({ language, setLanguage, t: translations[language] }), [language]);
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
-}
-
-export function useLanguage() {
-  const context = useContext(LanguageContext);
-  if (!context) throw new Error("useLanguage must be used inside LanguageProvider");
-  return context;
-}
+function getInitialLanguage() { if (typeof window === "undefined") return "en"; return window.localStorage.getItem(STORAGE_KEY) === "te" ? "te" : "en"; }
+export function LanguageProvider({ children }) { const [language, setLanguageState] = useState(getInitialLanguage); const setLanguage = (next) => { const value = next === "te" ? "te" : "en"; setLanguageState(value); window.localStorage.setItem(STORAGE_KEY, value); document.documentElement.lang = value; }; const value = useMemo(() => ({ language, setLanguage, t: translations[language] }), [language]); return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>; }
+export function useLanguage() { const context = useContext(LanguageContext); if (!context) throw new Error("useLanguage must be used inside LanguageProvider"); return context; }
