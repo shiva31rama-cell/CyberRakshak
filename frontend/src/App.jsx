@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import SafetyHome from "./pages/SafetyHome/SafetyHome";
 import CheckCenter from "./pages/CheckCenter/CheckCenter";
 import IncidentMode from "./pages/IncidentMode/IncidentMode";
+import ThreatRadar from "./pages/ThreatRadar/ThreatRadar";
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -34,6 +35,7 @@ function App() {
             <Routes>
               <Route path="/" element={<SafetyHome />} />
               <Route path="/check" element={<CheckCenter />} />
+              <Route path="/threats" element={<ThreatRadar />} />
               <Route path="/incidents" element={<IncidentMode />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
