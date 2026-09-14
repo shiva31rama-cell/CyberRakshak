@@ -31,6 +31,22 @@ test("detects UPI PIN requests", () => {
   assert.ok(result.score >= 35);
 });
 
+test("detects malicious-app installation pressure", () => {
+  const result = analyzeText("Install this APK immediately to receive your refund.");
+  assert.ok(result.categories.includes("malicious_app"));
+  assert.ok(result.score >= 30);
+});
+
+test("detects suspicious attachments", () => {
+  const result = analyzeText("Open this unexpected attachment from the account.");
+  assert.ok(result.categories.includes("malicious_attachment"));
+});
+
+test("detects remote-access pressure", () => {
+  const result = analyzeText("Share your screen so our support team can fix the issue.");
+  assert.ok(result.categories.includes("remote_access_scam"));
+});
+
 test("extracts links", () => {
   const result = analyzeText("Click here immediately: https://example.test/login");
   assert.ok(result.categories.includes("malicious_link"));
