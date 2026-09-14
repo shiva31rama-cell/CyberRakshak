@@ -64,7 +64,7 @@ function Feedback() {
         });
         setSubmitted(false);
       }, 3000);
-    } catch (error) {
+    } catch {
       alert("Error submitting feedback. Please try again.");
     } finally {
       setIsLoading(false);

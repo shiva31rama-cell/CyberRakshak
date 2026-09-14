@@ -18,17 +18,6 @@ function ScamSolutions() {
   const [caseNumber, setCaseNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const scamTypes = [
-    "phishing",
-    "fake-job",
-    "romance-scam",
-    "investment-fraud",
-    "upi-fraud",
-    "sms-scam",
-    "call-fraud",
-    "other",
-  ];
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -66,7 +55,7 @@ function ScamSolutions() {
           amountLost: "",
         });
       }, 3000);
-    } catch (error) {
+    } catch {
       alert("Error submitting report. Please try again.");
     } finally {
       setIsLoading(false);
@@ -310,3 +299,5 @@ function ScamSolutions() {
 }
 
 export default ScamSolutions;
+
+

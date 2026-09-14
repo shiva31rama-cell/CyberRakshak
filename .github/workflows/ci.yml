@@ -6,35 +6,73 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: cyberrakshak-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   backend-check:
+    name: Backend checks
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: backend/package-lock.json
-      - run: npm install
-      - run: node -c server.js
-      - run: npm test
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Syntax check
+        run: node -c server.js
+
+      - name: Load application and routes
+        run: node -e "require('./server'); console.log('Backend application loaded successfully')"
+
+      - name: Backend tests
+        run: npm test
 
   frontend-check:
+    name: Frontend checks
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - run: npm install
-      - run: npm run lint
-      - run: npm run build
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
+
+  integration-gate:
+    name: Integration gate
+    needs: [backend-check, frontend-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify required build gates passed
+        run: echo "Backend and frontend production gates passed."
