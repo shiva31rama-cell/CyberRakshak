@@ -1,180 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../../services/api";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./ThreatIntelDashboard.css";
-
-const statusMeta = {
-  healthy: { label: "Live", icon: "●" },
-  degraded: { label: "Curated", icon: "◐" },
-  failed: { label: "Unavailable", icon: "○" },
-  manual: { label: "Manual", icon: "◐" },
-};
-
+const statusMeta = { healthy: ["Live", "●"], degraded: ["Curated", "◐"], failed: ["Unavailable", "○"], manual: ["Manual", "◐"] };
 const severityOrder = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
-
-function formatDate(value) {
-  if (!value) return "Not available";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Not available";
-  return new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(date);
-}
-
-function sourceLabel(source) {
-  if (!source) return "Unknown source";
-  return source.name || source.id || "Unknown source";
-}
-
+function formatDate(value) { if (!value) return "—"; const d = new Date(value); return Number.isNaN(d.getTime()) ? "—" : new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(d); }
 function ThreatIntelDashboard() {
-  const [health, setHealth] = useState(null);
-  const [threats, setThreats] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [selected, setSelected] = useState(null);
-
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const [healthData, threatData] = await Promise.all([
-          apiRequest("/intelligence/health"),
-          apiRequest("/threats?limit=12"),
-        ]);
-        if (!active) return;
-        setHealth(healthData);
-        setThreats(threatData.threats || []);
-      } catch (err) {
-        if (active) setError(err.message || "Unable to load the intelligence dashboard.");
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-    load();
-    return () => { active = false; };
-  }, []);
-
-  const sortedThreats = useMemo(() => [...threats].sort((a, b) => {
-    const severityDiff = (severityOrder[a.severity] ?? 9) - (severityOrder[b.severity] ?? 9);
-    if (severityDiff !== 0) return severityDiff;
-    return String(b.publishedAt || b.retrievedAt || "").localeCompare(String(a.publishedAt || a.retrievedAt || ""));
-  }), [threats]);
-
-  const summary = health?.summary || {};
-  const liveFeeds = (health?.feeds || []).filter((feed) => feed.status === "healthy").length;
-  const curatedFeeds = (health?.feeds || []).filter((feed) => feed.status === "manual" || feed.status === "degraded").length;
-
-  return (
-    <section className="intel-page">
-      <header className="intel-hero">
-        <div>
-          <span className="intel-eyebrow">CYBERRAKSHAK 2.0 · INTELLIGENCE CENTER</span>
-          <h1>Know <span>where the signal comes from.</span></h1>
-          <p>See which intelligence feeds are live, which records are curated, and why a threat deserves your attention.</p>
-        </div>
-        <div className="intel-hero-actions">
-          <Link className="intel-primary" to="/check">Check a message →</Link>
-          <Link className="intel-secondary" to="/threats">Threat Radar</Link>
-        </div>
-      </header>
-
-      {error && <div className="intel-error" role="alert">⚠️ {error}</div>}
-
-      <div className="intel-metrics" aria-label="Intelligence health summary">
-        <article><span>Feed health</span><strong>{summary.healthPercent ?? 0}%</strong><small>{summary.healthy ?? 0} healthy · {summary.failed ?? 0} failed</small></article>
-        <article><span>Live feeds</span><strong>{liveFeeds}</strong><small>Automatically refreshed sources</small></article>
-        <article><span>Curated feeds</span><strong>{curatedFeeds}</strong><small>Clearly labelled manual sources</small></article>
-        <article><span>Visible threats</span><strong>{threats.length}</strong><small>Records in the current feed</small></article>
-      </div>
-
-      <div className="intel-grid">
-        <section className="intel-panel feed-panel">
-          <div className="intel-panel-heading">
-            <div><span className="panel-kicker">PROVENANCE</span><h2>Source health</h2></div>
-            <span className="generated">Updated {health?.generatedAt ? formatDate(health.generatedAt) : "—"}</span>
-          </div>
-          {loading ? <div className="intel-loading">Loading source status…</div> : (
-            <div className="feed-list">
-              {(health?.feeds || []).map((feed) => {
-                const meta = statusMeta[feed.status] || statusMeta.degraded;
-                return (
-                  <article className="feed-row" key={feed.id}>
-                    <div className={`feed-status status-${feed.status}`} title={meta.label}><span>{meta.icon}</span></div>
-                    <div className="feed-main">
-                      <strong>{feed.name || feed.sourceId}</strong>
-                      <span>{feed.type || "intelligence"} · {feed.parser || "manual"}</span>
-                      {feed.url ? <a href={feed.url} target="_blank" rel="noreferrer" className="feed-link">Official source ↗</a> : <span>No source URL registered</span>}
-                    </div>
-                    <div className="feed-state"><strong>{meta.label}</strong><span>{feed.records ?? 0} record{feed.records === 1 ? "" : "s"}</span></div>
-                  </article>
-                );
-              })}
-              {!loading && (health?.feeds || []).length === 0 && <div className="intel-empty">No intelligence feeds are registered yet.</div>}
-            </div>
-          )}
-          <p className="provenance-note">“Live” means the current integration has a working automated parser. “Curated” means the source is registered but its records are maintained manually. Neither label means a source is infallible.</p>
-        </section>
-
-        <section className="intel-panel methodology-panel">
-          <span className="panel-kicker">TRUST MODEL</span>
-          <h2>How to read a threat</h2>
-          <div className="trust-step"><b>01</b><div><strong>Source</strong><span>Identify who published the information and whether the source is authoritative.</span></div></div>
-          <div className="trust-step"><b>02</b><div><strong>Verification</strong><span>Separate published intelligence from a confirmed incident or definitive attribution.</span></div></div>
-          <div className="trust-step"><b>03</b><div><strong>Decision</strong><span>Use the evidence to decide what to check, block, report, or learn next.</span></div></div>
-          <Link className="method-link" to="/threats">Explore threat records →</Link>
-        </section>
-      </div>
-
-      <section className="intel-panel records-panel">
-        <div className="intel-panel-heading">
-          <div><span className="panel-kicker">LATEST SIGNALS</span><h2>Threat records</h2></div>
-          <Link to="/threats">Open full radar →</Link>
-        </div>
-        {loading ? <div className="intel-loading">Loading threat records…</div> : sortedThreats.length === 0 ? (
-          <div className="intel-empty">No threat records are available in the current catalog.</div>
-        ) : (
-          <div className="record-grid">
-            {sortedThreats.map((threat) => (
-              <button className={`record-card severity-${threat.severity || "info"}`} key={threat.threatId || threat.id} onClick={() => setSelected(threat)}>
-                <div className="record-top"><span>{String(threat.severity || "info").toUpperCase()}</span><small>{threat.category || "general"}</small></div>
-                <h3>{threat.title}</h3>
-                <p>{threat.description}</p>
-                <footer><span>{threat.sourceConfidence ?? 0}% confidence</span><span>{formatDate(threat.publishedAt || threat.retrievedAt)}</span></footer>
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {selected && (
-        <div className="intel-modal-backdrop" role="presentation" onClick={() => setSelected(null)}>
-          <article className="intel-modal" role="dialog" aria-modal="true" aria-label={selected.title} onClick={(event) => event.stopPropagation()}>
-            <button className="intel-close" onClick={() => setSelected(null)} aria-label="Close threat record">×</button>
-            <span className={`record-severity severity-${selected.severity || "info"}`}>{String(selected.severity || "info").toUpperCase()}</span>
-            <h2>{selected.title}</h2>
-            <p>{selected.description}</p>
-            <div className="modal-facts">
-              <div><span>Category</span><strong>{selected.category || "General"}</strong></div>
-              <div><span>Confidence</span><strong>{selected.sourceConfidence ?? 0}%</strong></div>
-              <div><span>Published</span><strong>{formatDate(selected.publishedAt)}</strong></div>
-              <div><span>Retrieved</span><strong>{formatDate(selected.retrievedAt)}</strong></div>
-            </div>
-            <h3>Source provenance</h3>
-            <div className="modal-sources">
-              {(selected.sources || []).map((source) => (
-                <div key={source.id || source.name}>
-                  <strong>{sourceLabel(source)}</strong>
-                  <span>Tier {source.tier ?? "—"} · {source.confidence ?? 0}% confidence</span>
-                </div>
-              ))}
-              {(selected.sources || []).length === 0 && <span>No source metadata was attached to this record.</span>}
-            </div>
-            <Link className="intel-primary" to="/check">Check related content →</Link>
-          </article>
-        </div>
-      )}
-    </section>
-  );
+  const { language } = useLanguage(); const te = language === "te";
+  const [health, setHealth] = useState(null); const [threats, setThreats] = useState([]); const [loading, setLoading] = useState(true); const [error, setError] = useState(""); const [selected, setSelected] = useState(null);
+  useEffect(() => { let active = true; Promise.all([apiRequest("/intelligence/health"), apiRequest("/threats?limit=12")]).then(([h, t]) => { if (active) { setHealth(h); setThreats(t.threats || []); } }).catch((e) => active && setError(e.message || (te ? "ఇంటెలిజెన్స్ డ్యాష్‌బోర్డ్ లోడ్ కాలేదు." : "Unable to load the intelligence dashboard."))).finally(() => active && setLoading(false)); return () => { active = false; }; }, [te]);
+  const sorted = useMemo(() => [...threats].sort((a, b) => (severityOrder[a.severity] ?? 9) - (severityOrder[b.severity] ?? 9) || String(b.publishedAt || b.retrievedAt || "").localeCompare(String(a.publishedAt || a.retrievedAt || ""))), [threats]);
+  const summary = health?.summary || {}; const live = (health?.feeds || []).filter((f) => f.status === "healthy").length; const curated = (health?.feeds || []).filter((f) => f.status === "manual" || f.status === "degraded").length;
+  return <section className="intel-page"><header className="intel-hero"><div><span className="intel-eyebrow">CYBERRAKSHAK 2.0 · {te ? "ఇంటెలిజెన్స్ సెంటర్" : "INTELLIGENCE CENTER"}</span><h1>{te ? <>సిగ్నల్ <span>ఎక్కడి నుంచి వచ్చిందో తెలుసుకోండి.</span></> : <>Know <span>where the signal comes from.</span></>}</h1><p>{te ? "ఏ ఇంటెలిజెన్స్ ఫీడ్ లైవ్‌లో ఉందో, ఏ సమాచారం క్యూయరేట్ చేయబడిందో మరియు ఏ థ్రెట్‌కు మీ దృష్టి అవసరమో చూడండి." : "See which intelligence feeds are live, which records are curated, and why a threat deserves your attention."}</p></div><div className="intel-hero-actions"><Link className="intel-primary" to="/check">{te ? "మెసేజ్ చెక్ చేయండి →" : "Check a message →"}</Link><Link className="intel-secondary" to="/threats">{te ? "థ్రెట్ రాడార్" : "Threat Radar"}</Link></div></header>
+  {error && <div className="intel-error" role="alert">⚠️ {error}</div>}<div className="intel-metrics"><article><span>{te ? "ఫీడ్ ఆరోగ్యం" : "Feed health"}</span><strong>{summary.healthPercent ?? 0}%</strong><small>{summary.healthy ?? 0} {te ? "సరిగ్గా ఉన్నాయి" : "healthy"} · {summary.failed ?? 0} {te ? "విఫలమయ్యాయి" : "failed"}</small></article><article><span>{te ? "లైవ్ ఫీడ్‌లు" : "Live feeds"}</span><strong>{live}</strong><small>{te ? "ఆటోమేటిక్‌గా రిఫ్రెష్ అయ్యే వనరులు" : "Automatically refreshed sources"}</small></article><article><span>{te ? "క్యూయరేట్ ఫీడ్‌లు" : "Curated feeds"}</span><strong>{curated}</strong><small>{te ? "స్పష్టంగా లేబుల్ చేసిన మాన్యువల్ వనరులు" : "Clearly labelled manual sources"}</small></article><article><span>{te ? "కనిపించే థ్రెట్‌లు" : "Visible threats"}</span><strong>{threats.length}</strong><small>{te ? "ప్రస్తుత ఫీడ్‌లోని రికార్డులు" : "Records in the current feed"}</small></article></div>
+  <div className="intel-grid"><section className="intel-panel feed-panel"><div className="intel-panel-heading"><div><span className="panel-kicker">{te ? "మూల ఆధారం" : "PROVENANCE"}</span><h2>{te ? "వనరుల ఆరోగ్యం" : "Source health"}</h2></div><span className="generated">{te ? "అప్‌డేట్:" : "Updated"} {health?.generatedAt ? formatDate(health.generatedAt) : "—"}</span></div>{loading ? <div className="intel-loading">{te ? "వనరుల స్థితి లోడ్ అవుతోంది…" : "Loading source status…"}</div> : <div className="feed-list">{(health?.feeds || []).map((feed) => { const meta = statusMeta[feed.status] || statusMeta.degraded; return <article className="feed-row" key={feed.id}><div className={`feed-status status-${feed.status}`}><span>{meta[1]}</span></div><div className="feed-main"><strong>{feed.name || feed.sourceId}</strong><span>{feed.type || "intelligence"} · {feed.parser || "manual"}</span>{feed.url ? <a href={feed.url} target="_blank" rel="noreferrer" className="feed-link">{te ? "అధికారిక వనరు ↗" : "Official source ↗"}</a> : <span>{te ? "వనరు URL నమోదు కాలేదు" : "No source URL registered"}</span>}</div><div className="feed-state"><strong>{te ? ({ Live: "లైవ్", Curated: "క్యూయరేట్", Manual: "మాన్యువల్", Unavailable: "అందుబాటులో లేదు" }[meta[0]] || meta[0]) : meta[0]}</strong><span>{feed.records ?? 0} {te ? "రికార్డులు" : `record${feed.records === 1 ? "" : "s"}`}</span></div></article>; })}</div>}<p className="provenance-note">{te ? "‘లైవ్’ అంటే ఆటోమేటెడ్ పార్సర్ పనిచేస్తోందని మాత్రమే. ‘క్యూయరేట్’ అంటే రికార్డులు మాన్యువల్‌గా నిర్వహించబడుతున్నాయని అర్థం. ఏ లేబుల్ కూడా వనరు తప్పులేనిదని హామీ ఇవ్వదు." : "“Live” means the current integration has a working automated parser. “Curated” means the source is registered but its records are maintained manually. Neither label means a source is infallible."}</p></section>
+  <section className="intel-panel methodology-panel"><span className="panel-kicker">{te ? "ట్రస్ట్ మోడల్" : "TRUST MODEL"}</span><h2>{te ? "థ్రెట్‌ను ఎలా చదవాలి" : "How to read a threat"}</h2>{[["01", te ? "వనరు" : "Source", te ? "సమాచారం ఎవరు ప్రచురించారో, అది అధికారిక వనరా కాదా చూడండి." : "Identify who published the information and whether the source is authoritative."],["02", te ? "ధృవీకరణ" : "Verification", te ? "ప్రచురించిన ఇంటెలిజెన్స్‌ను నిర్ధారించిన ఘటనగా భావించకండి." : "Separate published intelligence from a confirmed incident or definitive attribution."],["03", te ? "నిర్ణయం" : "Decision", te ? "ఆధారాలను ఉపయోగించి ఏం చెక్ చేయాలి, బ్లాక్ చేయాలి, రిపోర్ట్ చేయాలి లేదా నేర్చుకోవాలో నిర్ణయించండి." : "Use the evidence to decide what to check, block, report, or learn next."]].map(([n, title, text]) => <div className="trust-step" key={n}><b>{n}</b><div><strong>{title}</strong><span>{text}</span></div></div>)}<Link className="method-link" to="/threats">{te ? "థ్రెట్ రికార్డులు చూడండి →" : "Explore threat records →"}</Link></section></div>
+  <section className="intel-panel records-panel"><div className="intel-panel-heading"><div><span className="panel-kicker">{te ? "తాజా సంకేతాలు" : "LATEST SIGNALS"}</span><h2>{te ? "థ్రెట్ రికార్డులు" : "Threat records"}</h2></div><Link to="/threats">{te ? "పూర్తి రాడార్ →" : "Open full radar →"}</Link></div>{loading ? <div className="intel-loading">{te ? "థ్రెట్ రికార్డులు లోడ్ అవుతున్నాయి…" : "Loading threat records…"}</div> : sorted.length === 0 ? <div className="intel-empty">{te ? "ప్రస్తుత క్యాటలాగ్‌లో థ్రెట్ రికార్డులు లేవు." : "No threat records are available in the current catalog."}</div> : <div className="record-grid">{sorted.map((threat) => <button className={`record-card severity-${threat.severity || "info"}`} key={threat.threatId || threat.id} onClick={() => setSelected(threat)}><div className="record-top"><span>{String(threat.severity || "info").toUpperCase()}</span><small>{threat.category || "general"}</small></div><h3>{threat.title}</h3><p>{threat.description}</p><footer><span>{threat.sourceConfidence ?? 0}% {te ? "నమ్మకం" : "confidence"}</span><span>{formatDate(threat.publishedAt || threat.retrievedAt)}</span></footer></button>)}</div>}</section>
+  {selected && <div className="intel-modal-backdrop" role="presentation" onClick={() => setSelected(null)}><article className="intel-modal" role="dialog" aria-modal="true" aria-label={selected.title} onClick={(e) => e.stopPropagation()}><button className="intel-close" onClick={() => setSelected(null)} aria-label="Close">×</button><span className={`record-severity severity-${selected.severity || "info"}`}>{String(selected.severity || "info").toUpperCase()}</span><h2>{selected.title}</h2><p>{selected.description}</p><div className="modal-facts"><div><span>{te ? "కేటగిరీ" : "Category"}</span><strong>{selected.category || "General"}</strong></div><div><span>{te ? "నమ్మకం" : "Confidence"}</span><strong>{selected.sourceConfidence ?? 0}%</strong></div><div><span>{te ? "ప్రచురణ" : "Published"}</span><strong>{formatDate(selected.publishedAt)}</strong></div><div><span>{te ? "సేకరణ" : "Retrieved"}</span><strong>{formatDate(selected.retrievedAt)}</strong></div></div><h3>{te ? "వనరు ఆధారం" : "Source provenance"}</h3><div className="modal-sources">{(selected.sources || []).map((s) => <div key={s.id || s.name}><strong>{s.name}</strong><span>Tier {s.tier ?? "—"} · {s.confidence ?? 0}% confidence</span></div>)}{(selected.sources || []).length === 0 && <span>{te ? "ఈ రికార్డుకు వనరు మెటాడేటా లేదు." : "No source metadata was attached to this record."}</span>}</div><Link className="intel-primary" to="/check">{te ? "సంబంధిత కంటెంట్ చెక్ చేయండి →" : "Check related content →"}</Link></article></div>}</section>;
 }
-
 export default ThreatIntelDashboard;
