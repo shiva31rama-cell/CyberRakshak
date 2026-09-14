@@ -47,6 +47,30 @@ const HIGH_RISK_PATTERNS = [
     category: "payment_fraud",
     weight: 20,
   },
+  {
+    pattern: /\b(?:apk|application package|install this app|install the app|unknown app)\b/i,
+    reason: "The content encourages installation of an app that may not be independently trusted.",
+    category: "malicious_app",
+    weight: 30,
+  },
+  {
+    pattern: /\b(?:unexpected|unknown|suspicious) (?:attachment|file)\b|\bopen (?:this|the) attachment\b/i,
+    reason: "The content involves an unexpected or suspicious attachment.",
+    category: "malicious_attachment",
+    weight: 25,
+  },
+  {
+    pattern: /\b(?:screen share|screen-sharing|share your screen|remote access|remote control)\b/i,
+    reason: "The request involves remote or screen-sharing access that can expose sensitive information.",
+    category: "remote_access_scam",
+    weight: 30,
+  },
+  {
+    pattern: /\b(?:kyc|know your customer)\b.*\b(?:link|verify|update|expire)\b|\b(?:verify|update)\b.*\bkyc\b/i,
+    reason: "The message uses a KYC verification or expiry claim that can be used for phishing.",
+    category: "phishing",
+    weight: 20,
+  },
 ];
 
 const URL_PATTERN = /\bhttps?:\/\/[^\s<>"']+/gi;
