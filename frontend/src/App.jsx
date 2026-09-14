@@ -8,6 +8,7 @@ import CheckCenter from "./pages/CheckCenter/CheckCenter";
 import IncidentMode from "./pages/IncidentMode/IncidentMode";
 import ThreatRadar from "./pages/ThreatRadar/ThreatRadar";
 import MultimodalCheck from "./pages/MultimodalCheck/MultimodalCheck";
+import Learn2 from "./pages/Learn/Learn2";
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -41,7 +42,8 @@ function App() {
               <Route path="/incidents" element={<IncidentMode />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/learn" element={<Learn />} />
+              <Route path="/learn" element={<Learn2 />} />
+              <Route path="/learn/legacy" element={<Learn />} />
               <Route path="/digital-literacy" element={<DigitalLiteracy />} />
               <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
               <Route path="/upi-safety" element={<UPISafety />} />
