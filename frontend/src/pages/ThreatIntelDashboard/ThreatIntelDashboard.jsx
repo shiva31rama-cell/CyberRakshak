@@ -33,7 +33,6 @@ function ThreatIntelDashboard() {
 
   useEffect(() => {
     let active = true;
-
     const load = async () => {
       setLoading(true);
       setError("");
@@ -51,7 +50,6 @@ function ThreatIntelDashboard() {
         if (active) setLoading(false);
       }
     };
-
     load();
     return () => { active = false; };
   }, []);
@@ -95,7 +93,6 @@ function ThreatIntelDashboard() {
             <div><span className="panel-kicker">PROVENANCE</span><h2>Source health</h2></div>
             <span className="generated">Updated {health?.generatedAt ? formatDate(health.generatedAt) : "—"}</span>
           </div>
-
           {loading ? <div className="intel-loading">Loading source status…</div> : (
             <div className="feed-list">
               {(health?.feeds || []).map((feed) => {
@@ -106,11 +103,9 @@ function ThreatIntelDashboard() {
                     <div className="feed-main">
                       <strong>{feed.name || feed.sourceId}</strong>
                       <span>{feed.type || "intelligence"} · {feed.parser || "manual"}</span>
+                      {feed.url ? <a href={feed.url} target="_blank" rel="noreferrer" className="feed-link">Official source ↗</a> : <span>No source URL registered</span>}
                     </div>
-                    <div className="feed-state">
-                      <strong>{meta.label}</strong>
-                      <span>{feed.records ?? 0} record{feed.records === 1 ? "" : "s"}</span>
-                    </div>
+                    <div className="feed-state"><strong>{meta.label}</strong><span>{feed.records ?? 0} record{feed.records === 1 ? "" : "s"}</span></div>
                   </article>
                 );
               })}
@@ -135,7 +130,6 @@ function ThreatIntelDashboard() {
           <div><span className="panel-kicker">LATEST SIGNALS</span><h2>Threat records</h2></div>
           <Link to="/threats">Open full radar →</Link>
         </div>
-
         {loading ? <div className="intel-loading">Loading threat records…</div> : sortedThreats.length === 0 ? (
           <div className="intel-empty">No threat records are available in the current catalog.</div>
         ) : (
