@@ -5,6 +5,12 @@
   "severity": "high",
   "status": "active",
   "summary": "CERT-In reported a large-scale campaign targeting WhatsApp Desktop and WhatsApp Web users with malicious attachments distributed through compromised accounts.",
+  "keywords": [
+    "WhatsApp attachment",
+    "WhatsApp attachments",
+    "attachment malware",
+    "WhatsApp malware"
+  ],
   "indicators": [
     {
       "type": "attachment",
