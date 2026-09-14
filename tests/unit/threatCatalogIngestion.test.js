@@ -1,13 +1,13 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
 const { getAllThreats, searchThreats } = require("../../services/risk-engine/threatCatalog");
 
-describe("threat catalog ingestion", () => {
-  test("loads curated and nested intelligence records", () => {
-    const threats = getAllThreats();
-    expect(threats.length).toBeGreaterThan(0);
-    expect(threats.every((item) => item.id && item.title)).toBe(true);
-  });
+test("loads curated and nested intelligence records", () => {
+  const threats = getAllThreats();
+  assert.ok(threats.length > 0);
+  assert.equal(threats.every((item) => item.id && item.title), true);
+});
 
-  test("does not return empty-query matches", () => {
-    expect(searchThreats("")).toEqual([]);
-  });
+test("does not return empty-query matches", () => {
+  assert.deepEqual(searchThreats(""), []);
 });
