@@ -1,90 +1,94 @@
 [
   {
     "id": "upi-collect-request",
-    "title": "A payment request is not a payment receipt",
     "category": "payments",
     "severity": "high",
-    "language": "en",
     "durationMinutes": 3,
-    "scenario": "Someone says you will receive money and asks you to approve a UPI request or enter your UPI PIN.",
-    "redFlags": [
-      "You are told to enter a UPI PIN to receive money.",
-      "The sender creates urgency or asks you to act immediately.",
-      "The payment purpose does not match what you expected."
-    ],
-    "safeAction": "Stop and verify the payment independently. A UPI PIN is used to authorise payments, not to receive money.",
-    "checkQuestion": "What should you do when someone says a UPI PIN is needed to receive money?",
-    "answers": [
-      { "id": "a", "text": "Enter the PIN quickly", "correct": false },
-      { "id": "b", "text": "Stop and verify the request", "correct": true },
-      { "id": "c", "text": "Forward the request to friends", "correct": false }
-    ],
-    "sourceIds": ["i4c-ncrp", "npci-official"]
+    "sourceIds": ["i4c-ncrp", "npci-official"],
+    "en": {
+      "title": "A payment request is not a payment receipt",
+      "scenario": "Someone says you will receive money and asks you to approve a UPI request or enter your UPI PIN.",
+      "redFlags": ["You are told to enter a UPI PIN to receive money.", "The sender creates urgency or asks you to act immediately.", "The payment purpose does not match what you expected."],
+      "safeAction": "Stop and verify the payment independently. A UPI PIN is used to authorise payments, not to receive money.",
+      "checkQuestion": "What should you do when someone says a UPI PIN is needed to receive money?",
+      "answers": [{"id":"a","text":"Enter the PIN quickly","correct":false},{"id":"b","text":"Stop and verify the request","correct":true},{"id":"c","text":"Forward the request to friends","correct":false}]
+    },
+    "te": {
+      "title": "చెల్లింపు అభ్యర్థన అంటే డబ్బు వచ్చిన రసీదు కాదు",
+      "scenario": "ఎవరైనా మీకు డబ్బు వస్తుందని చెప్పి UPI అభ్యర్థనను ఆమోదించమని లేదా UPI PIN నమోదు చేయమని అడుగుతున్నారు.",
+      "redFlags": ["డబ్బు పొందడానికి UPI PIN నమోదు చేయమని చెబుతున్నారు.", "వెంటనే చర్య తీసుకోవాలని ఒత్తిడి చేస్తున్నారు.", "చెల్లింపు ఉద్దేశం మీరు ఊహించిన దానితో సరిపోలడం లేదు."],
+      "safeAction": "ఆగి, చెల్లింపు అభ్యర్థనను స్వతంత్రంగా ధృవీకరించండి. UPI PIN చెల్లింపును ఆమోదించడానికి ఉపయోగిస్తారు, డబ్బు స్వీకరించడానికి కాదు.",
+      "checkQuestion": "డబ్బు స్వీకరించడానికి UPI PIN అవసరమని ఎవరైనా చెబితే మీరు ఏమి చేయాలి?",
+      "answers": [{"id":"a","text":"వెంటనే PIN నమోదు చేయాలి","correct":false},{"id":"b","text":"ఆగి అభ్యర్థనను ధృవీకరించాలి","correct":true},{"id":"c","text":"అభ్యర్థనను స్నేహితులకు ఫార్వర్డ్ చేయాలి","correct":false}]
+    }
   },
   {
     "id": "malicious-apk",
-    "title": "Unknown APKs can turn a simple message into a device risk",
     "category": "mobile",
     "severity": "critical",
-    "language": "en",
     "durationMinutes": 3,
-    "scenario": "A message asks you to install an APK for a refund, delivery update, job, fine or account verification.",
-    "redFlags": [
-      "The app comes from a message or an unfamiliar website.",
-      "The sender asks you to enable unusual permissions.",
-      "The reason for installation is urgent or threatening."
-    ],
-    "safeAction": "Do not install an APK from an untrusted message. Verify the service through its official app or website instead.",
-    "checkQuestion": "What is the safest response to an unexpected APK link?",
-    "answers": [
-      { "id": "a", "text": "Install it if the message looks official", "correct": false },
-      { "id": "b", "text": "Verify independently and avoid the APK", "correct": true },
-      { "id": "c", "text": "Disable device security first", "correct": false }
-    ],
-    "sourceIds": ["cert-in", "i4c-ncrp"]
+    "sourceIds": ["cert-in", "i4c-ncrp"],
+    "en": {
+      "title": "Unknown APKs can turn a simple message into a device risk",
+      "scenario": "A message asks you to install an APK for a refund, delivery update, job, fine or account verification.",
+      "redFlags": ["The app comes from a message or an unfamiliar website.", "The sender asks you to enable unusual permissions.", "The reason for installation is urgent or threatening."],
+      "safeAction": "Do not install an APK from an untrusted message. Verify the service through its official app or website instead.",
+      "checkQuestion": "What is the safest response to an unexpected APK link?",
+      "answers": [{"id":"a","text":"Install it if the message looks official","correct":false},{"id":"b","text":"Verify independently and avoid the APK","correct":true},{"id":"c","text":"Disable device security first","correct":false}]
+    },
+    "te": {
+      "title": "తెలియని APKలు సాధారణ మెసేజ్‌ను కూడా పరికర ప్రమాదంగా మార్చవచ్చు",
+      "scenario": "రిఫండ్, డెలివరీ అప్‌డేట్, ఉద్యోగం, జరిమానా లేదా ఖాతా ధృవీకరణ కోసం APK ఇన్‌స్టాల్ చేయమని ఒక మెసేజ్ అడుగుతుంది.",
+      "redFlags": ["యాప్ మెసేజ్ లేదా తెలియని వెబ్‌సైట్ నుంచి వస్తోంది.", "అసాధారణ permissions ప్రారంభించమని అడుగుతున్నారు.", "ఇన్‌స్టాల్ చేయడానికి అత్యవసరమైన లేదా భయపెట్టే కారణం చెబుతున్నారు."],
+      "safeAction": "నమ్మకంలేని మెసేజ్ నుంచి APK ఇన్‌స్టాల్ చేయవద్దు. బదులుగా అధికారిక యాప్ లేదా వెబ్‌సైట్ ద్వారా సేవను ధృవీకరించండి.",
+      "checkQuestion": "అనుకోకుండా వచ్చిన APK లింక్‌కు సురక్షితమైన స్పందన ఏమిటి?",
+      "answers": [{"id":"a","text":"మెసేజ్ అధికారికంగా కనిపిస్తే ఇన్‌స్టాల్ చేయాలి","correct":false},{"id":"b","text":"స్వతంత్రంగా ధృవీకరించి APKను నివారించాలి","correct":true},{"id":"c","text":"ముందుగా పరికర భద్రతను ఆపాలి","correct":false}]
+    }
   },
   {
     "id": "ai-impersonation",
-    "title": "A familiar voice or image can still be fake",
     "category": "ai-scams",
     "severity": "high",
-    "language": "en",
     "durationMinutes": 3,
-    "scenario": "A caller or message appears to be from a known person and asks for urgent money, credentials or secrecy.",
-    "redFlags": [
-      "The request is unusually urgent or secretive.",
-      "The identity is based mainly on a voice, video or profile image.",
-      "The requester discourages independent verification."
-    ],
-    "safeAction": "Use a trusted contact method you already know to verify the person's identity before taking action.",
-    "checkQuestion": "What is a strong way to verify an urgent request from a familiar person?",
-    "answers": [
-      { "id": "a", "text": "Trust the voice immediately", "correct": false },
-      { "id": "b", "text": "Verify through an independent trusted channel", "correct": true },
-      { "id": "c", "text": "Share an OTP to confirm identity", "correct": false }
-    ],
-    "sourceIds": ["cert-in", "i4c-ncrp"]
+    "sourceIds": ["cert-in", "i4c-ncrp"],
+    "en": {
+      "title": "A familiar voice or image can still be fake",
+      "scenario": "A caller or message appears to be from a known person and asks for urgent money, credentials or secrecy.",
+      "redFlags": ["The request is unusually urgent or secretive.", "The identity is based mainly on a voice, video or profile image.", "The requester discourages independent verification."],
+      "safeAction": "Use a trusted contact method you already know to verify the person's identity before taking action.",
+      "checkQuestion": "What is a strong way to verify an urgent request from a familiar person?",
+      "answers": [{"id":"a","text":"Trust the voice immediately","correct":false},{"id":"b","text":"Verify through an independent trusted channel","correct":true},{"id":"c","text":"Share an OTP to confirm identity","correct":false}]
+    },
+    "te": {
+      "title": "పరిచయమైన స్వరం లేదా చిత్రం అయినా నకిలీ కావచ్చు",
+      "scenario": "పరిచయమైన వ్యక్తి నుంచి వచ్చినట్టుగా కనిపించే కాల్ లేదా మెసేజ్ అత్యవసరంగా డబ్బు, ఆధారాలు లేదా రహస్యంగా ఉంచమని అడుగుతుంది.",
+      "redFlags": ["అభ్యర్థన అసాధారణంగా అత్యవసరంగా లేదా రహస్యంగా ఉంది.", "గుర్తింపును ప్రధానంగా స్వరం, వీడియో లేదా ప్రొఫైల్ చిత్రంపై ఆధారపడి చెబుతున్నారు.", "స్వతంత్రంగా ధృవీకరించవద్దని కోరుతున్నారు."],
+      "safeAction": "చర్య తీసుకునే ముందు మీకు ఇప్పటికే తెలిసిన నమ్మకమైన సంప్రదింపు మార్గం ద్వారా వ్యక్తి గుర్తింపును ధృవీకరించండి.",
+      "checkQuestion": "పరిచయమైన వ్యక్తి నుంచి అత్యవసర అభ్యర్థన వస్తే బలమైన ధృవీకరణ పద్ధతి ఏది?",
+      "answers": [{"id":"a","text":"స్వరాన్ని వెంటనే నమ్మాలి","correct":false},{"id":"b","text":"స్వతంత్రంగా నమ్మకమైన మార్గంలో ధృవీకరించాలి","correct":true},{"id":"c","text":"గుర్తింపు కోసం OTP పంచుకోవాలి","correct":false}]
+    }
   },
   {
     "id": "phishing-urgency",
-    "title": "Urgency is a signal to slow down",
     "category": "messages",
     "severity": "high",
-    "language": "en",
     "durationMinutes": 2,
-    "scenario": "A message claims your account, delivery, job, bank service or government service will be affected unless you act now.",
-    "redFlags": [
-      "A deadline is used to pressure you.",
-      "A link asks for login or payment information.",
-      "The message mixes authority with fear or reward."
-    ],
-    "safeAction": "Do not use the supplied link. Open the official service yourself and verify the claim.",
-    "checkQuestion": "What should urgency make you do?",
-    "answers": [
-      { "id": "a", "text": "Slow down and verify", "correct": true },
-      { "id": "b", "text": "Share an OTP", "correct": false },
-      { "id": "c", "text": "Pay first and investigate later", "correct": false }
-    ],
-    "sourceIds": ["cert-in", "i4c-ncrp"]
+    "sourceIds": ["cert-in", "i4c-ncrp"],
+    "en": {
+      "title": "Urgency is a signal to slow down",
+      "scenario": "A message claims your account, delivery, job, bank service or government service will be affected unless you act now.",
+      "redFlags": ["A deadline is used to pressure you.", "A link asks for login or payment information.", "The message mixes authority with fear or reward."],
+      "safeAction": "Do not use the supplied link. Open the official service yourself and verify the claim.",
+      "checkQuestion": "What should urgency make you do?",
+      "answers": [{"id":"a","text":"Slow down and verify","correct":true},{"id":"b","text":"Share an OTP","correct":false},{"id":"c","text":"Pay first and investigate later","correct":false}]
+    },
+    "te": {
+      "title": "అత్యవసర ఒత్తిడి కనిపిస్తే నెమ్మదించాలి",
+      "scenario": "ఇప్పుడే చర్య తీసుకోకపోతే మీ ఖాతా, డెలివరీ, ఉద్యోగం, బ్యాంక్ సేవ లేదా ప్రభుత్వ సేవ ప్రభావితమవుతుందని ఒక మెసేజ్ చెబుతుంది.",
+      "redFlags": ["మీపై ఒత్తిడి చేయడానికి గడువు చెబుతున్నారు.", "లింక్ ద్వారా లాగిన్ లేదా చెల్లింపు సమాచారాన్ని అడుగుతున్నారు.", "అధికార భావనను భయం లేదా బహుమతితో కలిపి ఉపయోగిస్తున్నారు."],
+      "safeAction": "మెసేజ్‌లో ఇచ్చిన లింక్‌ను ఉపయోగించవద్దు. అధికారిక సేవను మీరే తెరిచి, చెప్పిన విషయాన్ని ధృవీకరించండి.",
+      "checkQuestion": "అత్యవసర ఒత్తిడి మీకు ఏమి చేయమని సూచించాలి?",
+      "answers": [{"id":"a","text":"నెమ్మదించి ధృవీకరించాలి","correct":true},{"id":"b","text":"OTP పంచుకోవాలి","correct":false},{"id":"c","text":"ముందుగా చెల్లించి తర్వాత పరిశీలించాలి","correct":false}]
+    }
   }
 ]
