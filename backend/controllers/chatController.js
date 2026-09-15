@@ -1,6 +1,21 @@
-const DEFAULT_SYSTEM_PROMPT = `You are CyberRakshak, a careful cyber-safety education assistant for general users.
+const DEFAULT_SYSTEM_PROMPT = `You are CyberRakshak, a friendly and responsible cyber-safety assistant for general users.
 
-MISSION: Give accurate, practical, defensive guidance about phishing, scams, passwords, MFA, OTPs, UPI safety, account security, malware awareness, privacy, social engineering and incident response.
+CORE ROLE:
+- You are a conversational assistant, not just a question-answer bot.
+- You may respond naturally to greetings such as "hi", "hello", "how are you?", and questions such as "what can you do?".
+- After a greeting or capability question, guide the conversation toward CyberRakshak topics.
+- Your supported scope is cyber safety, cybersecurity awareness, scams, phishing, suspicious links, online fraud, UPI/payment safety, OTP safety, passwords, MFA, hacked or compromised phones/accounts, malware awareness, privacy, social engineering, cyberbullying/reporting, digital safety and incident response.
+- If a request is clearly unrelated to cyber safety (for example homework, recipes, entertainment, general trivia, sports, coding unrelated to security, or casual life advice), do NOT answer that unrelated request. Politely explain that you are CyberRakshak and invite the user to ask about a cyber-safety concern.
+- Do not be rude or repeatedly say "I can't". Redirect naturally and offer 2-4 useful CyberRakshak topics.
+
+CONVERSATION BEHAVIOR:
+- Sound like a helpful human support assistant: acknowledge what the user said, then respond.
+- If the user says something vague such as "my phone is hacked", "I got a message", "something happened", or "I'm worried", ask a small number of focused follow-up questions before giving a long explanation.
+- For an incident, first identify urgency: what happened, what device/account/payment is involved, whether money or credentials were affected, and whether the user still has access. Never ask for secrets.
+- Ask one or two high-value questions at a time so the user can easily continue the conversation.
+- When enough information is available, give clear numbered actions and explain why the most important action comes first.
+- Do not overwhelm a worried user with a huge checklist.
+- If the user changes the subject back to a cyber-safety issue, follow the new issue naturally.
 
 RELIABILITY RULES:
 - Prefer established defensive guidance over guesses.
@@ -15,8 +30,17 @@ RELIABILITY RULES:
 - Keep answers concise, structured and action-oriented. Use numbered steps for incidents.
 - When uncertain, explicitly say what is uncertain instead of guessing.`;
 
+const CYBER_SCOPE_PATTERN = /cyber|hack|hacked|hacking|security|secure|scam|fraud|phish|suspicious|malware|virus|spyware|ransomware|otp|upi|payment|transaction|bank|password|passcode|mfa|2fa|account|login|sign.?in|email|phone|mobile|device|laptop|computer|wifi|privacy|data leak|breach|stolen|identity|impersonat|fake|online|internet|website|link|url|attachment|social engineering|cyberbully|harass|threat|blackmail|report|1930|cybercrime|digital arrest/i;
+const GREETING_PATTERN = /^(hi|hello|hey|hiya|good morning|good afternoon|good evening|how are you|how r u|what'?s up|who are you|what can you do|what do you do|help)$/i;
+
 const fallbackReply = (message) => {
-  const text = String(message || "").toLowerCase();
+  const text = String(message || "").trim().toLowerCase();
+  if (GREETING_PATTERN.test(text)) {
+    return "Hi! 👋 I'm CyberRakshak, your cyber-safety assistant. I can help with scams, phishing, hacked phones or accounts, OTP/UPI safety, passwords, privacy and other online-safety problems. If something happened to you, tell me what happened and I'll help you work through it step by step. 🛡️";
+  }
+  if (!CYBER_SCOPE_PATTERN.test(text)) {
+    return "I’m CyberRakshak 🛡️, so I’m focused on cyber safety and online security. I can help with things like a hacked phone/account, phishing, scams, suspicious links, UPI or payment fraud, OTP/password safety, privacy, malware, or reporting a cyber incident. What happened to you?";
+  }
   if (/1930|money|money lost|debited|upi fraud|bank fraud|financial fraud|payment fraud/.test(text)) {
     return "🚨 If money was lost or an unauthorized transaction occurred, contact your bank/payment provider immediately and report cyber financial fraud through India's official 1930 helpline or the National Cyber Crime Reporting Portal. Do not share OTPs, PINs, CVVs or passwords with anyone. Keep transaction IDs, timestamps and relevant evidence safe.";
   }
@@ -32,7 +56,7 @@ const fallbackReply = (message) => {
   if (/upi/.test(text)) {
     return "💳 Before approving a UPI payment, verify the recipient and amount. A UPI PIN authorizes a payment; it is not needed to receive money. Never share your PIN or OTP.";
   }
-  return "I can help with phishing, scams, OTP/UPI safety, passwords, account security, privacy and incident response. Tell me what happened without sharing passwords, OTPs, PINs, CVVs, recovery codes or other secrets.";
+  return "I can help you with that cyber-safety issue. Tell me a little more about what happened (for example, what message, device, account, link, or transaction is involved). Please do not share passwords, OTPs, PINs, CVVs, recovery codes or other secrets.";
 };
 
 const sanitizeMessages = (messages) => messages
@@ -85,6 +109,10 @@ exports.chat = async (req, res) => {
       : "";
     const systemPrompt = process.env.AI_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT;
     const providerMessages = [{ role: "system", content: `${systemPrompt}\n${secretWarning}` }, ...safeMessages];
+
+    if (!GREETING_PATTERN.test(latestUserMessage.trim()) && !CYBER_SCOPE_PATTERN.test(latestUserMessage)) {
+      return res.json({ success: true, reply: fallbackReply(latestUserMessage), provider: "CyberRakshak scope guard" });
+    }
 
     const apiKey = process.env.AI_API_KEY;
     const apiUrl = process.env.AI_API_URL;
