@@ -5,15 +5,18 @@ CORE ROLE:
 - Supported topics: phishing, scams, suspicious links, online fraud, UPI/payment safety, OTP safety, passwords, MFA, compromised phones/accounts, malware awareness, privacy, social engineering, cyberbullying/reporting, digital safety and incident response.
 - If clearly unrelated, politely redirect to CyberRakshak topics rather than answering the unrelated request.
 
-INCIDENT TRIAGE:
-- For a possible incident, behave like a calm first-line triage assistant.
-- Identify the incident type from context: phishing, financial fraud, account compromise, device compromise, malware, impersonation/social engineering, privacy/data exposure, cyberbullying/harassment, or general prevention.
-- Ask only 1-2 high-value questions at a time. Do not interrogate the user.
-- Ask about observable facts, not secrets: what happened, what was clicked/opened, which type of account/device/payment was involved, whether money or account access changed, and whether the user still has access.
-- Never ask for passwords, OTPs, PINs, CVVs, recovery codes, API keys, or private authentication secrets.
-- Once enough facts are available, give a short prioritized action plan: NOW, NEXT, and REPORT/GET HELP when applicable.
-- Do not claim a phone or account is definitely hacked merely from symptoms; distinguish signs from confirmed compromise.
-- If the situation is urgent, lead with containment rather than explanations.
+PROGRESSIVE INCIDENT TRIAGE:
+- Treat an incident as a conversation that progresses through: IDENTIFY -> ASSESS IMPACT -> CONTAIN -> RECOVER/REPORT -> PREVENT.
+- Do not repeat questions already answered in the conversation.
+- IDENTIFY: determine what happened and the affected device/account/message/payment.
+- ASSESS IMPACT: determine whether the user clicked/opened something, shared information, lost money, lost account access, or sees confirmed unfamiliar activity. Ask only what is missing.
+- CONTAIN: when risk is credible, give the most important immediate defensive action before optional education.
+- RECOVER/REPORT: guide the user to the affected service's official recovery/support process and appropriate official reporting when applicable. Do not claim a report was filed.
+- PREVENT: only after immediate risk is addressed, provide 1-3 practical prevention steps.
+- Ask at most 1-2 high-value questions at a time. Never interrogate the user.
+- Ask about observable facts, not secrets. Never request passwords, OTPs, PINs, CVVs, recovery codes, API keys or authentication secrets.
+- Never declare a device/account hacked solely from a symptom; explain that a symptom can have other causes.
+- For urgent financial fraud, lead with bank/payment-provider contact and appropriate official reporting.
 
 RELIABILITY AND SAFETY:
 - Prefer established defensive guidance over guesses.
@@ -27,7 +30,6 @@ RELIABILITY AND SAFETY:
 
 const CYBER_SCOPE_PATTERN = /cyber|hack|hacked|hacking|security|secure|scam|fraud|phish|suspicious|malware|virus|spyware|ransomware|otp|upi|payment|transaction|bank|password|passcode|mfa|2fa|account|login|sign.?in|email|phone|mobile|device|laptop|computer|wifi|privacy|data leak|breach|stolen|identity|impersonat|fake|online|internet|website|link|url|attachment|social engineering|cyberbully|harass|threat|blackmail|report|1930|cybercrime|digital arrest/i;
 const GREETING_PATTERN = /^(hi|hello|hey|hiya|good morning|good afternoon|good evening|how are you|how r u|what'?s up|who are you|what can you do|what do you do|help)$/i;
-
 const INCIDENT_PATTERNS = [
   { type: "financial_fraud", pattern: /money lost|money debited|unauthori[sz]ed.*(?:transaction|payment)|upi fraud|bank fraud|financial fraud|payment fraud|sent money.*scam|scammed.*money|transaction.*not mine/i },
   { type: "phishing", pattern: /phish|suspicious link|fake website|suspicious email|suspicious message|clicked.*link|link.*clicked|attachment/i },
@@ -38,8 +40,19 @@ const INCIDENT_PATTERNS = [
   { type: "privacy", pattern: /privacy|data leak|personal data|photos.*leak|information.*leak|dox/i },
   { type: "cyberbullying", pattern: /cyberbully|online harassment|harass|abuse online/i },
 ];
-
 const detectIncidentType = (text) => INCIDENT_PATTERNS.find((item) => item.pattern.test(text))?.type || null;
+
+const detectTriageStage = (messages, incidentType) => {
+  if (!incidentType) return "general";
+  const conversation = messages.map((item) => item.content).join(" ").toLowerCase();
+  const impactSignals = /clicked|opened|entered|shared|sent|debited|lost money|unauthorized|unknown login|lost access|can't login|cannot login|downloaded|installed|compromised/.test(conversation);
+  const containmentSignals = /changed password|reset password|enabled mfa|enabled 2fa|revoked|signed out|blocked|contacted bank|bank contacted|reported|froze|secured account/.test(conversation);
+  const recoverySignals = /recovered|regained access|case number|complaint|report(ed)?|support contacted|account restored/.test(conversation);
+  if (recoverySignals) return "recover_report";
+  if (containmentSignals) return "recover_report";
+  if (impactSignals) return "contain";
+  return "identify_assess";
+};
 
 const fallbackReply = (message) => {
   const text = String(message || "").trim().toLowerCase();
@@ -78,29 +91,27 @@ exports.chat = async (req, res) => {
     if (latestUserMessage.length > 2000) return res.status(400).json({ success: false, message: "Message is too long" });
     const safeMessages = sanitizeMessages(messages);
     if (!safeMessages.some((item) => item.role === "user")) return res.status(400).json({ success: false, message: "Please provide a user message" });
-
     const normalized = latestUserMessage.trim();
-    const incidentType = detectIncidentType(normalized);
+    const incidentType = detectIncidentType(normalized) || safeMessages.map((item) => item.content).map(detectIncidentType).find(Boolean) || null;
+    const triageStage = detectTriageStage(safeMessages, incidentType);
     const secretWarning = containsSecret(normalized) ? "The user may have included an authentication secret. Never repeat it. Tell them not to share secrets and continue with safe next steps." : "";
-    const triageHint = incidentType ? `Detected incident category: ${incidentType}. Continue conversational triage. Ask at most 1-2 high-value questions if key facts are missing; otherwise provide prioritized actions.` : "If this is an incident, identify its category and ask only the most useful next question.";
+    const triageHint = incidentType ? `Incident category: ${incidentType}. Current triage stage: ${triageStage}. Continue from this stage; do not repeat answered questions. Ask at most 1-2 missing high-value questions, then move to the next stage when enough information is available.` : "If this is an incident, identify its category and ask only the most useful next question.";
     const systemPrompt = process.env.AI_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT;
     const providerMessages = [{ role: "system", content: `${systemPrompt}\n${triageHint}\n${secretWarning}` }, ...safeMessages];
-
-    if (!GREETING_PATTERN.test(normalized) && !CYBER_SCOPE_PATTERN.test(normalized)) return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", incidentType: null });
-
+    if (!GREETING_PATTERN.test(normalized) && !CYBER_SCOPE_PATTERN.test(normalized)) return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", incidentType: null, triageStage: "general" });
     const apiKey = process.env.AI_API_KEY;
     const apiUrl = process.env.AI_API_URL;
     const model = process.env.AI_MODEL;
-    if (!apiKey || !apiUrl || !model) return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", incidentType });
+    if (!apiKey || !apiUrl || !model) return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", incidentType, triageStage });
     try {
       const reply = await callProvider({ apiUrl, apiKey, model, messages: providerMessages });
-      return res.json({ success: true, reply, provider: "AI", incidentType });
+      return res.json({ success: true, reply, provider: "AI", incidentType, triageStage });
     } catch (providerError) {
       console.error("AI provider request failed:", providerError.message);
-      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", incidentType });
+      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", incidentType, triageStage });
     }
   } catch (error) {
     console.error("Chat service error:", error.message);
-    return res.json({ success: true, reply: fallbackReply(req.body?.messages?.at?.(-1)?.content), provider: "CyberRakshak safety fallback", incidentType: null });
+    return res.json({ success: true, reply: fallbackReply(req.body?.messages?.at?.(-1)?.content), provider: "CyberRakshak safety fallback", incidentType: null, triageStage: "general" });
   }
 };
