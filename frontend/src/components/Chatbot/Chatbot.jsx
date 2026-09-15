@@ -3,10 +3,10 @@ import { sendChatMessage } from "../../services/chatService";
 import "./Chatbot.css";
 
 const quickQuestions = [
-  ["🔐 Password Safety", "How can I make my accounts safer with strong passwords and MFA?"],
-  ["⚠️ Phishing", "How can I identify a phishing message or website?"],
-  ["🔑 OTP Safety", "What should I do if someone asks me for an OTP?"],
-  ["💳 UPI Safety", "What are the safest steps before approving a UPI payment?"],
+  ["👋 Say Hi", "Hi! What can you help me with?"],
+  ["📱 Phone Hacked", "I think my phone is hacked. What should I do?"],
+  ["⚠️ Suspicious Message", "I received a suspicious message. Can you help me understand what to do?"],
+  ["💳 Money Lost", "I think I may have lost money to an online scam. What should I do first?"],
 ];
 
 function Chatbot() {
@@ -15,7 +15,7 @@ function Chatbot() {
     {
       id: 1,
       role: "assistant",
-      text: "Hello! I'm CyberRakshak AI Assistant. Ask me anything about staying safe online. 🛡️",
+      text: "Hi! 👋 I'm CyberRakshak AI. I can chat with you about cyber safety, scams, phishing, hacked phones or accounts, UPI/OTP safety, passwords, privacy and online threats.\n\nIf something happened to you, tell me what happened. I'll ask a few simple questions and help you step by step. 🛡️\n\nPlease never send me your password, OTP, PIN, CVV or recovery code.",
       timestamp: new Date(),
     },
   ]);
@@ -90,7 +90,7 @@ function Chatbot() {
       <section className={`chatbot-window ${isOpen ? "active" : ""}`} aria-label="CyberRakshak AI chat">
         <header className="chatbot-header">
           <h3>🤖 CyberRakshak AI</h3>
-          <p>AI-powered cyber-safety guidance</p>
+          <p>Your friendly cyber-safety guide</p>
         </header>
 
         <div className="chatbot-messages" aria-live="polite">
@@ -116,7 +116,7 @@ function Chatbot() {
 
         {messages.length === 1 && (
           <div className="quick-questions">
-            <p>Quick questions:</p>
+            <p>Try a conversation starter:</p>
             {quickQuestions.map(([label, question]) => (
               <button key={label} type="button" onClick={() => sendMessage(question)} disabled={isLoading}>
                 {label}
@@ -128,7 +128,7 @@ function Chatbot() {
         <form onSubmit={handleSubmit} className="chatbot-input-form">
           <input
             type="text"
-            placeholder="Ask a cyber-safety question..."
+            placeholder="Tell me what happened..."
             value={inputValue}
             onChange={(event) => setInputValue(event.target.value)}
             disabled={isLoading}
