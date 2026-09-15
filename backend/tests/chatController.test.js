@@ -42,6 +42,39 @@ test("chat returns a safe fallback when AI configuration is missing", async () =
   if (original.model !== undefined) process.env.AI_MODEL = original.model;
 });
 
+test("chat handles a normal greeting conversationally", async () => {
+  const result = await callChat({
+    messages: [{ role: "user", content: "Hi, how are you?" }],
+  });
+
+  assert.equal(result.statusCode, 200);
+  assert.equal(result.payload.success, true);
+  assert.match(result.payload.reply, /CyberRakshak/i);
+  assert.match(result.payload.reply, /cyber safety/i);
+});
+
+test("chat redirects clearly unrelated questions back to CyberRakshak scope", async () => {
+  const result = await callChat({
+    messages: [{ role: "user", content: "What is the best recipe for pizza?" }],
+  });
+
+  assert.equal(result.statusCode, 200);
+  assert.equal(result.payload.success, true);
+  assert.equal(result.payload.provider, "CyberRakshak scope guard");
+  assert.match(result.payload.reply, /focused on cyber safety/i);
+  assert.doesNotMatch(result.payload.reply, /recipe|pizza/i);
+});
+
+test("chat keeps vague cyber incidents open for follow-up", async () => {
+  const result = await callChat({
+    messages: [{ role: "user", content: "I think my phone is hacked" }],
+  });
+
+  assert.equal(result.statusCode, 200);
+  assert.equal(result.payload.success, true);
+  assert.match(result.payload.reply, /phone|device/i);
+});
+
 test("chat rejects a missing user message", async () => {
   const result = await callChat({ messages: [] });
   assert.equal(result.statusCode, 400);
