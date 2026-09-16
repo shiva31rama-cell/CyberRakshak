@@ -1,3 +1,5 @@
+const KNOWLEDGE_BASE = require("../data/cyberKnowledge");
+
 const DEFAULT_SYSTEM_PROMPT = `You are CyberRakshak, a friendly and responsible cyber-safety assistant for general users.
 
 CORE ROLE:
@@ -19,7 +21,8 @@ PROGRESSIVE INCIDENT TRIAGE:
 - For urgent financial fraud, lead with bank/payment-provider contact and appropriate official reporting.
 
 RELIABILITY AND SAFETY:
-- Prefer established defensive guidance over guesses.
+- Treat the supplied CyberRakshak knowledge context as the primary factual grounding for the relevant topic.
+- Do not contradict grounded facts unless the user provides new information that changes the situation.
 - Never invent helplines, portals, policies, legal rules, product features, or technical facts.
 - If country/app/bank/device context matters, ask for it.
 - Never claim CyberRakshak or another service took an action unless confirmed by the application.
@@ -53,6 +56,19 @@ const detectTriageStage = (messages, incidentType) => {
   if (impactSignals) return "contain";
   return "identify_assess";
 };
+
+const getGrounding = (incidentType) => {
+  const item = KNOWLEDGE_BASE[incidentType] || KNOWLEDGE_BASE.general;
+  return {
+    title: item.title,
+    facts: item.facts,
+    immediateActions: item.immediateActions,
+    avoid: item.avoid,
+    sources: item.sources,
+  };
+};
+
+const formatGroundingForModel = (grounding) => `\n\nCYBERRAKSHAK KNOWLEDGE CONTEXT\nTopic: ${grounding.title}\nEstablished facts:\n${grounding.facts.map((item) => `- ${item}`).join("\n")}\nImmediate defensive actions:\n${grounding.immediateActions.map((item) => `- ${item}`).join("\n")}\nAvoid:\n${grounding.avoid.length ? grounding.avoid.map((item) => `- ${item}`).join("\n") : "- None specified."}\nUse only this context for grounded claims. Do not invent details.\n`;
 
 const fallbackReply = (message) => {
   const text = String(message || "").trim().toLowerCase();
@@ -94,24 +110,25 @@ exports.chat = async (req, res) => {
     const normalized = latestUserMessage.trim();
     const incidentType = detectIncidentType(normalized) || safeMessages.map((item) => item.content).map(detectIncidentType).find(Boolean) || null;
     const triageStage = detectTriageStage(safeMessages, incidentType);
+    const grounding = getGrounding(incidentType);
     const secretWarning = containsSecret(normalized) ? "The user may have included an authentication secret. Never repeat it. Tell them not to share secrets and continue with safe next steps." : "";
     const triageHint = incidentType ? `Incident category: ${incidentType}. Current triage stage: ${triageStage}. Continue from this stage; do not repeat answered questions. Ask at most 1-2 missing high-value questions, then move to the next stage when enough information is available.` : "If this is an incident, identify its category and ask only the most useful next question.";
     const systemPrompt = process.env.AI_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT;
-    const providerMessages = [{ role: "system", content: `${systemPrompt}\n${triageHint}\n${secretWarning}` }, ...safeMessages];
-    if (!GREETING_PATTERN.test(normalized) && !CYBER_SCOPE_PATTERN.test(normalized)) return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", incidentType: null, triageStage: "general" });
+    const providerMessages = [{ role: "system", content: `${systemPrompt}\n${triageHint}\n${secretWarning}${formatGroundingForModel(grounding)}` }, ...safeMessages];
+    if (!GREETING_PATTERN.test(normalized) && !CYBER_SCOPE_PATTERN.test(normalized)) return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", incidentType: null, triageStage: "general", sources: [] });
     const apiKey = process.env.AI_API_KEY;
     const apiUrl = process.env.AI_API_URL;
     const model = process.env.AI_MODEL;
-    if (!apiKey || !apiUrl || !model) return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", incidentType, triageStage });
+    if (!apiKey || !apiUrl || !model) return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", incidentType, triageStage, sources: grounding.sources });
     try {
       const reply = await callProvider({ apiUrl, apiKey, model, messages: providerMessages });
-      return res.json({ success: true, reply, provider: "AI", incidentType, triageStage });
+      return res.json({ success: true, reply, provider: "AI", incidentType, triageStage, sources: grounding.sources });
     } catch (providerError) {
       console.error("AI provider request failed:", providerError.message);
-      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", incidentType, triageStage });
+      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", incidentType, triageStage, sources: grounding.sources });
     }
   } catch (error) {
     console.error("Chat service error:", error.message);
-    return res.json({ success: true, reply: fallbackReply(req.body?.messages?.at?.(-1)?.content), provider: "CyberRakshak safety fallback", incidentType: null, triageStage: "general" });
+    return res.json({ success: true, reply: fallbackReply(req.body?.messages?.at?.(-1)?.content), provider: "CyberRakshak safety fallback", incidentType: null, triageStage: "general", sources: KNOWLEDGE_BASE.general.sources });
   }
 };
