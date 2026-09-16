@@ -28,6 +28,7 @@ function Chatbot() {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [incidentStatus, setIncidentStatus] = useState(null);
+  const [sources, setSources] = useState([]);
 
   const sendMessage = async (text) => {
     const content = text.trim();
@@ -46,6 +47,7 @@ function Chatbot() {
       const data = await sendChatMessage(apiMessages);
       const reply = data?.reply?.trim() || "I couldn't generate a response right now. Please try again.";
       setIncidentStatus(data?.incidentType ? { type: data.incidentType, stage: data.triageStage } : null);
+      setSources(Array.isArray(data?.sources) ? data.sources : []);
       setMessages((current) => [...current, { id: `${Date.now()}-assistant`, role: "assistant", text: reply, timestamp: new Date() }]);
     } catch (error) {
       setMessages((current) => [...current, { id: `${Date.now()}-error`, role: "assistant", text: `Sorry, I couldn't reach the AI service. ${error.message || "Please try again."}`, timestamp: new Date() }]);
@@ -91,6 +93,19 @@ function Chatbot() {
             {quickQuestions.map(([label, question]) => (
               <button key={label} type="button" onClick={() => sendMessage(question)} disabled={isLoading}>{label}</button>
             ))}
+          </div>
+        )}
+
+        {sources.length > 0 && (
+          <div className="chatbot-sources">
+            <p>Trusted sources</p>
+            <div className="chatbot-source-links">
+              {sources.map((source) => (
+                <a key={source.url} href={source.url} target="_blank" rel="noreferrer">
+                  {source.label} ↗
+                </a>
+              ))}
+            </div>
           </div>
         )}
 
