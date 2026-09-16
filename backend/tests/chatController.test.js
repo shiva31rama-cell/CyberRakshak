@@ -42,6 +42,31 @@ test("chat returns a safe fallback when AI configuration is missing", async () =
   if (original.model !== undefined) process.env.AI_MODEL = original.model;
 });
 
+test("chat exposes curated official sources for a detected incident", async () => {
+  const original = {
+    key: process.env.AI_API_KEY,
+    url: process.env.AI_API_URL,
+    model: process.env.AI_MODEL,
+  };
+  delete process.env.AI_API_KEY;
+  delete process.env.AI_API_URL;
+  delete process.env.AI_MODEL;
+
+  const result = await callChat({
+    messages: [{ role: "user", content: "I lost money to a UPI scam" }],
+  });
+
+  assert.equal(result.statusCode, 200);
+  assert.equal(result.payload.incidentType, "financial_fraud");
+  assert.ok(Array.isArray(result.payload.sources));
+  assert.ok(result.payload.sources.some((source) => source.url.includes("cybercrime.gov.in")));
+  assert.ok(result.payload.sources.some((source) => source.label.includes("Official")));
+
+  if (original.key !== undefined) process.env.AI_API_KEY = original.key;
+  if (original.url !== undefined) process.env.AI_API_URL = original.url;
+  if (original.model !== undefined) process.env.AI_MODEL = original.model;
+});
+
 test("chat handles a normal greeting conversationally", async () => {
   const result = await callChat({
     messages: [{ role: "user", content: "Hi, how are you?" }],
