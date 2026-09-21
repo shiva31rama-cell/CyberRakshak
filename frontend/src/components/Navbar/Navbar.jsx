@@ -16,11 +16,9 @@ function Navbar() {
       setIsLoggedIn(isAuthenticated());
       setUserName(user?.name || "");
     };
-
     syncAuth();
     window.addEventListener("storage", syncAuth);
     window.addEventListener("cyberrakshak:auth-changed", syncAuth);
-
     return () => {
       window.removeEventListener("storage", syncAuth);
       window.removeEventListener("cyberrakshak:auth-changed", syncAuth);
@@ -28,23 +26,16 @@ function Navbar() {
   }, [location]);
 
   const handleLogout = async () => {
-    try {
-      await logout();
-    } catch {
-      // The local session is cleared by authService even if the API is unavailable.
-    } finally {
-      setIsLoggedIn(false);
-      setUserName("");
-      setIsOpen(false);
-      window.dispatchEvent(new Event("cyberrakshak:auth-changed"));
-      navigate("/");
-    }
+    try { await logout(); } catch { /* local session is still cleared by authService */ }
+    setIsLoggedIn(false);
+    setUserName("");
+    setIsOpen(false);
+    window.dispatchEvent(new Event("cyberrakshak:auth-changed"));
+    navigate("/");
   };
 
-  const handleNavClick = (path) => {
-    navigate(path);
-    setIsOpen(false);
-  };
+  const handleNavClick = (path) => { navigate(path); setIsOpen(false); };
+  const isActive = (paths) => paths.some((path) => location.pathname === path || location.pathname.startsWith(`${path}/`));
 
   return (
     <nav className="navbar" aria-label="Primary navigation">
@@ -55,12 +46,11 @@ function Navbar() {
         </button>
 
         <div className={`nav-menu ${isOpen ? "active" : ""}`}>
-          <button className={`nav-link ${location.pathname === "/" ? "active" : ""}`} onClick={() => handleNavClick("/")}>Home</button>
-          <button className={`nav-link ${location.pathname === "/learn" ? "active" : ""}`} onClick={() => handleNavClick("/learn")}>Learn</button>
-          <button className={`nav-link ${location.pathname === "/digital-literacy-quiz" ? "active" : ""}`} onClick={() => handleNavClick("/digital-literacy-quiz")}>Quiz</button>
-          <button className={`nav-link ${location.pathname === "/emergency-help" ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>Emergency</button>
-          <button className={`nav-link ${location.pathname === "/report-scam" ? "active" : ""}`} onClick={() => handleNavClick("/report-scam")}>Report Scam</button>
-          <button className={`nav-link ${location.pathname === "/feedback" ? "active" : ""}`} onClick={() => handleNavClick("/feedback")}>Feedback</button>
+          <button className={`nav-link ${isActive(["/"]) && location.pathname === "/" ? "active" : ""}`} onClick={() => handleNavClick("/")}>Home</button>
+          <button className={`nav-link ${isActive(["/scan"]) ? "active" : ""}`} onClick={() => handleNavClick("/scan")}>🔎 Scan</button>
+          <button className={`nav-link ${isActive(["/learn", "/digital-literacy", "/upi-safety", "/password-security"]) ? "active" : ""}`} onClick={() => handleNavClick("/learn")}>📚 Learn</button>
+          <button className={`nav-link ${isActive(["/emergency-help", "/report-scam"]) ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>🆘 Get Help</button>
+          <button className="nav-link" onClick={() => handleNavClick("/")}>💬 Ask</button>
 
           {isLoggedIn ? (
             <div className="user-menu">
