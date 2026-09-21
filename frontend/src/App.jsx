@@ -4,7 +4,6 @@ import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
 import ErrorBoundary from "./components/ErrorBoundary";
 
-// Pages
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -14,9 +13,9 @@ import DigitalLiteracyQuiz from "./pages/DigitalLiteracyQuiz/DigitalLiteracyQuiz
 import EmergencyHelp from "./pages/EmergencyHelp/EmergencyHelp";
 import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
+import MessageScanner from "./pages/MessageScanner/MessageScanner";
 import NotFound from "./pages/NotFound";
 
-// Learning Modules
 import UPISafety from "./pages/LearningModules/UPISafety";
 import CyberCrimeAwareness from "./pages/LearningModules/CyberCrimeAwareness";
 import SocialMediaSafety from "./pages/LearningModules/SocialMediaSafety";
@@ -36,6 +35,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/learn" element={<Learn />} />
+              <Route path="/scan" element={<MessageScanner />} />
+              <Route path="/scan-message" element={<MessageScanner />} />
               <Route path="/digital-literacy" element={<DigitalLiteracy />} />
               <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
               <Route path="/upi-safety" element={<UPISafety />} />
