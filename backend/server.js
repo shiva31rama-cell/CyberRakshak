@@ -29,7 +29,7 @@ const authLimiter = rateLimit({
 });
 
 const chatLimiter = rateLimit({
-  windowMs: 15 * 15 * 60 * 1000,
+  windowMs: 15 * 60 * 1000,
   limit: 60,
   standardHeaders: "draft-8",
   legacyHeaders: false,
