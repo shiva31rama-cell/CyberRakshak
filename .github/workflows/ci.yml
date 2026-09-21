@@ -2,9 +2,9 @@ name: CyberRakshak CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "cyberrakshak-2.0-final", "feat/**"]
   pull_request:
-    branches: [main]
+    branches: [main, "cyberrakshak-2.0-final"]
 
 jobs:
   backend-check:
@@ -21,6 +21,7 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
       - run: node -c server.js
+      - run: node -c controllers/chatController.js
       - run: npm test
 
   frontend-check:
