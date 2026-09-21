@@ -29,24 +29,34 @@ const authLimiter = rateLimit({
 });
 
 const chatLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 15 * 15 * 60 * 1000,
   limit: 60,
   standardHeaders: "draft-8",
   legacyHeaders: false,
   message: { success: false, message: "Too many chat requests. Please try again later." },
 });
 
+const scanLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 40,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many scan requests. Please try again later." },
+});
+
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 app.use("/api/chat", chatLimiter);
+app.use("/api/scan", scanLimiter);
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/chat", require("./routes/chat"));
+app.use("/api/scan", require("./routes/scan"));
 app.use("/api/quiz", require("./routes/quiz"));
 app.use("/api/feedback", require("./routes/feedback"));
 app.use("/api/scam-report", require("./routes/scamReport"));
 
-app.get("/", (req, res) => res.json({ success: true, message: "CyberRakshak Backend Running Successfully 🚀", version: "1.1.0" }));
-app.get("/health", (req, res) => res.json({ success: true, status: "ok", service: "CyberRakshak API" }));
+app.get("/", (req, res) => res.json({ success: true, message: "CyberRakshak Backend Running Successfully 🚀", version: "2.0.0" }));
+app.get("/health", (req, res) => res.json({ success: true, status: "ok", service: "CyberRakshak API", version: "2.0.0" }));
 
 app.use((req, res) => res.status(404).json({ success: false, message: "Route not found" }));
 app.use((err, req, res, next) => {
