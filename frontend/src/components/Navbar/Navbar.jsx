@@ -1,11 +1,13 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getStoredUser, isAuthenticated, logout } from "../../services/authService";
+import { useLanguage } from "../../contexts/LanguageContext";
 import "./Navbar.css";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
   const [userName, setUserName] = useState(() => getStoredUser()?.name || "");
@@ -46,11 +48,19 @@ function Navbar() {
         </button>
 
         <div className={`nav-menu ${isOpen ? "active" : ""}`}>
-          <button className={`nav-link ${isActive(["/"]) && location.pathname === "/" ? "active" : ""}`} onClick={() => handleNavClick("/")}>Home</button>
-          <button className={`nav-link ${isActive(["/scan"]) ? "active" : ""}`} onClick={() => handleNavClick("/scan")}>🔎 Scan</button>
-          <button className={`nav-link ${isActive(["/learn", "/digital-literacy", "/upi-safety", "/password-security"]) ? "active" : ""}`} onClick={() => handleNavClick("/learn")}>📚 Learn</button>
-          <button className={`nav-link ${isActive(["/emergency-help", "/report-scam"]) ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>🆘 Get Help</button>
-          <button className="nav-link" onClick={() => handleNavClick("/")}>💬 Ask</button>
+          <button className={`nav-link ${isActive(["/"]) && location.pathname === "/" ? "active" : ""}`} onClick={() => handleNavClick("/")}>{t.home}</button>
+          <button className={`nav-link ${isActive(["/scan"]) ? "active" : ""}`} onClick={() => handleNavClick("/scan")}>🔎 {t.scan}</button>
+          <button className={`nav-link ${isActive(["/learn", "/digital-literacy", "/upi-safety", "/password-security"]) ? "active" : ""}`} onClick={() => handleNavClick("/learn")}>📚 {t.learn}</button>
+          <button className={`nav-link ${isActive(["/emergency-help", "/report-scam"]) ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>🆘 {t.help}</button>
+          <button className="nav-link" onClick={() => handleNavClick("/")}>💬 {t.ask}</button>
+
+          <label className="language-control" title={t.language}>
+            <span aria-hidden="true">🌐</span>
+            <span className="sr-only">{t.language}</span>
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} aria-label={t.language}>
+              <option value="en">EN</option><option value="te">తెలుగు</option><option value="hi">हिन्दी</option>
+            </select>
+          </label>
 
           {isLoggedIn ? (
             <div className="user-menu">
