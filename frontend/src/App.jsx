@@ -14,6 +14,9 @@ import EmergencyHelp from "./pages/EmergencyHelp/EmergencyHelp";
 import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
 import MessageScanner from "./pages/MessageScanner/MessageScanner";
+import URLScanner from "./pages/URLScanner/URLScanner";
+import IncidentAssistant from "./pages/IncidentAssistant/IncidentAssistant";
+import SocialVerification from "./pages/SocialVerification/SocialVerification";
 import NotFound from "./pages/NotFound";
 
 import UPISafety from "./pages/LearningModules/UPISafety";
@@ -37,6 +40,11 @@ function App() {
               <Route path="/learn" element={<Learn />} />
               <Route path="/scan" element={<MessageScanner />} />
               <Route path="/scan-message" element={<MessageScanner />} />
+              <Route path="/scan/url" element={<URLScanner />} />
+              <Route path="/url-scanner" element={<URLScanner />} />
+              <Route path="/incident" element={<IncidentAssistant />} />
+              <Route path="/verify" element={<SocialVerification />} />
+              <Route path="/verify/social" element={<SocialVerification />} />
               <Route path="/digital-literacy" element={<DigitalLiteracy />} />
               <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
               <Route path="/upi-safety" element={<UPISafety />} />
