@@ -15,7 +15,7 @@ import EmergencyHelp from "./pages/EmergencyHelp/EmergencyHelp";
 import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
 import MessageScanner from "./pages/MessageScanner/MessageScanner";
-import URLScanner from "./pages/URLScanner/URLScanner";
+import UrlScanner from "./pages/UrlScanner/UrlScanner";
 import IncidentAssistant from "./pages/IncidentAssistant/IncidentAssistant";
 import SocialVerification from "./pages/SocialVerification/SocialVerification";
 import NotFound from "./pages/NotFound";
@@ -42,8 +42,8 @@ function App() {
                 <Route path="/learn" element={<Learn />} />
                 <Route path="/scan" element={<MessageScanner />} />
                 <Route path="/scan-message" element={<MessageScanner />} />
-                <Route path="/scan/url" element={<URLScanner />} />
-                <Route path="/url-scanner" element={<URLScanner />} />
+                <Route path="/scan/url" element={<UrlScanner />} />
+                <Route path="/url-scanner" element={<UrlScanner />} />
                 <Route path="/incident" element={<IncidentAssistant />} />
                 <Route path="/verify" element={<SocialVerification />} />
                 <Route path="/verify/social" element={<SocialVerification />} />
