@@ -1,54 +1,64 @@
 # CyberRakshak 2.0
 
-CyberRakshak is an AI-powered, cybersecurity-focused safety platform for everyday users. It is designed to help people **ASK, SCAN, LEARN and GET HELP** when they face suspicious messages, online scams or other cyber-safety situations.
+CyberRakshak is an AI-powered, cybersecurity-focused digital-safety platform for everyday users. The product journey is:
 
-## Current product direction
+**ASK → SCAN → LEARN → RESPOND → GET HELP**
+
+It is designed for students, smartphone users, UPI users, first-time digital users and rural/semi-urban communities. It is **not** an official government authority and must distinguish guidance from official reporting channels.
+
+## Current build branch
+
+- Repository: `shiva31rama-cell/CyberRakshak`
+- Working branch: `cyberrakshak-2.0-final`
+- `main` is kept outside the feature build workflow.
+
+## Current build
+
+### User-facing capabilities
+
+- **ASK** — cyber-only assistant with scope guard, grounded knowledge, incident triage and sensitive-input warnings.
+- **SCAN MESSAGE** — structured message analysis with scam indicators, category, risk level, explanation and safe actions.
+- **SCAN URL** — deterministic URL heuristics with cautious risk language and limitations.
+- **LEARN** — digital-literacy and cyber-safety modules plus curated awareness videos.
+- **QUIZ** — existing digital-literacy quiz foundation.
+- **RESPOND** — guided Incident Assistant with safe actions, evidence preservation and secret-sharing warnings.
+- **VERIFY** — first deterministic social-claim verification layer with an explicit “unverified is not false” rule.
+- **GET HELP** — existing emergency/help and scam-reporting flows.
+- **LANGUAGES** — shared English, తెలుగు and हिन्दी language state for core navigation/home content; full translation coverage is still in development.
+- **RESPONSIVE WEB** — one React/Vite frontend is the current shared-code experience for phone, tablet and desktop layouts.
+
+### Backend APIs
+
+- `GET /health`
+- `POST /api/chat`
+- `POST /api/scan/message`
+- `POST /api/scan/url`
+- `POST /api/incidents`
+- `POST /api/verify/social`
+- Existing auth, quiz, feedback and scam-report APIs.
+
+## Architecture
 
 ```text
-                    CYBERRAKSHAK
-                         |
-            +------------+------------+
-            |            |            |
-           ASK          SCAN         LEARN
-            |            |            |
-            +------------+------------+
-                         |
-                    UNDERSTAND
-                         |
-                      RESPOND
-                         |
-                     GET HELP
+Responsive React/Vite
+       |
+       +--> ASK / SCAN / LEARN / RESPOND / VERIFY / GET HELP
+       |
+       v
+REST API
+       |
+       v
+Node + Express
+  |       |        |
+  |       |        +--> validation / safety / rate limiting
+  |       +-----------> deterministic cyber analysis
+  +-------------------> AI provider boundary + grounded knowledge
+       |
+       v
+MongoDB Atlas foundation
 ```
 
-CyberRakshak is not intended to be a general-purpose chatbot. The assistant is constrained to cybersecurity and digital-safety topics and should redirect unrelated questions.
-
-## Implemented in the current upgrade branch
-
-- React + Vite product landing page rebuilt around cyber-safety tasks.
-- Unified primary navigation around Scan, Learn, Get Help and Ask.
-- Dedicated suspicious-message scanner at `/scan` and `/scan-message`.
-- Shared backend message-analysis service with observable indicators and calibrated risk levels.
-- Scanner API: `POST /api/scan/message`.
-- Scanner rate limiting.
-- Reusable cyber-relevance service for the assistant.
-- Shared sensitive-input protection service.
-- AI provider boundary so the chat controller no longer constructs the provider request directly.
-- Existing grounded chatbot and incident-triage functionality preserved.
-- Root development scripts now make `npm run dev` start the frontend and provide explicit frontend/backend scripts.
-- CI is configured to check the upgrade branch family as well as the main development paths.
-- Curated cyber-safety videos are integrated into the landing experience using the existing privacy-conscious YouTube embed component.
-
-## Existing features preserved
-
-- JWT/bcrypt authentication foundation
-- MongoDB/Mongoose foundation
-- Cyber-safety knowledge base
-- Chatbot safety fallback and incident triage
-- Learning modules
-- Digital-literacy quiz
-- Emergency help
-- Scam reporting
-- Feedback
+The architecture deliberately separates deterministic safety checks from AI generation. A heuristic result is not proof of fraud or maliciousness.
 
 ## Technology
 
@@ -56,21 +66,20 @@ CyberRakshak is not intended to be a general-purpose chatbot. The assistant is c
 - React 19
 - Vite 8
 - React Router
-- CSS
+- Responsive CSS
+- Shared language state
 
 ### Backend
 - Node.js
 - Express 5
-- Mongoose
-- MongoDB Atlas compatible configuration
-- JWT
-- bcryptjs
+- Mongoose / MongoDB Atlas
+- JWT / bcryptjs
 - Helmet
 - CORS
 - express-rate-limit
 
 ### AI
-The backend uses an OpenAI-compatible chat-completions interface through an internal service boundary. The provider is configured only on the backend.
+The provider is configured on the backend only. The assistant uses cyber relevance checks, sensitive-input protection, grounded knowledge and a safe fallback when AI configuration is unavailable.
 
 ## Local setup
 
@@ -84,15 +93,9 @@ cd ..\backend
 npm install
 ```
 
-### 2. Configure the backend
+### 2. Configure backend
 
-Copy the example environment file:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Set the required values in `backend/.env`:
+Create `backend/.env` from `backend/.env.example` and configure:
 
 ```env
 PORT=5000
@@ -104,18 +107,18 @@ AI_API_KEY=<server-side-key>
 AI_MODEL=<model-name>
 ```
 
-Never put `AI_API_KEY` in the Vite frontend environment.
+Never put `AI_API_KEY`, MongoDB credentials or JWT secrets in the frontend.
 
-### 3. Start the backend
+### 3. Start backend
 
 ```powershell
 cd backend
 npm run dev
 ```
 
-### 4. Start the frontend
+### 4. Start frontend
 
-In a second terminal:
+In another terminal:
 
 ```powershell
 cd frontend
@@ -128,58 +131,38 @@ Or from the repository root:
 npm run dev
 ```
 
-The root `dev` script starts the frontend. Run `npm run backend` separately for the backend.
+## Verification commands
 
-## API
-
-### Health
-
-`GET /health`
-
-### Chat
-
-`POST /api/chat`
-
-Body:
-
-```json
-{
-  "messages": [
-    { "role": "user", "content": "I received a suspicious bank message." }
-  ]
-}
+```powershell
+npm test
+npm run lint
+npm run build
 ```
 
-### Message scanner
+Runtime verification still requires a configured MongoDB environment for the full backend startup path.
 
-`POST /api/scan/message`
+## Safety boundaries
 
-Body:
+- Never request or store passwords, OTPs, PINs, CVVs, recovery codes or API keys.
+- Do not claim a message or URL is malicious without sufficient evidence.
+- “Unverified” must never be presented as “False.”
+- Official government/bank/reporting resources must be clearly distinguished from CyberRakshak.
+- The platform must not facilitate unauthorized access, credential theft, malware, evasion or other harmful cyber activity.
+- Future RAG/vector search, live social evidence retrieval, OCR/image scanning, voice, advanced ML and native mobile apps are **not claimed as complete** until built and verified.
 
-```json
-{
-  "message": "Your bank account will be blocked today. Update KYC using this link."
-}
-```
+## AWS direction
 
-The scanner returns a structured result containing cyber relevance, category, risk level, indicators, explanation and recommended actions.
-
-## Important product boundaries
-
-- Risk levels are based on observable indicators and are not proof of fraud.
-- CyberRakshak must never request OTPs, passwords, PINs, CVVs, recovery codes or API keys.
-- Official reporting/help resources must remain clearly distinguished from CyberRakshak guidance.
-- Future capabilities such as RAG, vector search, threat-intelligence APIs, ML classification, voice, screenshot vision and mobile apps are **planned**, not claimed as complete.
+The selected deployment direction is AWS. The production deployment remains a build/verification task. The final architecture will use managed AWS delivery/compute/secrets/monitoring services with MongoDB Atlas for application data, subject to cost, security and runtime validation.
 
 ## Documentation
 
-- `docs/IMPLEMENTATION_AUDIT.md` — verified architecture and current foundation
-- `docs/CURRENT_PROBLEMS.md` — problem/root-cause/fix/verification matrix
-- `docs/AI_WORKFLOW.md` — assistant analysis pipeline
-- `docs/API.md` — API contracts
-- `docs/SECURITY.md` — security and privacy controls
-- `docs/FUTURE_ROADMAP.md` — future work separated from current features
+- `docs/IMPLEMENTATION_AUDIT.md`
+- `docs/CURRENT_PROBLEMS.md`
+- `docs/AI_WORKFLOW.md`
+- `docs/API.md`
+- `docs/SECURITY.md`
+- `docs/FUTURE_ROADMAP.md`
 
-## Verification status
+## Build truth
 
-The upgrade branch has been implemented through the GitHub repository. Local runtime/build verification still needs to be performed on the developer machine with the real MongoDB and AI environment configuration. CI results should be checked after the branch workflow becomes available.
+A feature is marked **IMPLEMENTED** only after code, integration, tests and evidence support the acceptance criteria. Planned work remains clearly separated from implemented work.
