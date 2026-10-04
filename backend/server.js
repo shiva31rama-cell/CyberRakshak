@@ -9,6 +9,7 @@ dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
+let dbReady = false;
 
 app.disable("x-powered-by");
 app.use(helmet());
@@ -46,7 +47,7 @@ app.use("/api/feedback", require("./routes/feedback"));
 app.use("/api/scam-report", require("./routes/scamReport"));
 
 app.get("/", (req, res) => res.json({ success: true, message: "CyberRakshak Backend Running Successfully 🚀", version: "2.0.0" }));
-app.get("/health", (req, res) => res.json({ success: true, status: global.dbReady ? "ok" : "degraded", database: global.dbReady ? "connected" : "unavailable", service: "CyberRakshak API", version: "2.0.0" }));
+app.get("/health", (req, res) => res.json({ success: true, status: dbReady ? "ok" : "degraded", database: dbReady ? "connected" : "unavailable", service: "CyberRakshak API", version: "2.0.0" }));
 
 app.use((req, res) => res.status(404).json({ success: false, message: "Route not found" }));
 app.use((err, req, res, next) => {
@@ -57,10 +58,9 @@ app.use((err, req, res, next) => {
 });
 
 const start = async () => {
-  global.dbReady = false;
   try {
     await connectDB();
-    global.dbReady = true;
+    dbReady = true;
   } catch (error) {
     console.error("MongoDB unavailable:", error.message);
     if (process.env.NODE_ENV === "production") {
