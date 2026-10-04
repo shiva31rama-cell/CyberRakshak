@@ -1,0 +1,11 @@
+{
+  "name": "CyberRakshak 2.0",
+  "short_name": "CyberRakshak",
+  "description": "AI-powered multilingual digital literacy and cyber-safety platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#1769ff",
+  "lang": "en",
+  "categories": ["education", "security", "utilities"]
+}
