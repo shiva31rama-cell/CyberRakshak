@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
@@ -29,38 +30,40 @@ import "./App.css";
 function App() {
   return (
     <BrowserRouter>
-      <ErrorBoundary>
-        <div className="app">
-          <Navbar />
-          <main className="app-main">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/learn" element={<Learn />} />
-              <Route path="/scan" element={<MessageScanner />} />
-              <Route path="/scan-message" element={<MessageScanner />} />
-              <Route path="/scan/url" element={<URLScanner />} />
-              <Route path="/url-scanner" element={<URLScanner />} />
-              <Route path="/incident" element={<IncidentAssistant />} />
-              <Route path="/verify" element={<SocialVerification />} />
-              <Route path="/verify/social" element={<SocialVerification />} />
-              <Route path="/digital-literacy" element={<DigitalLiteracy />} />
-              <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
-              <Route path="/upi-safety" element={<UPISafety />} />
-              <Route path="/cyber-crime-awareness" element={<CyberCrimeAwareness />} />
-              <Route path="/social-media-safety" element={<SocialMediaSafety />} />
-              <Route path="/password-security" element={<PasswordSecurity />} />
-              <Route path="/emergency-help" element={<EmergencyHelp />} />
-              <Route path="/report-scam" element={<ScamSolutions />} />
-              <Route path="/feedback" element={<Feedback />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-          <Chatbot />
-        </div>
-      </ErrorBoundary>
+      <LanguageProvider>
+        <ErrorBoundary>
+          <div className="app">
+            <Navbar />
+            <main className="app-main">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/learn" element={<Learn />} />
+                <Route path="/scan" element={<MessageScanner />} />
+                <Route path="/scan-message" element={<MessageScanner />} />
+                <Route path="/scan/url" element={<URLScanner />} />
+                <Route path="/url-scanner" element={<URLScanner />} />
+                <Route path="/incident" element={<IncidentAssistant />} />
+                <Route path="/verify" element={<SocialVerification />} />
+                <Route path="/verify/social" element={<SocialVerification />} />
+                <Route path="/digital-literacy" element={<DigitalLiteracy />} />
+                <Route path="/digital-literacy-quiz" element={<DigitalLiteracyQuiz />} />
+                <Route path="/upi-safety" element={<UPISafety />} />
+                <Route path="/cyber-crime-awareness" element={<CyberCrimeAwareness />} />
+                <Route path="/social-media-safety" element={<SocialMediaSafety />} />
+                <Route path="/password-security" element={<PasswordSecurity />} />
+                <Route path="/emergency-help" element={<EmergencyHelp />} />
+                <Route path="/report-scam" element={<ScamSolutions />} />
+                <Route path="/feedback" element={<Feedback />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+            <Chatbot />
+          </div>
+        </ErrorBoundary>
+      </LanguageProvider>
     </BrowserRouter>
   );
 }
