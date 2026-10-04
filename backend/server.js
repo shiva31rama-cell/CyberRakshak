@@ -20,37 +20,27 @@ app.use(cors({
 app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 
-const authLimiter = rateLimit({
+const createLimiter = (limit, message) => rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 50,
+  limit,
   standardHeaders: "draft-8",
   legacyHeaders: false,
-  message: { success: false, message: "Too many authentication requests. Please try again later." },
+  message: { success: false, message },
 });
 
-const chatLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 60,
-  standardHeaders: "draft-8",
-  legacyHeaders: false,
-  message: { success: false, message: "Too many chat requests. Please try again later." },
-});
+app.use("/api/auth/login", createLimiter(50, "Too many authentication requests. Please try again later."));
+app.use("/api/auth/register", createLimiter(50, "Too many authentication requests. Please try again later."));
+app.use("/api/chat", createLimiter(60, "Too many chat requests. Please try again later."));
+app.use("/api/scan", createLimiter(40, "Too many scan requests. Please try again later."));
+app.use("/api/incidents", createLimiter(30, "Too many incident requests. Please try again later."));
+app.use("/api/verify", createLimiter(30, "Too many verification requests. Please try again later."));
 
-const scanLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 40,
-  standardHeaders: "draft-8",
-  legacyHeaders: false,
-  message: { success: false, message: "Too many scan requests. Please try again later." },
-});
-
-app.use("/api/auth/login", authLimiter);
-app.use("/api/auth/register", authLimiter);
-app.use("/api/chat", chatLimiter);
-app.use("/api/scan", scanLimiter);
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/chat", require("./routes/chat"));
 app.use("/api/scan", require("./routes/scan"));
+app.use("/api/scan/url", require("./routes/urlScan"));
+app.use("/api/incidents", require("./routes/incidents"));
+app.use("/api/verify/social", require("./routes/socialVerification"));
 app.use("/api/quiz", require("./routes/quiz"));
 app.use("/api/feedback", require("./routes/feedback"));
 app.use("/api/scam-report", require("./routes/scamReport"));
