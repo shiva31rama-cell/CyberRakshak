@@ -4,6 +4,7 @@ import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
