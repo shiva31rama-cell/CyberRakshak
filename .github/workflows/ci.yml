@@ -2,7 +2,7 @@ name: CyberRakshak CI
 
 on:
   push:
-    branches: [main, "cyberrakshak-2.0-final", "feat/**"]
+    branches: [main, "cyberrakshak-2.0-final"]
   pull_request:
     branches: [main, "cyberrakshak-2.0-final"]
 
