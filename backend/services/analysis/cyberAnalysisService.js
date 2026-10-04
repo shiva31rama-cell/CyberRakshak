@@ -11,6 +11,12 @@ const CATEGORY_RULES = [
   { category: "impersonation", patterns: [/pretend.*bank/i, /pretending.*bank/i, /impersonat/i, /fake.*profile/i, /official.*representative/i] },
 ];
 
+const SENSITIVE_PATTERNS = [
+  /\b(?:otp|one[- ]time password|verification code|passcode)\b/i,
+  /\b(?:password|passwd|pin|upi pin|cvv|cvc|recovery code|backup code)\b/i,
+  /\b\d{4,8}\b/,
+];
+
 function analyzeMessage(input) {
   const text = String(input || "").trim();
   if (!text) throw Object.assign(new Error("Message is required"), { status: 400 });
@@ -18,6 +24,7 @@ function analyzeMessage(input) {
 
   const indicators = [];
   const add = (value) => { if (!indicators.includes(value)) indicators.push(value); };
+  const sensitiveDataDetected = SENSITIVE_PATTERNS.some((pattern) => pattern.test(text));
 
   if (/https?:\/\/|www\.|bit\.ly|tinyurl|\.com\//i.test(text)) add("Contains a link or URL");
   if (/urgent|immediately|within \d+ (minutes?|hours?)|today|last chance|account.*blocked/i.test(text)) add("Urgency or pressure");
@@ -25,6 +32,7 @@ function analyzeMessage(input) {
   if (/pay|payment|fee|send money|transfer|deposit|₹|rs\.?\s?\d+/i.test(text)) add("Requests money or payment");
   if (/won|winner|prize|reward|cashback|refund/i.test(text)) add("Unexpected reward, prize or refund claim");
   if (/kyc|verify.*account|update.*account|suspend|blocked/i.test(text)) add("Account verification or suspension pressure");
+  if (sensitiveDataDetected) add("Message may contain a sensitive value; do not share such values with CyberRakshak");
 
   const matched = CATEGORY_RULES.find((rule) => rule.patterns.some((pattern) => pattern.test(text)));
   const category = matched?.category || (indicators.length ? "suspicious_message" : "general_cyber_awareness");
@@ -42,6 +50,7 @@ function analyzeMessage(input) {
   ];
 
   if (/money|payment|transaction|upi|bank/i.test(text)) recommendedActions.unshift("If an unauthorized payment occurred, contact your bank or payment provider immediately.");
+  if (sensitiveDataDetected) recommendedActions.unshift("If you pasted a secret by mistake, do not repeat it here; use the affected service's official security/recovery process.");
 
   return {
     isCyberRelated,
@@ -49,6 +58,7 @@ function analyzeMessage(input) {
     riskLevel,
     confidence: indicators.length ? Math.min(0.98, 0.55 + indicators.length * 0.1) : 0.45,
     indicators,
+    sensitiveDataDetected,
     explanation: indicators.length
       ? "The message contains observable warning signs that can be associated with cyber scams or unsafe requests. These indicators are not, by themselves, proof of fraud."
       : "No strong scam indicators were detected by the current heuristic checks.",
@@ -56,7 +66,8 @@ function analyzeMessage(input) {
     shouldReport: ["phishing", "lottery_scam", "upi_fraud", "banking_fraud", "fake_job_scam", "investment_scam"].includes(category),
     language: "en",
     sources: [],
-    analysisMethod: "CyberRakshak heuristic analysis",
+    analysisMethod: "CyberRakshak deterministic heuristic analysis",
+    evidenceStatus: "HEURISTIC_ONLY",
   };
 }
 
