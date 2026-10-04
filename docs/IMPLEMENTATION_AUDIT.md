@@ -43,7 +43,7 @@
 | F29 Native mobile | P3 | PLANNED | responsive web/PWA is the current shared-code direction |
 | F30 Analytics | P3 | PLANNED | no fabricated metrics |
 | F31 AWS deployment | P1 | PLANNED/IN DEVELOPMENT | architecture selected; production deployment still needs real environment verification |
-| F34 Automated tests | P1 | IN DEVELOPMENT | backend unit tests exist; full feature matrix pending |
+| F34 Automated tests | P1 | IN DEVELOPMENT | chat tests + new core safety-service coverage; full feature matrix pending |
 | F35 Security testing | P1 | IN DEVELOPMENT | baseline middleware and secret rules exist; dedicated security test pass pending |
 | F36 Technical docs | P1 | IN PROGRESS | docs are being updated with implementation evidence |
 | F37 Community validation | P1 | PLANNED | must be supported by real survey/session evidence |
@@ -80,6 +80,14 @@ MongoDB Atlas (configured foundation; runtime verification pending)
 ## Important truth boundary
 
 The project currently has deterministic message/URL heuristics and a first social-claim verification layer. It does **not** yet have live browsing-based social verification, RAG/vector search, OCR, voice, or a native mobile client. Those remain separate until built and tested.
+
+## Latest build work
+
+- Added deterministic URL-analysis safety boundaries and removed the duplicate unused URL-scanner implementation.
+- Hardened message scanning so sensitive-value presence is flagged without returning the submitted message as analysis output.
+- Added automated coverage for message scanning, URL scanning, incident planning, and social-claim triage.
+- CI is scoped to `main` and `cyberrakshak-2.0-final` so feature-branch noise does not become part of the release workflow.
+- These changes are committed to `cyberrakshak-2.0-final`; runtime CI/browser results still require verification.
 
 ## Immediate verification gate
 
