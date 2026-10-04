@@ -20,7 +20,7 @@
 | F06 Home | P0 | IMPLEMENTED | `frontend/src/pages/Home/Home.jsx` |
 | F07 Navigation/routing | P0 | IMPLEMENTED foundation | `frontend/src/App.jsx`, Navbar |
 | F08 Cyber Assistant | P0 | IMPLEMENTED | `backend/controllers/chatController.js` |
-| F09 Message Scanner | P0 | IMPLEMENTED foundation | `/scan`, `POST /api/scan/message` |
+| F09 Message Scanner | P0 | IMPLEMENTED foundation + safety signals | `/scan`, `POST /api/scan/message`, sensitive-input detection |
 | F10 Risk classification | P0 | IMPLEMENTED heuristic layer | `backend/services/analysis/cyberAnalysisService.js` |
 | F11 AI safety | P0 | IMPLEMENTED foundation | chat grounding, sensitive-input checks, fallback |
 | F12 Input validation | P0 | IMPLEMENTED foundation | chat/scanner/url/incident/verification services |
@@ -34,7 +34,7 @@
 | F20 Responsive | P1 | IN DEVELOPMENT | responsive CSS exists; full device matrix still requires browser verification |
 | F21 Auth | P1 | IMPLEMENTED foundation | JWT/bcrypt routes/services |
 | F22 Accessibility | P1 | IN DEVELOPMENT | labels/ARIA exist in core screens; full audit pending |
-| F23 URL Scanner | P1 | IMPLEMENTED foundation | `/url-scanner`, `POST /api/scan/url` |
+| F23 URL Scanner | P1 | IMPLEMENTED foundation + structural evidence boundary | `/url-scanner`, `POST /api/scan/url`, deterministic URL analysis |
 | F24 Social verification | P2 | IMPLEMENTED first deterministic layer | `/verify`, `POST /api/verify/social` |
 | F25 Evidence/source display | P2 | PARTIAL | chatbot sources + verification registry; live evidence retrieval not implemented |
 | F26 RAG | P2 | PLANNED | not claimed as implemented |
