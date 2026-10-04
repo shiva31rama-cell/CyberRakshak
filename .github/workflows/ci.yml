@@ -22,6 +22,14 @@ jobs:
       - run: npm ci
       - run: node -c server.js
       - run: node -c controllers/chatController.js
+      - run: node -c controllers/scanController.js
+      - run: node -c controllers/urlScanController.js
+      - run: node -c controllers/incidentController.js
+      - run: node -c controllers/socialVerificationController.js
+      - run: node -c services/analysis/cyberAnalysisService.js
+      - run: node -c services/analysis/urlAnalysisService.js
+      - run: node -c services/incident/incidentService.js
+      - run: node -c services/verification/socialVerificationService.js
       - run: npm test
 
   frontend-check:
