@@ -4,7 +4,6 @@ import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { LanguageProvider } from "./contexts/LanguageContext";
-import { LanguageProvider } from "./contexts/LanguageContext";
 
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
@@ -16,7 +15,7 @@ import EmergencyHelp from "./pages/EmergencyHelp/EmergencyHelp";
 import ScamSolutions from "./pages/ScamSolutions/ScamSolutions";
 import Feedback from "./pages/Feedback/Feedback";
 import MessageScanner from "./pages/MessageScanner/MessageScanner";
-import UrlScanner from "./pages/UrlScanner/UrlScanner";
+import URLScanner from "./pages/URLScanner/URLScanner";
 import IncidentAssistant from "./pages/IncidentAssistant/IncidentAssistant";
 import SocialVerification from "./pages/SocialVerification/SocialVerification";
 import NotFound from "./pages/NotFound";
@@ -43,7 +42,7 @@ function App() {
                 <Route path="/learn" element={<Learn />} />
                 <Route path="/scan" element={<MessageScanner />} />
                 <Route path="/scan-message" element={<MessageScanner />} />
-                <Route path="/scan/url" element={<UrlScanner />} />
+                <Route path="/scan/url" element={<URLScanner />} />
                 <Route path="/url-scanner" element={<UrlScanner />} />
                 <Route path="/incident" element={<IncidentAssistant />} />
                 <Route path="/verify" element={<SocialVerification />} />
