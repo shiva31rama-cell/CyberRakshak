@@ -14,7 +14,7 @@ const CATEGORY_RULES = [
 const SENSITIVE_PATTERNS = [
   /\b(?:otp|one[- ]time password|verification code|passcode)\b/i,
   /\b(?:password|passwd|pin|upi pin|cvv|cvc|recovery code|backup code)\b/i,
-  /\b\d{4,8}\b/,
+  /\b(?:otp|code|pin|verification|passcode)\b[^\d]{0,12}\d{4,8}\b/i,
 ];
 
 function analyzeMessage(input) {
