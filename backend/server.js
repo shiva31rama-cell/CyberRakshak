@@ -46,7 +46,7 @@ app.use("/api/feedback", require("./routes/feedback"));
 app.use("/api/scam-report", require("./routes/scamReport"));
 
 app.get("/", (req, res) => res.json({ success: true, message: "CyberRakshak Backend Running Successfully 🚀", version: "2.0.0" }));
-app.get("/health", (req, res) => res.json({ success: true, status: "ok", service: "CyberRakshak API", version: "2.0.0" }));
+app.get("/health", (req, res) => res.json({ success: true, status: global.dbReady ? "ok" : "degraded", database: global.dbReady ? "connected" : "unavailable", service: "CyberRakshak API", version: "2.0.0" }));
 
 app.use((req, res) => res.status(404).json({ success: false, message: "Route not found" }));
 app.use((err, req, res, next) => {
@@ -57,13 +57,21 @@ app.use((err, req, res, next) => {
 });
 
 const start = async () => {
+  global.dbReady = false;
   try {
     await connectDB();
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    global.dbReady = true;
   } catch (error) {
-    console.error("Startup failed:", error.message);
-    process.exit(1);
+    console.error("MongoDB unavailable:", error.message);
+    if (process.env.NODE_ENV === "production") {
+      console.error("Production startup requires a working MongoDB connection.");
+      process.exit(1);
+      return;
+    }
+    console.warn("Starting API in degraded development mode; database-backed routes may be unavailable.");
   }
+
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 };
 
 if (require.main === module) start();
