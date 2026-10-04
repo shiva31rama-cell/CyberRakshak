@@ -43,7 +43,7 @@ function App() {
                 <Route path="/scan" element={<MessageScanner />} />
                 <Route path="/scan-message" element={<MessageScanner />} />
                 <Route path="/scan/url" element={<URLScanner />} />
-                <Route path="/url-scanner" element={<UrlScanner />} />
+                <Route path="/url-scanner" element={<URLScanner />} />
                 <Route path="/incident" element={<IncidentAssistant />} />
                 <Route path="/verify" element={<SocialVerification />} />
                 <Route path="/verify/social" element={<SocialVerification />} />
