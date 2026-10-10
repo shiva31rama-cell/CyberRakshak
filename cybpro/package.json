@@ -1,0 +1,12 @@
+{
+  "name": "cybpro",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Evidence-first cyber safety platform",
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @cybpro/web --filter @cybpro/api dev",
+    "build": "pnpm --filter @cybpro/web build && pnpm --filter @cybpro/api typecheck",
+    "test": "pnpm --filter @cybpro/api test"
+  }
+}
