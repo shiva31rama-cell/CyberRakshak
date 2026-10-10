@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "CYBPRO",
+    "slug": "cybpro",
+    "scheme": "cybpro",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.cybpro.app" },
+    "android": { "package": "com.cybpro.app", "adaptiveIcon": { "backgroundColor": "#071321" } },
+    "plugins": ["expo-router", "expo-document-picker", "expo-image-picker"],
+    "experiments": { "typedRoutes": true }
+  }
+}
