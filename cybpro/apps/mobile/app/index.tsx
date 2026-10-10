@@ -128,7 +128,7 @@ export default function HomeScreen() {
             <Text style={styles.sectionEyebrow}>MORE WAYS TO STAY SAFE</Text>
             <Text style={styles.sectionTitle}>Your protection toolkit</Text>
           </View>
-          <ActionCard icon="🔗" title="Check a link" description="Inspect suspicious web addresses" onPress={() => router.push("/coming-soon?feature=URL%20scanner")} />
+          <ActionCard icon="🔗" title="Advanced link tools" description="More link checks are planned" onPress={() => router.push("/coming-soon?feature=Advanced%20link%20tools")} />
           <ActionCard icon="🖼️" title="Image, audio & files" description="Multimodal analysis is planned" onPress={() => router.push("/coming-soon?feature=Media%20analysis")} />
           <ActionCard icon="🆘" title="I've been scammed" description="Incident guidance is being built" onPress={() => router.push("/coming-soon?feature=Incident%20response")} />
           <View style={styles.footer}><Text style={styles.footerBrand}>CYBPRO · CYBER PROTECTION</Text><Text style={styles.footerText}>Early preview. Not a definitive security verdict or a substitute for official incident response.</Text></View>
