@@ -6,10 +6,12 @@ on:
     paths:
       - "cybpro/**"
       - ".github/workflows/cybpro-ci.yml"
+      - ".github/workflows/cybpro-lockfile.yml"
   pull_request:
     paths:
       - "cybpro/**"
       - ".github/workflows/cybpro-ci.yml"
+      - ".github/workflows/cybpro-lockfile.yml"
   workflow_dispatch:
 
 concurrency:
@@ -33,9 +35,59 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      - name: Install workspace dependencies
-        run: pnpm install --no-frozen-lockfile
-      - name: Run API tests
+      - name: Install workspace dependencies from lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Run API unit and route integration tests
         run: pnpm test
       - name: Build web and type-check API and mobile
         run: pnpm build
+      - name: Start API and web together
+        env:
+          NODE_ENV: test
+          HOST: 127.0.0.1
+          PORT: 4000
+          WEB_ORIGINS: http://127.0.0.1:5173,http://localhost:5173
+        run: |
+          pnpm --filter @cybpro/api dev > /tmp/cybpro-api.log 2>&1 &
+          echo $! > /tmp/cybpro-api.pid
+          pnpm --filter @cybpro/web dev -- --host 127.0.0.1 > /tmp/cybpro-web.log 2>&1 &
+          echo $! > /tmp/cybpro-web.pid
+          for attempt in $(seq 1 40); do
+            if curl --silent --fail http://127.0.0.1:4000/api/v1/health > /tmp/cybpro-health.json &&
+               curl --silent --fail http://127.0.0.1:5173/ > /tmp/cybpro-web.html; then
+              break
+            fi
+            sleep 1
+          done
+          test -s /tmp/cybpro-health.json || { cat /tmp/cybpro-api.log; exit 1; }
+          test -s /tmp/cybpro-web.html || { cat /tmp/cybpro-web.log; exit 1; }
+          grep -q "CYBPRO" /tmp/cybpro-health.json
+          grep -q 'id="root"' /tmp/cybpro-web.html
+      - name: Smoke-test message and URL journeys through running API
+        run: |
+          text_response=$(curl --silent --show-error --fail \
+            -H "content-type: application/json" \
+            -d '{"content":"URGENT: share your OTP to claim a reward"}' \
+            http://127.0.0.1:4000/api/v1/analyze/text)
+          echo "$text_response" | jq -e '.status == "rule_based_preview" and .confidence == "limited" and (.indicators | length > 0)' >/dev/null
+
+          url_response=$(curl --silent --show-error --fail \
+            -H "content-type: application/json" \
+            -d '{"url":"http://bit.ly:8080/test"}' \
+            http://127.0.0.1:4000/api/v1/analyze/url)
+          echo "$url_response" | jq -e '.status == "rule_based_preview" and (.indicators | any(contains("URL-shortening domain")))' >/dev/null
+          echo "API health, web serving, message analysis, and URL analysis smoke checks passed."
+      - name: Print service logs if a smoke test fails
+        if: failure()
+        working-directory: .
+        run: |
+          echo "----- API log -----"
+          cat /tmp/cybpro-api.log 2>/dev/null || true
+          echo "----- Web log -----"
+          cat /tmp/cybpro-web.log 2>/dev/null || true
+      - name: Stop preview processes
+        if: always()
+        working-directory: .
+        run: |
+          if [ -f /tmp/cybpro-api.pid ]; then kill "$(cat /tmp/cybpro-api.pid)" 2>/dev/null || true; fi
+          if [ -f /tmp/cybpro-web.pid ]; then kill "$(cat /tmp/cybpro-web.pid)" 2>/dev/null || true; fi
