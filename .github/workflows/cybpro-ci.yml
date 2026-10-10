@@ -41,6 +41,8 @@ jobs:
         run: pnpm test
       - name: Build web and type-check API and mobile
         run: pnpm build
+      - name: Bundle Expo mobile app for Android
+        run: pnpm --filter @cybpro/mobile exec expo export --platform android --output-dir /tmp/cybpro-mobile-export
       - name: Start API and web together
         env:
           NODE_ENV: test
