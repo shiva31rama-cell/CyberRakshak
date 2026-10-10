@@ -93,7 +93,8 @@ export default function HomeScreen() {
           {report ? (
             <View style={styles.reportCard} accessibilityLiveRegion="polite">
               <Text style={styles.reportTitle}>Initial signal report</Text>
-              <Text style={styles.risk}>Signal level: {report.risk.replaceAll("_", " ")}</Text>
+              <Text style={styles.risk}>Risk signal: {report.risk.replaceAll("_", " ")}</Text>
+              <Text style={styles.reportText}>Confidence: {report.confidence} (limited rule-based coverage)</Text>
               <Text style={styles.reportText}>{report.caveat}</Text>
               <Text style={styles.reportHeading}>Indicators observed</Text>
               {report.indicators.length ? report.indicators.map((item) => <Text key={item} style={styles.bullet}>• {item}</Text>) : <Text style={styles.reportText}>No configured warning patterns detected. That does not prove this message is safe.</Text>}
@@ -117,7 +118,8 @@ export default function HomeScreen() {
           {urlError ? <Text accessibilityRole="alert" style={styles.error}>{urlError}</Text> : null}
           {urlReport ? <View style={styles.reportCard} accessibilityLiveRegion="polite">
             <Text style={styles.reportTitle}>URL signal report</Text>
-            <Text style={styles.risk}>Signal level: {urlReport.risk.replaceAll("_", " ")}</Text>
+            <Text style={styles.risk}>Risk signal: {urlReport.risk.replaceAll("_", " ")}</Text>
+            <Text style={styles.reportText}>Confidence: {urlReport.confidence} (limited rule-based coverage)</Text>
             <Text style={styles.reportText}>{urlReport.caveat}</Text>
             <Text style={styles.reportHeading}>Observable URL traits</Text>
             {urlReport.indicators.length ? urlReport.indicators.map((item) => <Text key={item} style={styles.bullet}>• {item}</Text>) : <Text style={styles.reportText}>No configured URL warning traits observed. This does not mean the destination is safe.</Text>}
