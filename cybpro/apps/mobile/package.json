@@ -15,7 +15,6 @@
     "expo-document-picker": "latest",
     "expo-image-picker": "latest",
     "expo-status-bar": "latest",
-    "expo-av": "latest",
     "expo-file-system": "latest",
     "expo-router": "latest",
     "expo-speech": "latest",
