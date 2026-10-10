@@ -161,4 +161,4 @@ const styles = StyleSheet.create({
   actionTitle: { color: "#edf4fd", fontSize: 13, fontWeight: "800" }, actionDescription: { color: "#8fa2b8", fontSize: 11, lineHeight: 16, marginTop: 4 }, chevron: { color: "#73f0c2", fontSize: 26 },
   footer: { borderTopWidth: 1, borderTopColor: "#1b3045", marginTop: 24, paddingTop: 18 }, footerBrand: { color: "#91a8c0", fontSize: 9, fontWeight: "800", letterSpacing: 1.2 },
   footerText: { color: "#72869d", fontSize: 10, lineHeight: 16, marginTop: 8 }
-});
+} as const);
