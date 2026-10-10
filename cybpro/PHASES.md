@@ -5,7 +5,7 @@ Workload target: 100 effort points, split 50/50. These are planning estimates, n
 ## Phase 1 — Core protection (50 points)
 
 1. Foundation and secure contracts — 10 points
-   - Fresh frontend/API/service structure, configuration validation, typed contracts, OpenAPI, CI, threat model, safe error handling.
+   - Fresh web, mobile, API/service structure, configuration validation, typed contracts, OpenAPI, CI, threat model, safe error handling. Both web and mobile shells must start and share the same API contract.
 2. Text and URL analysis — 10 points
    - Message indicators, safe URL parsing/normalization, deterministic baseline rules, risk and confidence kept separate.
 3. Evidence connectors — 10 points
@@ -13,7 +13,7 @@ Workload target: 100 effort points, split 50/50. These are planning estimates, n
 4. Explainable results and language support — 10 points
    - Structured reports, evidence references, unknown/conflicting outcomes, English and Telugu core flows, AI output schema validation and non-AI fallback.
 5. End-to-end incident journey and quality — 10 points
-   - Responsive UI, safe incident checklist, verified official help links, benchmark dataset, unit/integration/E2E tests, setup docs and demonstration.
+   - Responsive web UI, usable mobile text-analysis flow, safe incident checklist, verified official help links, benchmark dataset, unit/integration/E2E tests, setup docs and demonstration.
 
 ### Phase 1 exit gate (all required)
 - Clean install and documented local start.
@@ -29,9 +29,9 @@ Workload target: 100 effort points, split 50/50. These are planning estimates, n
 ## Phase 2 — Multimodal and advanced intelligence (50 points)
 
 6. Safe file ingestion and screenshot analysis — 10 points
-   - Allowlisted types, signature-based type checks, limits, isolated parsing, OCR, redaction, no execution of uploaded content.
+   - Web and mobile input flows for allowlisted types, signature-based type checks, limits, isolated parsing, OCR, redaction, no execution of uploaded content.
 7. Audio and video analysis — 10 points
-   - Speech-to-text and sampled-frame extraction; time/duration/size limits; explain coverage and limitations.
+   - Mobile recording/import and web upload flows, speech-to-text and sampled-frame extraction; time/duration/size limits; explain coverage and limitations.
 8. Multimodal model and model routing — 10 points
    - Local/open-weight model option, provider abstraction, fallback, measured latency/memory, model/licence inventory.
 9. Public-claim verification and community reporting — 10 points
