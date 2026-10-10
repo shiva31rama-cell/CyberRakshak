@@ -51,7 +51,7 @@ export default function UrlScanner() {
         <div className="input-footer"><span>Never enter passwords or private tokens in a URL.</span><button onClick={analyze} disabled={!url.trim() || busy}>{busy ? "Checking…" : "Inspect URL"} <ArrowUpRight size={16} /></button></div>
       </div>
       {error && <p className="error-message" role="alert">{error}</p>}
-      {report && <div className="report-card" aria-live="polite"><div className="report-title"><Link2 size={20} /><div><b>URL signal report</b><small>Local parsing only · not a destination verdict</small></div></div><p className="risk-label">Signal level: {report.risk.replaceAll("_", " ")}</p><p>{report.caveat}</p><h3>Observable URL traits</h3>{report.indicators.length ? <ul>{report.indicators.map((item) => <li key={item}>{item}</li>)}</ul> : <p>No configured URL warning traits were observed. This does not mean the destination is safe.</p>}</div>}
+      {report && <div className="report-card" aria-live="polite"><div className="report-title"><Link2 size={20} /><div><b>URL signal report</b><small>Local parsing only · not a destination verdict</small></div></div><p className="risk-label">Risk signal: {report.risk.replaceAll("_", " ")}</p><p>Confidence: {report.confidence} (limited rule-based coverage)</p><p>{report.caveat}</p><h3>Observable URL traits</h3>{report.indicators.length ? <ul>{report.indicators.map((item) => <li key={item}>{item}</li>)}</ul> : <p>No configured URL warning traits were observed. This does not mean the destination is safe.</p>}</div>}
     </section>
   );
 }
