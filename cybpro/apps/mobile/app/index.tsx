@@ -43,6 +43,21 @@ export default function HomeScreen() {
     } finally { setBusy(false); }
   }
 
+  async function analyzeUrl() {
+    if (!urlInput.trim() || urlBusy) return;
+    setUrlBusy(true); setUrlError(""); setUrlReport(null);
+    try {
+      const response = await fetch(`${API_BASE}/api/v1/analyze/url`, {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: urlInput })
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "URL analysis failed");
+      setUrlReport(body as Report);
+    } catch {
+      setUrlError("Could not reach CYBPRO API. Check the API address and network connection.");
+    } finally { setUrlBusy(false); }
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -86,6 +101,27 @@ export default function HomeScreen() {
               {report.guidance.map((item) => <Text key={item} style={styles.bullet}>• {item}</Text>)}
             </View>
           ) : null}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionEyebrow}>LINK CHECKING</Text>
+            <Text style={styles.sectionTitle}>Inspect a URL</Text>
+            <Text style={styles.sectionDescription}>Checks visible URL traits locally. CYBPRO will not open the submitted address.</Text>
+          </View>
+          <View style={styles.scannerCard}>
+            <Text style={styles.fieldLabel}>WEBSITE ADDRESS</Text>
+            <TextInput accessibilityLabel="Website address to inspect" autoCapitalize="none" autoCorrect={false} keyboardType="url" maxLength={2048} value={urlInput} onChangeText={setUrlInput} placeholder="https://example.com" placeholderTextColor="#657b92" style={styles.urlInput} />
+            <Text style={styles.privacyHint}>Never enter passwords or private tokens in a URL.</Text>
+            <Pressable accessibilityRole="button" disabled={!urlInput.trim() || urlBusy} onPress={analyzeUrl} style={({ pressed }) => [styles.primaryButton, (!urlInput.trim() || urlBusy) && styles.disabledButton, pressed && styles.pressed]}>
+              {urlBusy ? <ActivityIndicator color="#071b19" /> : <Text style={styles.primaryButtonText}>Inspect URL  ↗</Text>}
+            </Pressable>
+          </View>
+          {urlError ? <Text accessibilityRole="alert" style={styles.error}>{urlError}</Text> : null}
+          {urlReport ? <View style={styles.reportCard} accessibilityLiveRegion="polite">
+            <Text style={styles.reportTitle}>URL signal report</Text>
+            <Text style={styles.risk}>Signal level: {urlReport.risk.replaceAll("_", " ")}</Text>
+            <Text style={styles.reportText}>{urlReport.caveat}</Text>
+            <Text style={styles.reportHeading}>Observable URL traits</Text>
+            {urlReport.indicators.length ? urlReport.indicators.map((item) => <Text key={item} style={styles.bullet}>• {item}</Text>) : <Text style={styles.reportText}>No configured URL warning traits observed. This does not mean the destination is safe.</Text>}
+          </View> : null}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionEyebrow}>MORE WAYS TO STAY SAFE</Text>
             <Text style={styles.sectionTitle}>Your protection toolkit</Text>
