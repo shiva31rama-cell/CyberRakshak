@@ -20,6 +20,10 @@ function ActionCard({ icon, title, description, onPress }: { icon: string; title
 export default function HomeScreen() {
   const router = useRouter();
   const [message, setMessage] = useState("");
+  const [urlInput, setUrlInput] = useState("");
+  const [urlBusy, setUrlBusy] = useState(false);
+  const [urlError, setUrlError] = useState("");
+  const [urlReport, setUrlReport] = useState<Report | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [report, setReport] = useState<Report | null>(null);
@@ -108,7 +112,7 @@ const styles = StyleSheet.create({
   sectionHeader: { marginBottom: 14, marginTop: 8 }, sectionEyebrow: { color: "#73f0c2", fontSize: 9, fontWeight: "800", letterSpacing: 1.4 }, sectionTitle: { color: "#f5f8ff", fontSize: 24, fontWeight: "800", letterSpacing: -0.5, marginTop: 7 },
   sectionDescription: { color: "#8fa2b8", fontSize: 12, lineHeight: 18, marginTop: 5 }, scannerCard: { borderWidth: 1, borderColor: "#294056", backgroundColor: "#0e2032", borderRadius: 15, padding: 16, marginBottom: 12 },
   fieldLabel: { color: "#dce8f5", fontSize: 10, fontWeight: "800", letterSpacing: 1, marginBottom: 11 }, input: { minHeight: 130, maxHeight: 240, borderWidth: 1, borderColor: "#263d53", backgroundColor: "#091725", borderRadius: 10, padding: 13, color: "#f2f7ff", fontSize: 13, lineHeight: 20 },
-  privacyHint: { color: "#8197ad", fontSize: 10, lineHeight: 16, marginTop: 10 }, primaryButton: { minHeight: 46, backgroundColor: "#73f0c2", borderRadius: 9, alignItems: "center", justifyContent: "center", marginTop: 14 },
+  urlInput: { minHeight: 48, borderWidth: 1, borderColor: "#263d53", backgroundColor: "#091725", borderRadius: 10, paddingHorizontal: 13, color: "#f2f7ff", fontSize: 13 },\n  privacyHint: { color: "#8197ad", fontSize: 10, lineHeight: 16, marginTop: 10 }, primaryButton: { minHeight: 46, backgroundColor: "#73f0c2", borderRadius: 9, alignItems: "center", justifyContent: "center", marginTop: 14 },
   primaryButtonText: { color: "#062019", fontWeight: "900", fontSize: 12 }, disabledButton: { opacity: 0.55 }, pressed: { opacity: 0.78 }, error: { color: "#ffb4a8", fontSize: 12, lineHeight: 18, marginBottom: 12 },
   reportCard: { backgroundColor: "#102337", borderColor: "#31516b", borderWidth: 1, borderRadius: 13, padding: 16, marginBottom: 22 }, reportTitle: { color: "#73f0c2", fontSize: 16, fontWeight: "800" },
   risk: { color: "#ffd18b", fontWeight: "800", textTransform: "capitalize", marginTop: 12 }, reportText: { color: "#b9c9db", fontSize: 12, lineHeight: 19, marginTop: 8 },
