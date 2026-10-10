@@ -22,4 +22,4 @@ const styles = StyleSheet.create({
   eyebrow: { color: "#73f0c2", fontSize: 10, fontWeight: "800", letterSpacing: 1.3 }, title: { color: "#f5f8ff", fontSize: 30, fontWeight: "900", marginTop: 14 },
   body: { color: "#a9b9cc", fontSize: 14, lineHeight: 23, marginTop: 12 }, button: { backgroundColor: "#73f0c2", borderRadius: 10, alignItems: "center", padding: 14, marginTop: 24 },
   buttonText: { color: "#062019", fontSize: 13, fontWeight: "900" }
-} as const);
+});
