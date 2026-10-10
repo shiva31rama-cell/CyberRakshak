@@ -1,4 +1,5 @@
 import { useState } from "react";
+import UrlScanner from "./UrlScanner";
 import { ArrowUpRight, AudioLines, FileSearch, Fingerprint, Link2, ScanSearch, ShieldCheck, ShieldAlert, Sparkles } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
@@ -72,6 +73,8 @@ export default function App() {
         {error && <p className="error-message" role="alert">{error}</p>}
         {report && <div className="report-card" aria-live="polite"><div className="report-title"><ShieldAlert size={20} /><div><b>Initial signal report</b><small>Rule-based preview · not a definitive verdict</small></div></div><p className="risk-label">Result: {report.risk.replaceAll("_", " ")}</p><p>{report.caveat}</p><h3>Indicators observed</h3>{report.indicators.length ? <ul>{report.indicators.map((item) => <li key={item}>{item}</li>)}</ul> : <p>No configured warning patterns were detected. That does not prove the message is safe.</p>}<h3>Safer next steps</h3><ul>{report.guidance.map((item) => <li key={item}>{item}</li>)}</ul></div>}
       </section>
+
+      <UrlScanner />
 
       <section className="capabilities">
         <div className="capability"><span className="cap-icon"><Link2 size={19} /></span><b>Link analysis</b><p>URL parsing and reputation evidence will be added through safe, policy-compliant connectors.</p><span className="planned">PLANNED</span></div>
