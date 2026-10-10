@@ -10,21 +10,21 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@expo/vector-icons": "latest",
-    "expo": "latest",
-    "expo-document-picker": "latest",
-    "expo-image-picker": "latest",
-    "expo-status-bar": "latest",
-    "expo-file-system": "latest",
-    "expo-router": "latest",
-    "expo-speech": "latest",
-    "react": "latest",
-    "react-native": "latest",
-    "react-native-safe-area-context": "latest",
-    "react-native-screens": "latest"
+    "@expo/vector-icons": "^15.0.2",
+    "expo": "~54.0.0",
+    "expo-document-picker": "~14.0.7",
+    "expo-image-picker": "~17.0.8",
+    "expo-status-bar": "~3.0.9",
+    "expo-file-system": "~19.0.17",
+    "expo-router": "~6.0.0",
+    "expo-speech": "~14.0.7",
+    "react": "19.1.0",
+    "react-native": "0.81.4",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0"
   },
   "devDependencies": {
-    "@types/react": "latest",
-    "typescript": "latest"
+    "@types/react": "~19.1.10",
+    "typescript": "~5.9.2"
   }
 }
