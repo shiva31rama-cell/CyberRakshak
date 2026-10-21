@@ -2,12 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { buildApp } from "./app.js";
 
-test("health endpoint returns service identity", async () => {
+test("health endpoint returns service identity and reputation configuration", async () => {
   const app = await buildApp({ logger: false });
   try {
     const response = await app.inject({ method: "GET", url: "/api/v1/health" });
     assert.equal(response.statusCode, 200);
-    assert.deepEqual(response.json(), { status: "ok", product: "CYBPRO", stage: "early-preview" });
+    const body = response.json();
+    assert.equal(body.status, "ok");
+    assert.equal(body.product, "CYBPRO");
+    assert.equal(body.stage, "early-preview");
+    assert.ok(["configured", "not_configured"].includes(body.urlReputation));
   } finally {
     await app.close();
   }
@@ -32,7 +36,9 @@ test("text endpoint returns the documented report contract", async () => {
   }
 });
 
-test("URL endpoint parses without fetching destination", async () => {
+test("URL endpoint reports local traits and explicitly says when reputation is not configured", async () => {
+  const originalKey = process.env.GOOGLE_SAFE_BROWSING_API_KEY;
+  delete process.env.GOOGLE_SAFE_BROWSING_API_KEY;
   const app = await buildApp({ logger: false });
   try {
     const response = await app.inject({
@@ -42,9 +48,12 @@ test("URL endpoint parses without fetching destination", async () => {
     assert.equal(response.statusCode, 200);
     const report = response.json();
     assert.ok(report.indicators.includes("Known URL-shortening domain hides the final destination"));
-    assert.match(report.caveat, /destination was not contacted/i);
+    assert.equal(report.reputation.status, "not_configured");
+    assert.match(report.caveat, /not configured/i);
   } finally {
     await app.close();
+    if (originalKey === undefined) delete process.env.GOOGLE_SAFE_BROWSING_API_KEY;
+    else process.env.GOOGLE_SAFE_BROWSING_API_KEY = originalKey;
   }
 });
 
