@@ -16,9 +16,7 @@ function isPrivateOrLocalHostname(hostname: string): boolean {
     host.endsWith(".local") ||
     host === "::1" ||
     host === "::" ||
-    host.startsWith("fc") ||
-    host.startsWith("fd") ||
-    host.startsWith("fe80:")
+    (host.includes(":") && (host.startsWith("fc") || host.startsWith("fd") || host.startsWith("fe80:")))
   ) return true;
 
   const octets = host.split(".");
