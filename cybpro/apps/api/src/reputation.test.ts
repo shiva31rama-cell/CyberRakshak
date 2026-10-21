@@ -22,7 +22,7 @@ test("reports a provider match and its threat type", async () => {
   let requestedEndpoint = "";
   const result = await checkUrlReputation("https://example.com/path", {
     apiKey: "test-key",
-    fetchImpl: (async (input) => {
+    fetchImpl: (async (input: RequestInfo | URL) => {
       requestedEndpoint = String(input);
       return new Response(JSON.stringify({ matches: [{ threatType: "SOCIAL_ENGINEERING" }] }), {
         status: 200, headers: { "content-type": "application/json" }
