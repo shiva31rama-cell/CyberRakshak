@@ -34,7 +34,7 @@ See [PHASES.md](./PHASES.md). Phase 2 cannot start until Phase 1's exit gate is 
 - Engineering: OpenAPI, Vitest, Playwright, GitHub Actions, secret scanning, dependency checks, structured logs, and deployment runbooks.
 
 ## Web and mobile clients
-Both clients use the same backend and report contract. The Expo mobile app and React web app both connect to the shared Fastify API for text analysis and local URL-trait inspection. These are deterministic rule-based previews, not definitive security verdicts. URL inspection never fetches or opens the submitted destination. Reputation feeds, uploads, incident workflows, and multilingual AI assistance remain planned.
+Both clients use the same backend and report contract. The Expo mobile app and React web app both connect to the shared Fastify API for text analysis and local URL-trait inspection. These are deterministic rule-based previews, not definitive security verdicts. URL inspection never fetches or opens the submitted destination. An optional Google Safe Browsing adapter is implemented for URL reputation checks; it remains inactive unless `GOOGLE_SAFE_BROWSING_API_KEY` is configured. When enabled, the submitted URL is shared with Google Safe Browsing. Results distinguish a threat match, no known match, an unconfigured provider, a private/local address, and provider failure. A no-match result is not proof of safety. Uploads, incident workflows, and multilingual AI assistance remain planned.
 
 See [mobile and web architecture](./MOBILE_AND_WEB_ARCHITECTURE.md).
 
