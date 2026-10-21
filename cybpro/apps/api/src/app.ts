@@ -4,6 +4,7 @@ import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 import { z } from "zod";
 import { analyzeText, analyzeUrl } from "./analyze.js";
+import { checkUrlReputation } from "./reputation.js";
 
 export async function buildApp(options: { logger?: boolean } = {}): Promise<FastifyInstance> {
   const app = Fastify({
@@ -28,7 +29,8 @@ export async function buildApp(options: { logger?: boolean } = {}): Promise<Fast
   app.get("/api/v1/health", async () => ({
     status: "ok",
     product: "CYBPRO",
-    stage: "early-preview"
+    stage: "early-preview",
+    urlReputation: process.env.GOOGLE_SAFE_BROWSING_API_KEY ? "configured" : "not_configured"
   }));
 
   const textSchema = z.object({
@@ -51,7 +53,16 @@ export async function buildApp(options: { logger?: boolean } = {}): Promise<Fast
     if (!parsed.success) {
       return reply.code(400).send({ error: "Provide a url field containing 1 to 2048 characters." });
     }
-    return analyzeUrl(parsed.data.url);
+
+    const localReport = analyzeUrl(parsed.data.url);
+    const reputation = await checkUrlReputation(parsed.data.url);
+    return {
+      ...localReport,
+      reputation,
+      caveat: reputation.status === "checked"
+        ? `${localReport.caveat} The submitted URL was shared with Google Safe Browsing for a reputation lookup. A no-match result is not proof of safety.`
+        : `${localReport.caveat} ${reputation.detail}`
+    };
   });
 
   return app;
