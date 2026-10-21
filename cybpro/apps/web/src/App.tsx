@@ -77,7 +77,7 @@ export default function App() {
       <UrlScanner />
 
       <section className="capabilities">
-        <div className="capability"><span className="cap-icon"><Link2 size={19} /></span><b>Link analysis</b><p>Basic URL traits are checked locally. Live domain reputation evidence is still planned.</p><span className="planned">PLANNED</span></div>
+        <div className="capability"><span className="cap-icon"><Link2 size={19} /></span><b>Link analysis</b><p>Local URL traits plus optional Google Safe Browsing evidence when configured. Unknown and unavailable results remain explicit.</p><span className="planned">OPTIONAL PROVIDER</span></div>
         <div className="capability"><span className="cap-icon"><AudioLines size={19} /></span><b>Voice & media</b><p>Controlled image, audio, video, and document ingestion is planned for Phase 2.</p><span className="planned">PLANNED</span></div>
         <div className="capability"><span className="cap-icon"><FileSearch size={19} /></span><b>Evidence trail</b><p>Source, freshness, uncertainty, and model limitations are core product requirements.</p><span className="planned">IN DEVELOPMENT</span></div>
       </section>
