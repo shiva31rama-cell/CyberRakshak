@@ -16,11 +16,12 @@ const guidance = [
 ];
 
 const textPatterns: Array<{ label: string; pattern: RegExp }> = [
-  { label: "Urgency or threat language", pattern: /\b(urgent|immediately|within\s+\d+\s+(minute|hour)|blocked|suspended|expire today|final warning)\b/i },
-  { label: "Credential or verification request", pattern: /\b(otp|one[- ]time password|upi pin|cvv|password|recovery code|verify your identity)\b/i },
-  { label: "Payment or reward lure", pattern: /\b(prize|won|reward|cashback|claim your|pay now|transfer money|processing fee)\b/i },
-  { label: "Link present in submitted text", pattern: /https?:\/\/|www\./i },
-  { label: "Impersonation language", pattern: /\b(bank support|customer care|government officer|account department|police officer)\b/i }
+  { label: "Urgency or threat language", pattern: /\b(urgent|immediately|right away|act now|within\s+\d+\s+(minute|hour)|blocked|block(?:ed|ing)?|suspend(?:ed|ing)?|account.{0,25}(?:expire|close|deactivat)|expire today|final warning|avoid suspension|last chance)\b/i },
+  { label: "Credential or verification request", pattern: /\b(otp|one[- ]time password|upi\s*pin|cvv|password|recovery code|verify (?:your )?(?:identity|account|details)|verification (?:code|pending)|reply with your (?:otp|code)|login credentials)\b/i },
+  { label: "Payment or reward lure", pattern: /\b(prize|you(?:'ve| have) won|won a reward|reward|cashback|claim your|pay now|transfer money|processing fee|refund pending|receive a payment)\b/i },
+  { label: "Link present in submitted text", pattern: /(?:https?:\/\/|www\.)\S+/i },
+  { label: "Impersonation language", pattern: /\b(bank support|customer care|government officer|account department|police officer|official support team|security team)\b/i },
+  { label: "Request to open or follow a link", pattern: /\b(click|tap|open|follow)\s+(?:on\s+)?(?:this\s+)?(?:link|url|button)\b/i }
 ];
 
 const urlShorteners = new Set(["bit.ly", "tinyurl.com", "t.co", "is.gd", "cutt.ly", "rb.gy"]);
@@ -44,7 +45,7 @@ function buildReport(indicators: string[], extraCaveat: string): AnalysisReport 
 
 export function analyzeText(content: string): AnalysisReport {
   const indicators = textPatterns.filter(({ pattern }) => pattern.test(content)).map(({ label }) => label);
-  return buildReport(indicators, "No live reputation service or tested detection benchmark is connected.");
+  return buildReport(indicators, "Live reputation is not used for message-text analysis.");
 }
 
 /**
@@ -73,7 +74,7 @@ export function analyzeUrl(input: string): AnalysisReport {
   if (hostname.startsWith("xn--") || hostname.split(".").some((part) => part.startsWith("xn--"))) {
     indicators.push("Hostname contains an internationalized/punycode label");
   }
-  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname.startsWith("[") && hostname.endsWith("]")) {
+  if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(hostname) || hostname.startsWith("[") && hostname.endsWith("]")) {
     indicators.push("Destination is written as an IP address rather than a domain name");
   }
   if (urlShorteners.has(hostname)) indicators.push("Known URL-shortening domain hides the final destination");
@@ -81,5 +82,5 @@ export function analyzeUrl(input: string): AnalysisReport {
   if (parsed.port && !["80", "443"].includes(parsed.port)) indicators.push("URL uses a non-default port");
   if (parsed.hostname.length > 100) indicators.push("Hostname is unusually long");
 
-  return buildReport(indicators, "The destination was not contacted and no domain reputation, redirect, certificate, or page-content check was performed.");
+  return buildReport(indicators, "Local parsing does not contact the destination. Domain reputation, redirects, certificates, and page content are not part of this local check.");
 }
