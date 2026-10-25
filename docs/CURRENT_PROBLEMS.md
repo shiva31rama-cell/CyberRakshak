@@ -8,9 +8,9 @@
 | B04 | Full accessibility matrix is not verified | P1 | Keyboard/focus/labels/contrast/screen-size audit | IN DEVELOPMENT |
 | B05 | Social verification does not yet retrieve live evidence | P2 | Add permitted source/API adapters and evidence scoring | PLANNED |
 | B06 | AI output is not yet a fully validated structured contract | P1 | Add output schema + validator + safe fallback | OPEN |
-| B07 | Deterministic URL analysis needs broader regression coverage | P0 | Add hostname-boundary, private-host and inconclusive-result regressions; run CI | TESTS ADDED; CI PENDING |
+| B07 | Deterministic URL analysis needs broader regression coverage | P0 | Added hostname-boundary, private-host and inconclusive-result regressions; backend CI passed | REGRESSION TESTS ADDED; CI PASSING |
 | B08 | URL analysis is heuristic only | P1 | Keep limitations explicit; later add a reviewed reputation evidence adapter | IMPLEMENTED WITH LIMITATION |
-| B09 | CI needs broader syntax checks for newly added services | P1 | Extend workflow checks | IN DEVELOPMENT |
+| B09 | CI should keep syntax, lint, tests and production-build checks aligned with changed modules | P1 | Backend tests, service-worker syntax, frontend lint and production build now pass; expand checks as modules are added | CI PASSING; FUTURE COVERAGE REVIEW |
 | B10 | Browser/device verification is pending | P1 | Test phone, tablet, desktop, landscape and failure states | OPEN |
 | B11 | AWS deployment is not yet verified | P1 | Deploy using selected architecture and capture health evidence | PLANNED |
 | B12 | Final report must stay synchronized with actual software | P0 | Update only from verified implementation/evidence | IN DEVELOPMENT |
