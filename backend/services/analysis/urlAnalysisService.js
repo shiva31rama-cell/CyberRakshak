@@ -21,7 +21,7 @@ function hostnameContainsBrandToken(hostname, token) {
 }
 
 function isPrivateOrLocalHost(hostname) {
-  const host = hostname.replace(/^\\[|\\]$/g, "").toLowerCase();
+  const host = hostname.startsWith("[") && hostname.endsWith("]") ? hostname.slice(1, -1).toLowerCase() : hostname.toLowerCase();
   if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host.endsWith(".internal") || host === "::1") {
     return true;
   }
