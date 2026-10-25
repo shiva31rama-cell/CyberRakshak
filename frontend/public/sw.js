@@ -1,3 +1,4 @@
+/* global self, caches, clients, fetch, URL, Response */
 const SHELL_CACHE = "cyberrakshak-shell-v1";
 const ASSET_CACHE = "cyberrakshak-assets-v1";
 const CACHE_PREFIX = "cyberrakshak-";
@@ -6,7 +7,11 @@ const SHELL_PATHS = ["/", "/index.html", "/manifest.webmanifest"];
 
 async function cacheResponse(cache, requestOrUrl, response) {
   if (response && response.ok && response.type !== "opaque") {
-    await cache.put(requestOrUrl, response.clone());
+    try {
+      await cache.put(requestOrUrl, response.clone());
+    } catch {
+      // Storage limits or browser cache policy must not block the online response.
+    }
   }
 }
 
