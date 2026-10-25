@@ -1,4 +1,3 @@
-/* global self, caches, clients, fetch, URL, Response */
 const SHELL_CACHE = "cyberrakshak-shell-v1";
 const ASSET_CACHE = "cyberrakshak-assets-v1";
 const CACHE_PREFIX = "cyberrakshak-";
