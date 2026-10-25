@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
+import OfflineNotice from "./components/OfflineNotice";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
@@ -33,6 +34,7 @@ function App() {
       <LanguageProvider>
         <ErrorBoundary>
           <div className="app">
+            <OfflineNotice />
             <Navbar />
             <main className="app-main">
               <Routes>
