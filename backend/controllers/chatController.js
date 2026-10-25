@@ -27,7 +27,7 @@ RELIABILITY AND SAFETY:
 - If uncertain, say what is uncertain instead of guessing.`;
 
 const INCIDENT_PATTERNS = [
-  { type: "financial_fraud", pattern: /money lost|money debited|unauthori[sz]ed.*(?:transaction|payment)|upi fraud|bank fraud|financial fraud|payment fraud|sent money.*scam|scammed.*money|transaction.*not mine/i },
+  { type: "financial_fraud", pattern: /money lost|lost money.*(?:upi|scam|fraud|online|payment|bank)?|(?:upi|scam|fraud).*lost money|money debited|unauthori[sz]ed.*(?:transaction|payment)|upi fraud|bank fraud|financial fraud|payment fraud|sent money.*scam|scammed.*money|transaction.*not mine/i },
   { type: "phishing", pattern: /phish|suspicious link|fake website|suspicious email|suspicious message|clicked.*link|link.*clicked|attachment/i },
   { type: "account_compromise", pattern: /account hacked|account compromised|account taken|someone.*logged in|unknown login|can't login|cannot login|lost access|password.*changed|email.*hacked/i },
   { type: "device_compromise", pattern: /phone hacked|mobile hacked|device hacked|computer hacked|laptop hacked|phone.*compromised|device.*compromised|unknown app|strange app|pop.?ups|phone.*acting strange/i },
@@ -61,10 +61,10 @@ const fallbackReply = (message) => {
   const text = String(message || "").trim().toLowerCase();
   const relevance = classify(text);
   if (relevance.isGreeting) return "Hi! 👋 I'm CyberRakshak, your cyber-safety assistant. I can help with scams, phishing, suspicious links, UPI/payment fraud, OTP/password safety, privacy, malware and cyber incidents. Tell me what happened and we'll work through it safely. 🛡️";
-  if (!relevance.isCyberRelated) return "I’m CyberRakshak 🛡️, so I focus on cyber safety and online security. I can help with phishing, scams, suspicious links, UPI/payment fraud, OTP/password safety, privacy, malware, account/device safety and cyber incident reporting.";
+  if (!relevance.isCyberRelated) return "I’m CyberRakshak 🛡️, a cyber-safety assistant focused on cyber safety and online security. I can help with phishing, scams, suspicious links, UPI/payment fraud, OTP/password safety, privacy, malware, account/device safety and cyber incident reporting.";
   if (/money lost|money debited|unauthori[sz]ed.*(?:transaction|payment)|upi fraud|bank fraud|financial fraud|payment fraud/.test(text)) return "🚨 If money was lost or an unauthorized transaction occurred, contact your bank/payment provider immediately and use India's official cyber-fraud reporting channels. Do not share OTPs, PINs, CVVs or passwords. Keep transaction IDs and relevant evidence safe.";
   if (/account hacked|account compromised|account taken|can't login|cannot login/.test(text)) return "🔐 Let's check this safely. Do you still have access to the account, and did you notice an unfamiliar login or a recovery/password change you did not make? Please don't send the password or any OTP/recovery code.";
-  if (/phish|suspicious link|fake website|suspicious email|suspicious message/.test(text)) return "⚠️ Did you click the link/open the attachment, or did you only receive the message? Please don't paste any password, OTP, PIN or other secret here.";
+  if (/phish|suspicious link|fake website|suspicious email|suspicious message/.test(text)) return "⚠️ This may involve phishing or another suspicious message. Did you click the link/open the attachment, or did you only receive the message? Please don't paste any password, OTP, PIN or other secret here.";
   if (/otp|pin|cvv|password/.test(text)) return "🔑 Never share an OTP, UPI PIN, card PIN, CVV, password or recovery code. Tell me what happened around the request without including the secret itself.";
   return "I can help with that cyber-safety issue. Tell me what happened—what device, account, message, link or transaction is involved? Please don't share passwords, OTPs, PINs, CVVs, recovery codes or other secrets.";
 };
