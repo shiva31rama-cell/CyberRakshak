@@ -27,6 +27,15 @@ It is designed for students, smartphone users, UPI users, first-time digital use
 - **LANGUAGES** — shared English, తెలుగు and हिन्दी language state for core navigation/home content; full translation coverage is still in development.
 - **RESPONSIVE WEB** — one React/Vite frontend is the current shared-code experience for phone, tablet and desktop layouts.
 
+### Offline behavior and analysis boundaries
+
+- The production service worker caches the application shell and same-origin static assets after a successful online visit.
+- The offline banner makes connectivity state visible. AI chat, message scanning, URL scanning, and other API-backed flows still require network connectivity.
+- API responses and submitted messages/URLs are intentionally excluded from service-worker caching.
+- URL scanning uses static structural heuristics only. It does not open the destination or query a live reputation service.
+- Social claim review is local triage; it does not establish that an official source was accessed live.
+- A clean-looking URL or an unverified claim must never be treated as proof of safety or truth.
+
 ### Backend APIs
 
 - `GET /health`
