@@ -33,6 +33,12 @@ Technical logs should not contain these values or raw sensitive incident details
 
 `.env` files are ignored by Git and `.env.example` files contain placeholders only. AI keys must never be placed in Vite frontend environment variables.
 
+## URL analysis and offline cache
+
+The URL scanner performs local structural analysis on the submitted URL on the CyberRakshak backend. It does not fetch the destination and does not currently perform live reputation checks. URL indicators are clues to investigate, not proof of maliciousness. A clean structural result is not a safety guarantee.
+
+The frontend service worker caches only the same-origin app shell and static assets. It bypasses `/api` requests entirely; chat requests, scans, and other dynamic API responses are not cached. First-time offline use is not guaranteed until an online visit has successfully cached the necessary shell and assets. API-backed features remain unavailable without connectivity.
+
 ## File uploads
 
 Screenshot/image analysis is not represented as implemented yet. Before enabling it, the backend must enforce MIME validation, extension checks, size limits, processing timeouts and temporary-storage cleanup.
