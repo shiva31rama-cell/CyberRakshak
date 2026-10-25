@@ -7,7 +7,7 @@
 | B03 | Full multilingual switching is not implemented | P1 | Add language state and reusable content keys | IN DEVELOPMENT |
 | B04 | Full accessibility matrix is not verified | P1 | Keyboard/focus/labels/contrast/screen-size audit | IN DEVELOPMENT |
 | B05 | Social verification does not yet retrieve live evidence | P2 | Add permitted source/API adapters and evidence scoring | PLANNED |
-| B06 | AI output needs a complete structured contract and tested invalid-output fallback | P1 | Added response schema validator for reply, provider, intent, incident type, triage stage and HTTPS source metadata; added controller fallback test and CI checks | IMPLEMENTED; CI VERIFICATION PENDING |
+| B06 | AI output needs a complete structured contract and tested invalid-output fallback | P1 | Added response schema validator for reply, provider, intent, incident type, triage stage and HTTPS source metadata; added controller fallback test and CI checks | IMPLEMENTED; CI PASSING (34 BACKEND TESTS) |
 | B07 | Deterministic URL analysis needs broader regression coverage | P0 | Added hostname-boundary, private-host and inconclusive-result regressions; backend CI passed | REGRESSION TESTS ADDED; CI PASSING |
 | B08 | URL analysis is heuristic only | P1 | Keep limitations explicit; later add a reviewed reputation evidence adapter | IMPLEMENTED WITH LIMITATION |
 | B09 | CI should keep syntax, lint, tests and production-build checks aligned with changed modules | P1 | Backend tests, service-worker syntax, frontend lint and production build now pass; expand checks as modules are added | CI PASSING; FUTURE COVERAGE REVIEW |
