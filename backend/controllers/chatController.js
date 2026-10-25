@@ -2,6 +2,7 @@ const KNOWLEDGE_BASE = require("../data/cyberKnowledge");
 const { classify } = require("../services/ai/cyberRelevanceService");
 const { safetyInstruction } = require("../services/safety/sensitiveInputService");
 const aiService = require("../services/ai/aiService");
+const { validateChatResponse } = require("../services/ai/chatResponseContract");
 
 const DEFAULT_SYSTEM_PROMPT = `You are CyberRakshak, a friendly and responsible cyber-safety assistant for general users.
 
@@ -71,6 +72,45 @@ const fallbackReply = (message) => {
 
 const sanitizeMessages = (messages) => messages.filter((item) => item && ["user", "assistant"].includes(item.role) && typeof item.content === "string").slice(-12).map((item) => ({ role: item.role, content: item.content.trim().slice(0, 4000) }));
 
+
+const buildSafeResponse = (message) => {
+  const text = String(message || "");
+  const relevance = classify(text);
+  const incidentType = detectIncidentType(text);
+  const grounding = getGrounding(incidentType);
+  return {
+    success: true,
+    reply: fallbackReply(text),
+    provider: "CyberRakshak safety fallback",
+    intent: relevance.intent,
+    incidentType,
+    triageStage: "general",
+    sources: grounding.sources,
+  };
+};
+
+const sendValidatedChatResponse = (res, payload, sourceMessage) => {
+  const validation = validateChatResponse(payload);
+  if (validation.valid) return res.json(validation.data);
+
+  // Do not forward malformed provider output. Return a deterministic safe reply instead.
+  console.error("Chat response contract validation failed:", validation.errors.join("; "));
+  const fallback = validateChatResponse(buildSafeResponse(sourceMessage));
+  if (fallback.valid) return res.json(fallback.data);
+
+  // Static final guard: this payload is intentionally minimal and matches the contract.
+  return res.json({
+    success: true,
+    reply: "I can help with cyber safety. Please describe what happened without sharing passwords, OTPs, PINs, CVVs or recovery codes.",
+    provider: "CyberRakshak safety fallback",
+    intent: "cyber_assistance",
+    incidentType: null,
+    triageStage: "general",
+    sources: [],
+  });
+};
+
+
 exports.chat = async (req, res) => {
   try {
     const messages = Array.isArray(req.body?.messages) ? req.body.messages : [];
@@ -86,7 +126,7 @@ exports.chat = async (req, res) => {
     const grounding = getGrounding(incidentType);
 
     if (!relevance.isCyberRelated) {
-      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", intent: "non_cyber", incidentType: null, triageStage: "general", sources: [] });
+      return sendValidatedChatResponse(res, { success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", intent: "non_cyber", incidentType: null, triageStage: "general", sources: [] }, normalized);
     }
 
     const secretWarning = safetyInstruction(normalized);
@@ -97,18 +137,21 @@ exports.chat = async (req, res) => {
     const providerMessages = [{ role: "system", content: `${systemPrompt}\n${triageHint}\n${secretWarning}${formatGroundingForModel(grounding)}` }, ...safeMessages];
 
     if (!process.env.AI_API_KEY || !process.env.AI_API_URL || !process.env.AI_MODEL) {
-      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources });
+      return sendValidatedChatResponse(res, { success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources }, normalized);
     }
 
     try {
       const reply = await aiService.generate(providerMessages);
-      return res.json({ success: true, reply, provider: "AI", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources });
+      return sendValidatedChatResponse(res, { success: true, reply, provider: "AI", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources }, normalized);
     } catch (providerError) {
       console.error("AI provider request failed:", providerError.message);
-      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources });
+      return sendValidatedChatResponse(res, { success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources }, normalized);
     }
   } catch (error) {
     console.error("Chat service error:", error.message);
-    return res.json({ success: true, reply: fallbackReply(req.body?.messages?.at?.(-1)?.content), provider: "CyberRakshak safety fallback", intent: "cyber_assistance", incidentType: null, triageStage: "general", sources: KNOWLEDGE_BASE.general.sources });
+    const latestMessage = Array.isArray(req.body?.messages)
+      ? [...req.body.messages].reverse().find((item) => item?.role === "user")?.content
+      : "";
+    return sendValidatedChatResponse(res, buildSafeResponse(latestMessage), latestMessage);
   }
 };
