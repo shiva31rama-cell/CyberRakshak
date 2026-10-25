@@ -231,8 +231,6 @@ function EmergencyHelp() {
           </div>
         </section>
       </div>
-        </section>
-      </div>
 
       <button className="back-home-btn" onClick={() => navigate("/")}>
         ← Back to Home
