@@ -31,7 +31,25 @@ Request:
       ]
     }
 
-The response can include intent, incident type, triage stage and grounded source metadata.
+The successful response contract is:
+
+    {
+      "success": true,
+      "reply": "A bounded, non-empty assistant reply",
+      "provider": "AI",
+      "intent": "cyber_assistance",
+      "incidentType": "phishing",
+      "triageStage": "identify_assess",
+      "sources": [
+        { "label": "Official source label", "url": "https://official.example/" }
+      ]
+    }
+
+`provider` is one of `AI`, `CyberRakshak safety fallback`, or `CyberRakshak scope guard`.
+`intent` is one of `greeting`, `cyber_assistance`, or `non_cyber`.
+`incidentType` is a supported incident category or `null`; `triageStage` is one of `general`, `identify_assess`, `contain`, or `recover_report`. Replies must be non-empty strings of at most 8,000 characters. Source entries must have a bounded label and a credential-free HTTPS URL.
+
+The backend validates this structure before returning it. If the provider output or metadata is malformed, the controller returns a deterministic CyberRakshak safety fallback instead. Schema validation does **not** prove that natural-language model claims are true.
 
 ## Message scanner
 
