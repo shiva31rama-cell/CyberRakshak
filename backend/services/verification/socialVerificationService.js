@@ -26,7 +26,7 @@ function verifySocialClaim(input) {
     explanation = "The claim mentions an official source, but mentioning a domain or organization is not proof that the claim itself is genuine. Open the official source independently and compare the exact announcement.";
   } else if (unsupportedAbsolute || scamSignals) {
     verdict = "Needs verification";
-    explanation = "The claim contains pressure, financial/security language, or an absolute assertion that requires independent verification using evidence from an official or reliable source before being trusted or shared.";
+    explanation = "Unverified does not mean false. The claim contains pressure, financial/security language, or an absolute assertion that requires independent verification using evidence from an official or reliable source before being trusted or shared.";
   }
 
   return {
