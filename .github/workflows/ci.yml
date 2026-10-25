@@ -1,7 +1,7 @@
 name: CyberRakshak CI
 
 permissions:
-  contents: write
+  contents: read
 
 on:
   push:
@@ -47,32 +47,6 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - name: Reconcile frontend lockfile
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-      - name: Export reconciled lockfile for repository maintenance
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-package-lock-reconciled
-          path: frontend/package-lock.json
-          if-no-files-found: error
-      - name: Commit reconciled lockfile to this PR branch
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
-        env:
-          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          cp package-lock.json "$RUNNER_TEMP/frontend-package-lock.json"
-          git fetch origin "$PR_BRANCH"
-          git checkout --force -B "$PR_BRANCH" "origin/$PR_BRANCH"
-          cp "$RUNNER_TEMP/frontend-package-lock.json" package-lock.json
-          git -C "$GITHUB_WORKSPACE" add frontend/package-lock.json
-          if git -C "$GITHUB_WORKSPACE" diff --cached --quiet; then
-            echo "Frontend package lockfile is already current."
-            exit 0
-          fi
-          git -C "$GITHUB_WORKSPACE" config user.name "github-actions[bot]"
-          git -C "$GITHUB_WORKSPACE" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$GITHUB_WORKSPACE" commit -m "Refresh frontend package lockfile"
-          git -C "$GITHUB_WORKSPACE" push origin "HEAD:refs/heads/$PR_BRANCH"
       - run: npm ci
       - run: node --check public/sw.js
       - run: npm run lint
