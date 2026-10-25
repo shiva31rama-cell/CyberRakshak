@@ -8,12 +8,13 @@
 | B04 | Full accessibility matrix is not verified | P1 | Keyboard/focus/labels/contrast/screen-size audit | IN DEVELOPMENT |
 | B05 | Social verification does not yet retrieve live evidence | P2 | Add permitted source/API adapters and evidence scoring | PLANNED |
 | B06 | AI output is not yet a fully validated structured contract | P1 | Add output schema + validator + safe fallback | OPEN |
-| B07 | Deterministic risk engine needs broader test coverage | P0 | Add category/risk edge cases and regression tests | IN DEVELOPMENT |
-| B08 | URL analysis is heuristic only | P1 | Add explicit limitations and later evidence adapters | IMPLEMENTED WITH LIMITATION |
+| B07 | Deterministic URL analysis needs broader regression coverage | P0 | Add hostname-boundary, private-host and inconclusive-result regressions; run CI | TESTS ADDED; CI PENDING |
+| B08 | URL analysis is heuristic only | P1 | Keep limitations explicit; later add a reviewed reputation evidence adapter | IMPLEMENTED WITH LIMITATION |
 | B09 | CI needs broader syntax checks for newly added services | P1 | Extend workflow checks | IN DEVELOPMENT |
 | B10 | Browser/device verification is pending | P1 | Test phone, tablet, desktop, landscape and failure states | OPEN |
 | B11 | AWS deployment is not yet verified | P1 | Deploy using selected architecture and capture health evidence | PLANNED |
 | B12 | Final report must stay synchronized with actual software | P0 | Update only from verified implementation/evidence | IN DEVELOPMENT |
+| B13 | Offline shell is implemented but not browser-verified | P1 | Verify first online cache, reload while offline, update behavior and API non-caching | CODE ADDED; BROWSER VERIFICATION PENDING |
 
 ## Release-blocking rule
 
