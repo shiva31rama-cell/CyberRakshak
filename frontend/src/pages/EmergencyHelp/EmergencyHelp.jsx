@@ -6,40 +6,28 @@ function EmergencyHelp() {
 
   const emergencyContacts = [
     {
-      title: "Cyber Crime Helpline",
+      title: "Cyber Financial Fraud Helpline",
       number: "1930",
-      description: "Report cyber crimes and get assistance from authorities",
+      description: "For immediate reporting of online financial cyber fraud. Preserve transaction details and report promptly.",
       icon: "📱",
     },
     {
-      title: "Police Emergency",
-      number: "100",
-      description: "General emergency services and crime reporting",
-      icon: "🚔",
+      title: "Integrated Emergency Number",
+      number: "112",
+      description: "Pan-India emergency response for police, fire and health emergencies.",
+      icon: "🚨",
     },
     {
-      title: "Women's Helpline",
-      number: "1091",
-      description: "Support for women facing harassment or abuse",
-      icon: "👩",
-    },
-    {
-      title: "Ambulance/Medical",
-      number: "102",
-      description: "Medical emergencies and ambulance services",
-      icon: "🚑",
-    },
-    {
-      title: "Fire Emergency",
-      number: "101",
-      description: "Fire department and firefighting services",
-      icon: "🚒",
-    },
-    {
-      title: "RBI Cyber Fraud",
+      title: "National Cyber Crime Reporting Portal",
       number: "https://cybercrime.gov.in",
-      description: "Report cyber fraud to RBI and authorities",
-      icon: "🏦",
+      description: "Official Government of India portal for submitting cybercrime complaints.",
+      icon: "🌐",
+    },
+    {
+      title: "Chakshu — Sanchar Saathi",
+      number: "https://sancharsaathi.gov.in/",
+      description: "Report suspected fraudulent communications received by call, SMS or WhatsApp. If money was lost, use 1930 and the cybercrime portal.",
+      icon: "📩",
     },
   ];
 
@@ -55,14 +43,14 @@ function EmergencyHelp() {
       description: "File a formal complaint with cyber police",
       icon: "📋",
       action: () => {
-        window.open("https://cybercrime.gov.in", "_blank");
+        window.open("https://cybercrime.gov.in", "_blank", "noopener,noreferrer");
       },
     },
     {
       title: "Bank Support",
       description: "Contact your bank for compromised accounts",
       icon: "🏦",
-      action: () => alert("Call your bank's customer service number"),
+      action: () => alert("Use the number in your bank's official app or on your bank card. Do not call a number supplied in a suspicious message."),
     },
     {
       title: "Learn Prevention",
@@ -204,9 +192,9 @@ function EmergencyHelp() {
           </div>
         </section>
 
-        {/* Useful Resources */}
+        {/* Useful India-focused official resources */}
         <section className="resources-section">
-          <h2>📚 Useful Resources</h2>
+          <h2>📚 Official Resources</h2>
           <div className="resources-list">
             <a
               href="https://cybercrime.gov.in"
@@ -214,33 +202,35 @@ function EmergencyHelp() {
               rel="noopener noreferrer"
               className="resource-link"
             >
-              🌐 Indian Cyber Crime Coordination Centre
+              🌐 National Cyber Crime Reporting Portal
             </a>
             <a
-              href="https://www.ncsc.gov.in"
+              href="https://sancharsaathi.gov.in/"
               target="_blank"
               rel="noopener noreferrer"
               className="resource-link"
             >
-              🛡️ National Cyber Security Centre of India
+              📩 Sanchar Saathi — Chakshu fraud communication reporting
             </a>
             <a
-              href="https://www.identitytheft.gov"
+              href="https://www.cert-in.org.in/"
               target="_blank"
               rel="noopener noreferrer"
               className="resource-link"
             >
-              🆔 Identity Theft Resources
+              🛡️ CERT-In cybersecurity advisories
             </a>
             <a
-              href="https://www.consumer.ftc.gov/articles/how-recognize-and-report-spam-text-messages"
+              href="https://112.gov.in/"
               target="_blank"
               rel="noopener noreferrer"
               className="resource-link"
             >
-              📞 How to Report Spam
+              🚨 Emergency Response Support System (112)
             </a>
           </div>
+        </section>
+      </div>
         </section>
       </div>
 
