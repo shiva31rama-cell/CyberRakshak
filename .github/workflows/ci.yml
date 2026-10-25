@@ -63,7 +63,7 @@ jobs:
           cp package-lock.json "$RUNNER_TEMP/frontend-package-lock.json"
           git fetch origin "$PR_BRANCH"
           git checkout --force -B "$PR_BRANCH" "origin/$PR_BRANCH"
-          cp "$RUNNER_TEMP/frontend-package-lock.json" frontend/package-lock.json
+          cp "$RUNNER_TEMP/frontend-package-lock.json" package-lock.json
           git -C "$GITHUB_WORKSPACE" add frontend/package-lock.json
           if git -C "$GITHUB_WORKSPACE" diff --cached --quiet; then
             echo "Frontend package lockfile is already current."
