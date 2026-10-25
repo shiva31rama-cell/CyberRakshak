@@ -57,7 +57,7 @@ test("social verification keeps unsupported claims unverified", () => {
 test("URL scanner flags a deceptive bank-like hostname without trusting a substring", () => {
   const spoofed = analyzeUrl("https://sbi.co.in.attacker.com/login");
   assert.ok(spoofed.indicators.some((item) => /SBI name|brand/i.test(item)));
-  assert.equal(spoofed.riskLevel, "MEDIUM");
+  assert.equal(spoofed.riskLevel, "HIGH");
   assert.match(spoofed.explanation, /not proof/i);
 });
 
