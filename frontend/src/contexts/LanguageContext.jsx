@@ -43,6 +43,8 @@ export function LanguageProvider({ children }) {
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
+// This context module intentionally also exposes a hook used by non-component modules.
+ // eslint-disable-next-line react-refresh/only-export-components
 export const useLanguage = () => {
   const value = useContext(LanguageContext);
   if (!value) throw new Error("useLanguage must be used inside LanguageProvider");
