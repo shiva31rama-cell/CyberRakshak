@@ -97,7 +97,7 @@ function analyzeUrl(input) {
     confidence: indicators.length ? Math.min(0.9, 0.5 + indicators.length * 0.08) : 0.35,
     indicators,
     explanation: indicators.length
-      ? "The URL has observable characteristics that deserve caution. These signals are not proof that the destination is malicious."
+      ? "The URL has observable characteristics that deserve caution. This assessment does not prove that the destination is malicious."
       : "No obvious structural warning signs were detected. A clean-looking URL is not proof that a site is trustworthy.",
     recommendedActions: [
       "Do not sign in, pay, download files, or share sensitive information until the destination is independently verified.",
