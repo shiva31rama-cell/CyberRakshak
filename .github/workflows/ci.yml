@@ -33,6 +33,8 @@ jobs:
       - run: node -c services/analysis/urlAnalysisService.js
       - run: node -c services/incident/incidentService.js
       - run: node -c services/verification/socialVerificationService.js
+      - run: node -c services/ai/chatResponseContract.js
+      - run: node -c controllers/chatController.js
       - run: npm test
 
   frontend-check:
