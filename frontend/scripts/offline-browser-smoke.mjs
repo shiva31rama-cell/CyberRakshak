@@ -71,17 +71,20 @@ try {
   const chatInput = page.getByRole("textbox", { name: "Chat message" });
   await page.getByRole("button", { name: /Ask CyberRakshak/ }).click();
   await chatInput.waitFor({ state: "visible" });
+  await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Chat message");
   assert.equal(await chatInput.evaluate((element) => element === document.activeElement), true, "Home Ask should open and focus the assistant");
 
   await page.getByRole("button", { name: "Close CyberRakshak AI" }).click();
   await page.locator(".nav-menu .nav-link").filter({ hasText: "Ask" }).click();
   await chatInput.waitFor({ state: "visible" });
+  await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Chat message");
   assert.equal(await chatInput.evaluate((element) => element === document.activeElement), true, "Navigation Ask should open and focus the assistant");
 
   await page.getByRole("button", { name: "Close CyberRakshak AI" }).click();
   const footerAssistant = page.getByRole("button", { name: "Open the safety assistant" });
   await footerAssistant.click();
   await chatInput.waitFor({ state: "visible" });
+  await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Chat message");
   assert.equal(await chatInput.evaluate((element) => element === document.activeElement), true, "Footer Ask should open and focus the assistant");
   await page.getByRole("button", { name: "Close CyberRakshak AI" }).click();
 
