@@ -127,10 +127,11 @@ try {
   assert.equal(await page.locator(".case-lookup-status").isVisible(), true, "The safe report status should be shown");
 
   const deleteDialogPromise = page.waitForEvent("dialog");
-  await page.getByRole("button", { name: "Delete my report" }).click();
+  const deleteClickPromise = page.getByRole("button", { name: "Delete my report" }).click();
   const deleteDialog = await deleteDialogPromise;
   assert.match(deleteDialog.message(), /delete this report/i, "Deletion should require an explicit confirmation");
   await deleteDialog.accept();
+  await deleteClickPromise;
   await page.getByText("The report was deleted from active CyberRakshak records.", { exact: true }).waitFor();
   assert.equal(deleteRequestCount, 1, "The case reference should issue exactly one DELETE request");
   assert.equal(await page.locator(".case-lookup-status").count(), 0, "Deleted report status should be cleared");
