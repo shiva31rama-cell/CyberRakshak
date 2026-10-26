@@ -56,8 +56,13 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   const menuButton = page.getByRole("button", { name: "Open menu" });
   await menuButton.click();
-  await page.waitForFunction(() => document.activeElement?.matches(".nav-menu .nav-link"));
   assert.equal(await page.locator(".nav-menu").evaluate((element) => getComputedStyle(element).visibility), "visible");
+  await page.keyboard.press("Tab");
+  assert.equal(
+    await page.evaluate(() => document.activeElement?.matches(".nav-menu .nav-link")),
+    true,
+    "Tab from the menu toggle should reach the first menu action"
+  );
   await page.keyboard.press("Escape");
   assert.equal(await menuButton.evaluate((element) => element === document.activeElement), true);
   assert.equal(await page.locator(".nav-menu").evaluate((element) => getComputedStyle(element).visibility), "hidden");
