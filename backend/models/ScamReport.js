@@ -67,7 +67,7 @@ const scamReportSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["new", "investigating", "resolved", "closed"],
+      enum: ["new", "under-investigation", "resolved", "closed"],
       default: "new",
     },
     caseNumber: {
