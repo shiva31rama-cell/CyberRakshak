@@ -1,177 +1,91 @@
-# CyberRakshak 2.0
+# CyberRakshak
 
-CyberRakshak is an AI-powered, cybersecurity-focused digital-safety platform for everyday users. The product journey is:
+CyberRakshak is a web application for practical cyber-safety learning and incident triage. It helps people understand suspicious messages and URLs, learn safer digital habits, and find next steps after a suspected scam.
 
-**ASK → SCAN → LEARN → RESPOND → GET HELP**
+The service provides educational guidance. It is not a bank, police service, government authority, or source of definitive fraud determinations.
 
-It is designed for students, smartphone users, UPI users, first-time digital users and rural/semi-urban communities. It is **not** an official government authority and must distinguish guidance from official reporting channels.
+## What is implemented
 
-## Current build branch
+- Cyber-safety learning modules and quizzes
+- A cyber-focused assistant with a configured AI provider and a safe fallback
+- Message and URL analysis with cautious, evidence-based language
+- An incident assistant for immediate protective steps
+- Social-claim triage that distinguishes “unverified” from “false”
+- User authentication, feedback, and scam-report workflows
+- Responsive React interface for desktop and mobile browsers
 
-- Repository: `shiva31rama-cell/CyberRakshak`
-- Working branch: `cyberrakshak-2.0-final`
-- `main` is kept outside the feature build workflow.
+URL analysis is heuristic and does not visit the destination or query a live reputation service. Social-claim triage does not establish that an official source was checked live.
 
-## Current build
+## Project structure
 
-### User-facing capabilities
+- \`frontend/\` — React and Vite user interface
+- \`backend/\` — Express API, validation, safety services, AI boundary, MongoDB models, and API tests
+- \`docs/\` — API, security, implementation status, and roadmap
+- \`research-paper/\` — project research materials
+- \`testing/\` — test plans and reported issues
 
-- **ASK** — cyber-only assistant with scope guard, grounded knowledge, incident triage and sensitive-input warnings.
-- **SCAN MESSAGE** — structured message analysis with scam indicators, category, risk level, explanation and safe actions.
-- **SCAN URL** — deterministic URL heuristics with cautious risk language and limitations.
-- **LEARN** — digital-literacy and cyber-safety modules plus curated awareness videos.
-- **QUIZ** — existing digital-literacy quiz foundation.
-- **RESPOND** — guided Incident Assistant with safe actions, evidence preservation and secret-sharing warnings.
-- **VERIFY** — first deterministic social-claim verification layer with an explicit “unverified is not false” rule.
-- **GET HELP** — existing emergency/help and scam-reporting flows.
-- **LANGUAGES** — shared English, తెలుగు and हिन्दी language state for core navigation/home content; full translation coverage is still in development.
-- **RESPONSIVE WEB** — one React/Vite frontend is the current shared-code experience for phone, tablet and desktop layouts.
+The backend keeps HTTP routes and controllers separate from reusable services. MongoDB schemas in \`backend/models/\` define the application data model.
 
-### Offline behavior and analysis boundaries
+## Requirements
 
-- The production service worker caches the application shell and same-origin static assets after a successful online visit.
-- The offline banner makes connectivity state visible. AI chat, message scanning, URL scanning, and other API-backed flows still require network connectivity.
-- API responses and submitted messages/URLs are intentionally excluded from service-worker caching.
-- URL scanning uses static structural heuristics only. It does not open the destination or query a live reputation service.
-- Social claim review is local triage; it does not establish that an official source was accessed live.
-- A clean-looking URL or an unverified claim must never be treated as proof of safety or truth.
-
-### Backend APIs
-
-- `GET /health`
-- `POST /api/chat`
-- `POST /api/scan/message`
-- `POST /api/scan/url`
-- `POST /api/incidents`
-- `POST /api/verify/social`
-- Existing auth, quiz, feedback and scam-report APIs.
-
-## Architecture
-
-```text
-Responsive React/Vite
-       |
-       +--> ASK / SCAN / LEARN / RESPOND / VERIFY / GET HELP
-       |
-       v
-REST API
-       |
-       v
-Node + Express
-  |       |        |
-  |       |        +--> validation / safety / rate limiting
-  |       +-----------> deterministic cyber analysis
-  +-------------------> AI provider boundary + grounded knowledge
-       |
-       v
-MongoDB Atlas foundation
-```
-
-The architecture deliberately separates deterministic safety checks from AI generation. A heuristic result is not proof of fraud or maliciousness.
-
-## Technology
-
-### Frontend
-- React 19
-- Vite 8
-- React Router
-- Responsive CSS
-- Shared language state
-
-### Backend
-- Node.js
-- Express 5
-- Mongoose / MongoDB Atlas
-- JWT / bcryptjs
-- Helmet
-- CORS
-- express-rate-limit
-
-### AI
-The provider is configured on the backend only. The assistant uses cyber relevance checks, sensitive-input protection, grounded knowledge and a safe fallback when AI configuration is unavailable.
+- Node.js 24 or a compatible current LTS release
+- npm
+- MongoDB for database-backed API routes
+- Optional server-side AI provider credentials for AI chat
 
 ## Local setup
 
-### 1. Install dependencies
+From the repository root, install each application’s locked dependencies:
 
-```powershell
-cd frontend
-npm install
+\`\`\`powershell
+npm ci --prefix backend
+npm ci --prefix frontend
+Copy-Item backend/.env.example backend/.env
+Copy-Item frontend/.env.example frontend/.env
+\`\`\`
 
-cd ..\backend
-npm install
-```
+Edit \`backend/.env\` with a MongoDB URI, a long random JWT secret, and any optional AI provider settings. Keep credentials out of the frontend and out of GitHub. The frontend’s \`VITE_API_BASE_URL\` should point to the backend API.
 
-### 2. Configure backend
+Start the API in one terminal:
 
-Create `backend/.env` from `backend/.env.example` and configure:
+\`\`\`powershell
+npm run backend
+\`\`\`
 
-```env
-PORT=5000
-NODE_ENV=development
-FRONTEND_URL=http://localhost:5173
-MONGODB_URI=<your-mongodb-uri>
-AI_API_URL=https://api.openai.com/v1/chat/completions
-AI_API_KEY=<server-side-key>
-AI_MODEL=<model-name>
-```
+Start the frontend in another terminal:
 
-Never put `AI_API_KEY`, MongoDB credentials or JWT secrets in the frontend.
-
-### 3. Start backend
-
-```powershell
-cd backend
+\`\`\`powershell
 npm run dev
-```
+\`\`\`
 
-### 4. Start frontend
+The frontend uses \`http://localhost:5000/api\` by default. The backend listens on port 5000 and accepts the frontend origin at \`http://localhost:5173\` by default.
 
-In another terminal:
+## Validation
 
-```powershell
-cd frontend
-npm run dev
-```
+Run the backend unit tests, frontend lint, and production build from the repository root:
 
-Or from the repository root:
-
-```powershell
-npm run dev
-```
-
-## Verification commands
-
-```powershell
+\`\`\`powershell
 npm test
 npm run lint
 npm run build
-```
+\`\`\`
 
-Runtime verification still requires a configured MongoDB environment for the full backend startup path.
+The optional MongoDB CRUD smoke test creates a synthetic report, reads it, updates it, and deletes only that report:
 
-## Safety boundaries
+\`\`\`powershell
+npm run test:db
+\`\`\`
 
-- Never request or store passwords, OTPs, PINs, CVVs, recovery codes or API keys.
-- Do not claim a message or URL is malicious without sufficient evidence.
-- “Unverified” must never be presented as “False.”
-- Official government/bank/reporting resources must be clearly distinguished from CyberRakshak.
-- The platform must not facilitate unauthorized access, credential theft, malware, evasion or other harmful cyber activity.
-- Future RAG/vector search, live social evidence retrieval, OCR/image scanning, voice, advanced ML and native mobile apps are **not claimed as complete** until built and verified.
+Before running it, set \`MONGODB_TEST_URI\` in \`backend/.env\` to a separate database whose name includes \`test\`. The script refuses other database names and never falls back to \`MONGODB_URI\`.
 
-## AWS direction
+## Data and safety boundaries
 
-The selected deployment direction is AWS. The production deployment remains a build/verification task. The final architecture will use managed AWS delivery/compute/secrets/monitoring services with MongoDB Atlas for application data, subject to cost, security and runtime validation.
+- Never ask users to share passwords, one-time codes, PINs, CVVs, recovery codes, or API keys.
+- Treat scanner results as guidance, not proof that a message or URL is malicious or safe.
+- Clearly distinguish CyberRakshak guidance from official reporting and banking channels.
+- Configure AI and MongoDB credentials only on the backend.
+- See [Security](docs/SECURITY.md), [API](docs/API.md), [AI workflow](docs/AI_WORKFLOW.md), and [database notes](docs/DATABASE.md).
 
-## Documentation
+## Current limitations
 
-- `docs/IMPLEMENTATION_AUDIT.md`
-- `docs/CURRENT_PROBLEMS.md`
-- `docs/AI_WORKFLOW.md`
-- `docs/API.md`
-- `docs/SECURITY.md`
-- `docs/FUTURE_ROADMAP.md`
-
-## Build truth
-
-A feature is marked **IMPLEMENTED** only after code, integration, tests and evidence support the acceptance criteria. Planned work remains clearly separated from implemented work.
+Production deployment and live MongoDB persistence have not been verified by this repository change. AI chat depends on a correctly configured provider; deterministic analysis and the safe fallback remain available when it is not configured. Features listed in the roadmap are not represented as complete.
