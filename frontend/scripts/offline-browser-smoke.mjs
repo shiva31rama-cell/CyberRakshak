@@ -88,23 +88,53 @@ try {
   assert.equal(await chatInput.evaluate((element) => element === document.activeElement), true, "Footer Ask should open and focus the assistant");
   await page.getByRole("button", { name: "Close CyberRakshak AI" }).click();
 
-  await page.route("**/scam-report/case/**", (route) => route.fulfill({
-    status: 200,
-    contentType: "application/json",
-    body: JSON.stringify({
-      success: true,
-      report: {
-        caseNumber: "CASE-" + "A".repeat(32),
-        status: "under-investigation",
-        reportedAt: "2026-01-01T12:00:00.000Z",
-      },
-    }),
-  }));
+  let deleteRequestCount = 0;
+  await page.route("**/scam-report/case/**", async (route) => {
+    const method = route.request().method();
+    if (method === "DELETE") {
+      deleteRequestCount += 1;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          message: "Report deleted from active CyberRakshak records",
+        }),
+      });
+      return;
+    }
+    if (method === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          report: {
+            caseNumber: "CASE-" + "A".repeat(32),
+            status: "under-investigation",
+            reportedAt: "2026-01-01T12:00:00.000Z",
+          },
+        }),
+      });
+      return;
+    }
+    await route.continue();
+  });
   await page.goto(new URL("/report-scam", baseUrl).href, { waitUntil: "domcontentloaded" });
   await page.getByLabel("CyberRakshak case number").fill("CASE-" + "A".repeat(32));
   await page.getByRole("button", { name: "Check status" }).click();
   await page.getByText("under investigation").waitFor();
   assert.equal(await page.locator(".case-lookup-status").isVisible(), true, "The safe report status should be shown");
+
+  const deleteDialogPromise = page.waitForEvent("dialog");
+  await page.getByRole("button", { name: "Delete my report" }).click();
+  const deleteDialog = await deleteDialogPromise;
+  assert.match(deleteDialog.message(), /delete this report/i, "Deletion should require an explicit confirmation");
+  await deleteDialog.accept();
+  await page.getByText("The report was deleted from active CyberRakshak records.", { exact: true }).waitFor();
+  assert.equal(deleteRequestCount, 1, "The case reference should issue exactly one DELETE request");
+  assert.equal(await page.locator(".case-lookup-status").count(), 0, "Deleted report status should be cleared");
+  assert.equal(await page.getByLabel("CyberRakshak case number").inputValue(), "", "The private case reference should be cleared");
 
   const apiWasCached = await page.evaluate(async () => {
     const names = await caches.keys();
@@ -137,7 +167,7 @@ try {
   assert.ok(shellText.trim().length > 0, "A cached SPA shell should render for an offline deep link");
 
   assert.deepEqual(pageErrors, [], "The app raised uncaught browser errors");
-  console.log("PASS: Chromium checked responsive layouts, keyboard focus/menu behavior, all shared Ask actions, offline deep-link loading, and network-only API behavior.");
+  console.log("PASS: Chromium checked responsive layouts, keyboard focus/menu behavior, shared Ask actions, report lookup/deletion, offline deep-link loading, and network-only API behavior.");
 } finally {
   await browser.close();
 }
