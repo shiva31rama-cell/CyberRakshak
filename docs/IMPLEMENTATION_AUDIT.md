@@ -21,7 +21,7 @@
 | Browser sizes | CI emulates 390px, 820px and 1440px layouts; physical device and assistive-technology checks remain open | .github/workflows/ci.yml |
 | Deployment | Docker Compose and AWS ECS Fargate templates/workflow added; no cloud resources deployed | Dockerfiles, docker-compose.yml, deployment/aws/ecs.yml, .github/workflows/aws-deploy.yml |
 | Multilingual UI | English, Telugu and Hindi strings cover shared navigation and home content; other page content remains partial | frontend/src/contexts/LanguageContext.jsx |
-| Accessibility | Core labels/ARIA remain; complete keyboard, contrast, screen-reader and device audit remains open | frontend/src/ |
+| Accessibility | Skip link, visible focus, reduced-motion support, mobile-menu keyboard handling and chat focus added; full contrast, screen-reader and device audit remains open | frontend/src/App.jsx, frontend/src/App.css, frontend/src/components/Navbar/, frontend/src/components/Chatbot/, frontend/scripts/offline-browser-smoke.mjs |
 | Auth | JWT/bcrypt foundation with protected current-user and logout routes | backend/middleware/auth.js |
 | AI | Provider boundary, grounding and response-contract fallback | backend/controllers/chatController.js, backend/services/ai/ |
 | Chat secret handling | Pattern-detected labeled secrets keep the full conversation on the application fallback rather than forwarding it to the configured AI provider | backend/services/safety/sensitiveInputService.js, backend/tests/chatController.test.js |
@@ -43,6 +43,7 @@ The project provides deterministic message/URL heuristics and a social-claim tri
 - Added bounded retrieval from the official PIB press-release RSS feed, with a fixed source URL, HTTPS host validation, timeout, response-size cap, redirect rejection and a short in-memory feed cache.
 - Updated the social-verification screen to display candidate items, source status, publication date and shared keywords while clearly stating that matches are not a fact-check verdict.
 - Added a Chromium CI smoke script for mobile/tablet/desktop-sized viewports, service-worker cache activation, offline deep-link loading, and network-only API calls.
+- Added a keyboard skip link, visible focus indicators, reduced-motion support, mobile-menu Escape/focus handling, and focus transfer to the chatbot input. Chromium CI now checks keyboard navigation and each shared Ask action.
 - Added production Dockerfiles, local Compose health checks, NGINX SPA/API routing, ECS Fargate CloudFormation, and a manual GitHub OIDC deployment workflow.
 - Prevented chat conversations containing pattern-detected labeled secrets from reaching the external AI provider and added a regression test.
 - Changed scam report references to random 128-bit values, removed personal details from public status lookups and submission responses, and disclosed stored report fields and reporting limits in the form.
