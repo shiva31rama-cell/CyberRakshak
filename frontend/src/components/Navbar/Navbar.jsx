@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getStoredUser, isAuthenticated, logout } from "../../services/authService";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { requestOpenChatbot } from "../../utils/chatbotEvents";
 import "./Navbar.css";
 
 function Navbar() {
@@ -52,7 +53,7 @@ function Navbar() {
           <button className={`nav-link ${isActive(["/scan"]) ? "active" : ""}`} onClick={() => handleNavClick("/scan")}>🔎 {t.scan}</button>
           <button className={`nav-link ${isActive(["/learn", "/digital-literacy", "/upi-safety", "/password-security"]) ? "active" : ""}`} onClick={() => handleNavClick("/learn")}>📚 {t.learn}</button>
           <button className={`nav-link ${isActive(["/emergency-help", "/report-scam"]) ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>🆘 {t.help}</button>
-          <button className="nav-link" onClick={() => handleNavClick("/")}>💬 {t.ask}</button>
+          <button className="nav-link" onClick={() => { setIsOpen(false); requestOpenChatbot(); }}>💬 {t.ask}</button>
 
           <label className="language-control" title={t.language}>
             <span aria-hidden="true">🌐</span>
