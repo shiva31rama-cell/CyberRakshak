@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Chatbot from "./components/Chatbot/Chatbot";
+import OfflineNotice from "./components/OfflineNotice";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
@@ -33,8 +34,10 @@ function App() {
       <LanguageProvider>
         <ErrorBoundary>
           <div className="app">
+            <OfflineNotice />
+            <a className="skip-link" href="#main-content">Skip to main content</a>
             <Navbar />
-            <main className="app-main">
+            <main className="app-main" id="main-content" tabIndex="-1">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />

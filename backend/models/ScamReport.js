@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { createCaseNumber } = require("../services/caseNumberService");
 
 const scamReportSchema = new mongoose.Schema(
   {
@@ -11,7 +12,7 @@ const scamReportSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide reporter email"],
       match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
         "Please provide a valid email",
       ],
     },
@@ -66,7 +67,7 @@ const scamReportSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["new", "investigating", "resolved", "closed"],
+      enum: ["new", "under-investigation", "resolved", "closed"],
       default: "new",
     },
     caseNumber: {
@@ -84,13 +85,9 @@ const scamReportSchema = new mongoose.Schema(
   }
 );
 
-// Generate case number before saving
-scamReportSchema.pre("save", async function (next) {
-  if (!this.caseNumber) {
-    const count = await mongoose.model("ScamReport").countDocuments();
-    this.caseNumber = `CASE-${Date.now()}-${count + 1}`;
-  }
-  next();
+// Case references are random because the public status lookup accepts them as bearer tokens.
+scamReportSchema.pre("save", function () {
+  if (!this.caseNumber) this.caseNumber = createCaseNumber();
 });
 
 const ScamReport = mongoose.model("ScamReport", scamReportSchema);

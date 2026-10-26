@@ -1,7 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getStoredUser, isAuthenticated, logout } from "../../services/authService";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { requestOpenChatbot } from "../../utils/chatbotEvents";
 import "./Navbar.css";
 
 function Navbar() {
@@ -9,6 +10,7 @@ function Navbar() {
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
+  const menuButtonRef = useRef(null);
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
   const [userName, setUserName] = useState(() => getStoredUser()?.name || "");
 
@@ -36,8 +38,27 @@ function Navbar() {
     navigate("/");
   };
 
-  const handleNavClick = (path) => { navigate(path); setIsOpen(false); };
+  const handleNavClick = (path) => {
+    const wasMenuOpen = isOpen;
+    navigate(path);
+    setIsOpen(false);
+    if (wasMenuOpen) {
+      window.requestAnimationFrame(() => document.getElementById("main-content")?.focus());
+    }
+  };
   const isActive = (paths) => paths.some((path) => location.pathname === path || location.pathname.startsWith(`${path}/`));
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const closeOnEscape = (event) => {
+      if (event.key !== "Escape") return;
+      setIsOpen(false);
+      menuButtonRef.current?.focus();
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isOpen]);
 
   return (
     <nav className="navbar" aria-label="Primary navigation">
@@ -47,12 +68,16 @@ function Navbar() {
           <span className="logo-text">CyberRakshak</span>
         </button>
 
+        <button ref={menuButtonRef} className="hamburger" onClick={() => setIsOpen((open) => !open)} aria-label={isOpen ? "Close menu" : "Open menu"} aria-expanded={isOpen}>
+          <span></span><span></span><span></span>
+        </button>
+
         <div className={`nav-menu ${isOpen ? "active" : ""}`}>
           <button className={`nav-link ${isActive(["/"]) && location.pathname === "/" ? "active" : ""}`} onClick={() => handleNavClick("/")}>{t.home}</button>
           <button className={`nav-link ${isActive(["/scan"]) ? "active" : ""}`} onClick={() => handleNavClick("/scan")}>🔎 {t.scan}</button>
           <button className={`nav-link ${isActive(["/learn", "/digital-literacy", "/upi-safety", "/password-security"]) ? "active" : ""}`} onClick={() => handleNavClick("/learn")}>📚 {t.learn}</button>
           <button className={`nav-link ${isActive(["/emergency-help", "/report-scam"]) ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>🆘 {t.help}</button>
-          <button className="nav-link" onClick={() => handleNavClick("/")}>💬 {t.ask}</button>
+          <button className="nav-link" onClick={() => { setIsOpen(false); requestOpenChatbot(); }}>💬 {t.ask}</button>
 
           <label className="language-control" title={t.language}>
             <span aria-hidden="true">🌐</span>
@@ -75,9 +100,6 @@ function Navbar() {
           )}
         </div>
 
-        <button className="hamburger" onClick={() => setIsOpen((open) => !open)} aria-label={isOpen ? "Close menu" : "Open menu"} aria-expanded={isOpen}>
-          <span></span><span></span><span></span>
-        </button>
       </div>
     </nav>
   );

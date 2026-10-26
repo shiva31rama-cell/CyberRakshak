@@ -42,6 +42,12 @@ function analyzeMessage(input) {
   else if (indicators.length >= 1) riskLevel = "MEDIUM";
   if (/shared.*otp|shared.*password|sent.*pin|money.*lost|unauthorized.*transaction|clicked.*link.*entered/i.test(text)) riskLevel = "HIGH";
 
+  // A reward/prize claim coupled with a request for money is materially more concerning
+  // than either signal alone. This is still a heuristic risk signal, not proof of fraud.
+  const requestsPayment = /pay|payment|fee|send money|transfer|deposit|₹|rs\.?\s?\d+/i.test(text);
+  const promisesReward = /won|winner|prize|reward|cashback|refund|lottery|lucky draw/i.test(text);
+  if (requestsPayment && promisesReward) riskLevel = "HIGH";
+
   const isCyberRelated = category !== "general_cyber_awareness" || indicators.length > 0 || /cyber|security|scam|fraud|phish|malware|password|otp|upi|privacy|hack|suspicious|online safety/i.test(text);
   const recommendedActions = [
     "Do not click suspicious links or open unexpected attachments.",

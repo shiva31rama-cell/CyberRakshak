@@ -8,6 +8,12 @@ const connectDB = require("./config/db");
 dotenv.config();
 
 const app = express();
+const trustProxyHops = process.env.TRUST_PROXY_HOPS === undefined ? 0 : Number(process.env.TRUST_PROXY_HOPS);
+if (!Number.isSafeInteger(trustProxyHops) || trustProxyHops < 0) {
+  throw new Error("TRUST_PROXY_HOPS must be a non-negative integer");
+}
+// Set this only when the API is reachable exclusively through the configured trusted proxies.
+app.set("trust proxy", trustProxyHops);
 const PORT = Number(process.env.PORT) || 5000;
 let dbReady = false;
 
@@ -35,6 +41,8 @@ app.use("/api/chat", createLimiter(60, "Too many chat requests. Please try again
 app.use("/api/scan", createLimiter(40, "Too many scan requests. Please try again later."));
 app.use("/api/incidents", createLimiter(30, "Too many incident requests. Please try again later."));
 app.use("/api/verify", createLimiter(30, "Too many verification requests. Please try again later."));
+app.use("/api/scam-report", createLimiter(15, "Too many report requests. Please try again later."));
+app.use("/api/feedback", createLimiter(30, "Too many feedback requests. Please try again later."));
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/chat", require("./routes/chat"));

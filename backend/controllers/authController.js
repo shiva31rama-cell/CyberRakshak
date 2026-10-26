@@ -20,11 +20,19 @@ const publicUser = (user) => ({
 // @access  Public
 exports.register = async (req, res) => {
   try {
-    const { name, password, confirmPassword } = req.body;
-    const email = normalizeEmail(req.body.email);
+    const body = req.body || {};
+    const { name, password, confirmPassword } = body;
+    const email = normalizeEmail(body.email);
     const cleanName = typeof name === "string" ? name.trim() : "";
 
-    if (!cleanName || !email || !password || !confirmPassword) {
+    if (
+      !cleanName ||
+      !email ||
+      typeof password !== "string" ||
+      typeof confirmPassword !== "string" ||
+      !password ||
+      !confirmPassword
+    ) {
       return res.status(400).json({ success: false, message: "Please provide all required fields" });
     }
     if (cleanName.length > 50) {
@@ -55,8 +63,11 @@ exports.register = async (req, res) => {
     if (error?.code === 11000) {
       return res.status(409).json({ success: false, message: "User with this email already exists" });
     }
-    console.error("Registration error:", error);
-    res.status(500).json({ success: false, message: "Error registering user" });
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: "Please check the supplied account details" });
+    }
+    console.error("Registration failed:", error?.name || "Unknown error");
+    return res.status(500).json({ success: false, message: "Error registering user" });
   }
 };
 
@@ -88,7 +99,7 @@ exports.login = async (req, res) => {
       user: publicUser(user),
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Login failed:", error?.name || "Unknown error");
     res.status(500).json({ success: false, message: "Error logging in user" });
   }
 };
@@ -103,7 +114,7 @@ exports.getCurrentUser = async (req, res) => {
 
     res.status(200).json({ success: true, user });
   } catch (error) {
-    console.error("Current-user error:", error);
+    console.error("Current-user lookup failed:", error?.name || "Unknown error");
     res.status(500).json({ success: false, message: "Error fetching user" });
   }
 };

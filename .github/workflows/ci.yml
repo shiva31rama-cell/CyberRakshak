@@ -1,8 +1,11 @@
 name: CyberRakshak CI
 
+permissions:
+  contents: read
+
 on:
   push:
-    branches: [main, "cyberrakshak-2.0-final"]
+    branches: [main, "cyberrakshak-2.0-final", "codex/cyberrakshak-security-hardening"]
   pull_request:
     branches: [main, "cyberrakshak-2.0-final"]
 
@@ -19,6 +22,7 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: backend/package-lock.json
+      - run: npm ci --prefix ..
       - run: npm ci
       - run: node -c server.js
       - run: node -c controllers/chatController.js
@@ -30,7 +34,22 @@ jobs:
       - run: node -c services/analysis/urlAnalysisService.js
       - run: node -c services/incident/incidentService.js
       - run: node -c services/verification/socialVerificationService.js
+      - run: node -c services/verification/officialEvidenceService.js
+      - run: node -c services/ai/chatResponseContract.js
+      - run: node -c scripts/mongodb-persistence-smoke.js
       - run: npm test
+      - name: Build backend container image
+        working-directory: .
+        run: docker build -f backend/Dockerfile -t cyberrakshak-api:ci .
+      - name: Optional MongoDB persistence integration
+        env:
+          MONGODB_TEST_URI: ${{ secrets.MONGODB_TEST_URI }}
+        run: |
+          if [ -n "$MONGODB_TEST_URI" ]; then
+            npm run test:db
+          else
+            echo "SKIP: MONGODB_TEST_URI secret is not configured; live MongoDB CRUD was not tested."
+          fi
 
   frontend-check:
     runs-on: ubuntu-latest
@@ -45,5 +64,27 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+      - run: node --check public/sw.js
       - run: npm run lint
       - run: npm run build
+      - name: Install pinned browser smoke dependency without changing package metadata
+        run: npm install --no-save --package-lock=false playwright@1.64.0
+      - name: Install Chromium for offline checks
+        run: npx playwright install --with-deps chromium
+      - name: Start production preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/cyberrakshak-vite-preview.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+      - name: Verify responsive layout and offline behavior in Chromium
+        run: node scripts/offline-browser-smoke.mjs
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+      - name: Build frontend container image
+        working-directory: .
+        run: docker build -f frontend/Dockerfile -t cyberrakshak-web:ci .

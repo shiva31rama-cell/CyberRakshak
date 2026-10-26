@@ -1,0 +1,83 @@
+name: Deploy CyberRakshak to AWS ECS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cyberrakshak-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/cyberrakshak-2.0-final'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure short-lived AWS credentials with GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and publish API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: backend/Dockerfile
+          push: true
+          tags: ${{ steps.ecr.outputs.registry }}/${{ vars.ECR_BACKEND_REPOSITORY }}:${{ github.sha }}
+
+      - name: Build and publish web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: frontend/Dockerfile
+          push: true
+          build-args: |
+            VITE_API_BASE_URL=/api
+          tags: ${{ steps.ecr.outputs.registry }}/${{ vars.ECR_FRONTEND_REPOSITORY }}:${{ github.sha }}
+
+      - name: Validate and deploy the ECS stack
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          STACK_NAME: ${{ vars.AWS_STACK_NAME }}
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          API_REPOSITORY: ${{ vars.ECR_BACKEND_REPOSITORY }}
+          WEB_REPOSITORY: ${{ vars.ECR_FRONTEND_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+          VPC_ID: ${{ vars.AWS_VPC_ID }}
+          PUBLIC_SUBNET_IDS: ${{ vars.AWS_PUBLIC_SUBNET_IDS }}
+          PRIVATE_SUBNET_IDS: ${{ vars.AWS_PRIVATE_SUBNET_IDS }}
+          MONGODB_SECRET_ARN: ${{ vars.AWS_MONGODB_SECRET_ARN }}
+          JWT_SECRET_ARN: ${{ vars.AWS_JWT_SECRET_ARN }}
+          FRONTEND_ORIGIN: ${{ vars.AWS_FRONTEND_ORIGIN }}
+          CERTIFICATE_ARN: ${{ vars.AWS_CERTIFICATE_ARN }}
+        run: |
+          aws cloudformation deploy \
+            --template-file deployment/aws/ecs.yml \
+            --stack-name "$STACK_NAME" \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --parameter-overrides \
+              VpcId="$VPC_ID" \
+              PublicSubnetIds="$PUBLIC_SUBNET_IDS" \
+              PrivateSubnetIds="$PRIVATE_SUBNET_IDS" \
+              ApiImageUri="$REGISTRY/$API_REPOSITORY:$IMAGE_TAG" \
+              WebImageUri="$REGISTRY/$WEB_REPOSITORY:$IMAGE_TAG" \
+              MongoSecretArn="$MONGODB_SECRET_ARN" \
+              JwtSecretArn="$JWT_SECRET_ARN" \
+              FrontendOrigin="$FRONTEND_ORIGIN" \
+              CertificateArn="$CERTIFICATE_ARN"
