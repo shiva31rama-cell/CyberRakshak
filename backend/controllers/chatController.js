@@ -1,6 +1,6 @@
 const KNOWLEDGE_BASE = require("../data/cyberKnowledge");
 const { classify } = require("../services/ai/cyberRelevanceService");
-const { safetyInstruction } = require("../services/safety/sensitiveInputService");
+const { containsSensitiveSecret, safetyInstruction } = require("../services/safety/sensitiveInputService");
 const aiService = require("../services/ai/aiService");
 const { validateChatResponse } = require("../services/ai/chatResponseContract");
 
@@ -124,6 +124,21 @@ exports.chat = async (req, res) => {
     const incidentType = detectIncidentType(normalized) || safeMessages.map((item) => detectIncidentType(item.content)).find(Boolean) || null;
     const triageStage = detectTriageStage(safeMessages, incidentType);
     const grounding = getGrounding(incidentType);
+
+    // The server may receive a secret the user pasted, but never forward any part of
+    // that conversation to an external AI provider once a secret is detected.
+    const conversationContainsSecret = safeMessages.some((item) => containsSensitiveSecret(item.content));
+    if (conversationContainsSecret) {
+      return sendValidatedChatResponse(res, {
+        success: true,
+        reply: "For your safety, do not share passwords, OTPs, PINs, CVVs, recovery codes or API keys here. I will not send this conversation to the AI provider. Please describe what happened without the secret itself.",
+        provider: "CyberRakshak safety fallback",
+        intent: relevance.intent,
+        incidentType,
+        triageStage,
+        sources: grounding.sources,
+      }, normalized);
+    }
 
     if (!relevance.isCyberRelated) {
       return sendValidatedChatResponse(res, { success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", intent: "non_cyber", incidentType: null, triageStage: "general", sources: [] }, normalized);
