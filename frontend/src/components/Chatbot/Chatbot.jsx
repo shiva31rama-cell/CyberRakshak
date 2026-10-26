@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { sendChatMessage } from "../../services/chatService";
 import "./Chatbot.css";
 
@@ -17,12 +17,16 @@ const stageLabels = {
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const openChat = () => setIsOpen(true);
     window.addEventListener("cyberrakshak:open-chat", openChat);
     return () => window.removeEventListener("cyberrakshak:open-chat", openChat);
   }, []);
+  useEffect(() => {
+    if (isOpen) inputRef.current?.focus();
+  }, [isOpen]);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -116,7 +120,7 @@ function Chatbot() {
         )}
 
         <form onSubmit={handleSubmit} className="chatbot-input-form">
-          <input type="text" placeholder="Tell me what happened..." value={inputValue} onChange={(event) => setInputValue(event.target.value)} disabled={isLoading} className="chatbot-input" maxLength={2000} aria-label="Chat message" />
+          <input ref={inputRef} type="text" placeholder="Tell me what happened..." value={inputValue} onChange={(event) => setInputValue(event.target.value)} disabled={isLoading} className="chatbot-input" maxLength={2000} aria-label="Chat message" />
           <button type="submit" disabled={isLoading || !inputValue.trim()} className="chatbot-send-btn">{isLoading ? "..." : "Send"}</button>
         </form>
       </section>
