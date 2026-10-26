@@ -39,7 +39,14 @@ function Navbar() {
     navigate("/");
   };
 
-  const handleNavClick = (path) => { navigate(path); setIsOpen(false); };
+  const handleNavClick = (path) => {
+    const wasMenuOpen = isOpen;
+    navigate(path);
+    setIsOpen(false);
+    if (wasMenuOpen) {
+      window.requestAnimationFrame(() => document.getElementById("main-content")?.focus());
+    }
+  };
   const isActive = (paths) => paths.some((path) => location.pathname === path || location.pathname.startsWith(`${path}/`));
 
   useEffect(() => {
