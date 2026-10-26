@@ -14,7 +14,7 @@
 |---|---|---|
 | Frontend and backend foundation | Implemented | frontend/, backend/ |
 | MongoDB connection and safe synthetic CRUD smoke | Code implemented; live CRUD step skipped because the private MONGODB_TEST_URI Actions secret is missing | backend/config/db.js, backend/scripts/mongodb-persistence-smoke.js |
-| Report workflow and privacy | Random case references, status-only public lookup with a matching UI, report form disclosure, and API/model status agreement; retention/deletion policy remains open | backend/services/caseNumberService.js, backend/controllers/scamReportController.js, backend/models/ScamReport.js, frontend/src/pages/ScamSolutions/ |
+| Report workflow and privacy | Random case references, status-only lookup, case-reference deletion of active reports, paginated admin/user lists, report form disclosure and API/model status agreement; automatic retention and backup purge policy remain open | backend/services/caseNumberService.js, backend/controllers/scamReportController.js, backend/models/ScamReport.js, frontend/src/pages/ScamSolutions/ |
 | Message and URL scanning | Deterministic triage; not a reputation verdict | backend/services/analysis/ |
 | Social claim check | Local claim triage plus official PIB RSS candidate retrieval displayed as safe linked leads; no social platform scraping and no truth verdict from keyword overlap | backend/services/verification/, frontend/src/pages/SocialVerification/ |
 | Offline shell | Service worker caches app shell/static assets only and bypasses /api; Chromium offline smoke passed | frontend/public/sw.js, frontend/scripts/offline-browser-smoke.mjs |
@@ -47,7 +47,7 @@ The project provides deterministic message/URL heuristics and a social-claim tri
 - Added production Dockerfiles, local Compose health checks, NGINX SPA/API routing, ECS Fargate CloudFormation, and a manual GitHub OIDC deployment workflow.
 - Prevented chat conversations containing pattern-detected labeled secrets from reaching the external AI provider and added a regression test.
 - Changed scam report references to random 128-bit values, removed personal details from public status lookups and submission responses, and disclosed stored report fields and reporting limits in the form.
-- Added a report-status lookup in the UI that shows only the case number, status and submission date; aligned report status validation between the API and model.
+- Added status lookup and case-reference deletion for active reports; the UI warns that anyone with the private reference can view or delete the active record. Added paginated administrator/user report lists, consistent closed-status handling, long-domain email validation and generic database-error responses.
 - Connected the ASK actions in navigation, home and footer to the same chatbot; removed fake social links, unimplemented policy links, unsupported trust badges and hard-coded emergency contact claims from the footer.
 - Configured explicit trusted-proxy hop counts for local Compose and AWS ALB deployments and added rate limits to public scam-report and feedback endpoints.
 - Kept chat, scan and incident histories transient as the MVP privacy decision until consent, retention and deletion requirements are approved.
@@ -56,6 +56,6 @@ The project provides deterministic message/URL heuristics and a social-claim tri
 
 ## Verification evidence
 
-GitHub Actions run [40305712328](https://github.com/shiva31rama-cell/CyberRakshak/actions/runs/40305712328), for code commit 867c8e78d63e1c743ed09597d7102c7addaf8008, completed successfully on 2026-10-26. Backend syntax checks and tests passed; frontend lint and production build passed; Chromium checked responsive layouts, keyboard navigation, the shared assistant actions, report-status lookup, offline deep-link loading and network-only API behavior; both production container builds passed.
+GitHub Actions run [40308509037](https://github.com/shiva31rama-cell/CyberRakshak/actions/runs/40308509037), for code commit 88126e6d900d00a1af5d34c0fbb2f15e5935c189, completed successfully on 2026-10-26. Backend syntax checks and tests passed; frontend lint and production build passed; Chromium checked responsive layouts, keyboard navigation, the shared assistant actions, report-status lookup, offline deep-link loading and network-only API behavior; both production container builds passed.
 
 The optional MongoDB step skipped because the private MONGODB_TEST_URI Actions secret is not configured. Live database CRUD remains unverified. A live run requires a new private test-only credential. AWS deployment requires an AWS account, protected GitHub environment and the documented network/resources. Physical acceptance requires real target devices and assistive-technology testing. No cloud resources were deployed.

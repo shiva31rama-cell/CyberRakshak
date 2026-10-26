@@ -10,11 +10,11 @@
 | B06 | AI output needs a complete structured contract and tested invalid-output fallback | P1 | Added response schema validator and controller fallback coverage | IMPLEMENTED; BRANCH CI PASS |
 | B07 | Deterministic URL analysis needs regression coverage | P0 | Added hostname-boundary, private-host and inconclusive-result regressions | IMPLEMENTED; BRANCH CI PASS |
 | B08 | URL analysis is heuristic only | P1 | Keep limitation explicit until reviewed reputation evidence is integrated | IMPLEMENTED WITH LIMITATION |
-| B09 | CI must cover syntax, lint, tests and production builds | P1 | Backend/frontend checks, Chromium smoke, and production container builds | PASS; WORKFLOW RUN 40305712328 |
+| B09 | CI must cover syntax, lint, tests and production builds | P1 | Backend/frontend checks, Chromium smoke, and production container builds | PASS; WORKFLOW RUN 40308509037 |
 | B10 | Physical browser/device verification is pending | P1 | Complete real phone/tablet/desktop and assistive-technology acceptance | CHROMIUM AUTOMATION PASS; PHYSICAL CHECK OPEN |
 | B11 | AWS deployment is not live | P1 | Configure protected GitHub environment and AWS resources, then deploy deliberately | DEPLOYMENT CODE READY; AWS ACCOUNT SETUP PENDING |
 | B12 | Final report must match verified software and evidence | P0 | Record CI result and external acceptance limits | UPDATED FROM VERIFIED EVIDENCE |
-| B13 | Offline shell needs browser verification | P1 | Install the production service worker, check offline navigation and confirm API requests are not cached | CHROMIUM SMOKE PASS IN RUN 40305712328; PHYSICAL DEVICE CHECK OPEN |
+| B13 | Offline shell needs browser verification | P1 | Install the production service worker, check offline navigation and confirm API requests are not cached | CHROMIUM SMOKE PASS IN RUN 40308509037; PHYSICAL DEVICE CHECK OPEN |
 | B14 | Automatic retention and backup purge policy for reports and feedback is not approved | P0 | Set a product retention period and verify database-backup expiry before production | OPEN; USER-INITIATED CASE-REFERENCE DELETION IMPLEMENTED |
 
 ## Privacy decision
