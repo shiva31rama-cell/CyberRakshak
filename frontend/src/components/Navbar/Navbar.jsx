@@ -11,7 +11,6 @@ function Navbar() {
   const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const menuButtonRef = useRef(null);
-  const firstMenuLinkRef = useRef(null);
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
   const [userName, setUserName] = useState(() => getStoredUser()?.name || "");
 
@@ -52,17 +51,13 @@ function Navbar() {
   useEffect(() => {
     if (!isOpen) return undefined;
 
-    const focusFrame = window.requestAnimationFrame(() => firstMenuLinkRef.current?.focus());
     const closeOnEscape = (event) => {
       if (event.key !== "Escape") return;
       setIsOpen(false);
       menuButtonRef.current?.focus();
     };
     window.addEventListener("keydown", closeOnEscape);
-    return () => {
-      window.cancelAnimationFrame(focusFrame);
-      window.removeEventListener("keydown", closeOnEscape);
-    };
+    return () => window.removeEventListener("keydown", closeOnEscape);
   }, [isOpen]);
 
   return (
@@ -73,8 +68,12 @@ function Navbar() {
           <span className="logo-text">CyberRakshak</span>
         </button>
 
+        <button ref={menuButtonRef} className="hamburger" onClick={() => setIsOpen((open) => !open)} aria-label={isOpen ? "Close menu" : "Open menu"} aria-expanded={isOpen}>
+          <span></span><span></span><span></span>
+        </button>
+
         <div className={`nav-menu ${isOpen ? "active" : ""}`}>
-          <button ref={firstMenuLinkRef} className={`nav-link ${isActive(["/"]) && location.pathname === "/" ? "active" : ""}`} onClick={() => handleNavClick("/")}>{t.home}</button>
+          <button className={`nav-link ${isActive(["/"]) && location.pathname === "/" ? "active" : ""}`} onClick={() => handleNavClick("/")}>{t.home}</button>
           <button className={`nav-link ${isActive(["/scan"]) ? "active" : ""}`} onClick={() => handleNavClick("/scan")}>🔎 {t.scan}</button>
           <button className={`nav-link ${isActive(["/learn", "/digital-literacy", "/upi-safety", "/password-security"]) ? "active" : ""}`} onClick={() => handleNavClick("/learn")}>📚 {t.learn}</button>
           <button className={`nav-link ${isActive(["/emergency-help", "/report-scam"]) ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>🆘 {t.help}</button>
@@ -101,9 +100,6 @@ function Navbar() {
           )}
         </div>
 
-        <button ref={menuButtonRef} className="hamburger" onClick={() => setIsOpen((open) => !open)} aria-label={isOpen ? "Close menu" : "Open menu"} aria-expanded={isOpen}>
-          <span></span><span></span><span></span>
-        </button>
       </div>
     </nav>
   );
