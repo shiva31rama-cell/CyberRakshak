@@ -2,101 +2,47 @@
 
 ## Current build target
 
-- Repository: `shiva31rama-cell/CyberRakshak`
-- Working branch: `cyberrakshak-2.0-final`
-- `main`: not part of this build workflow
-- Product journey: **ASK → SCAN → LEARN → RESPOND → GET HELP**
-- Release rule: **CODE → TEST → RESULT → EVIDENCE → DOCUMENTATION**
+- Repository: shiva31rama-cell/CyberRakshak
+- Working branch: codex/cyberrakshak-security-hardening
+- Pull request: #9, targeting cyberrakshak-2.0-final
+- Product journey: ASK → SCAN → LEARN → RESPOND → GET HELP
+- Release rule: CODE → TEST → RESULT → EVIDENCE → DOCUMENTATION
 
 ## Current implementation status
 
-| Feature | Priority | Current state | Evidence path |
-|---|---:|---|---|
-| F01 Architecture | P0 | IMPLEMENTED foundation | `frontend/`, `backend/`, `docs/` |
-| F02 Frontend foundation | P0 | IMPLEMENTED | React/Vite routes and shared UI |
-| F03 Backend foundation | P0 | IMPLEMENTED | Express server and routes |
-| F04 MongoDB | P0 | PARTIALLY IMPLEMENTED | `backend/config/db.js`; end-to-end persistence still needs runtime verification |
-| F05 Env/secrets | P0 | IMPLEMENTED foundation | `.gitignore`, `.env.example` files |
-| F06 Home | P0 | IMPLEMENTED | `frontend/src/pages/Home/Home.jsx` |
-| F07 Navigation/routing | P0 | IMPLEMENTED foundation | `frontend/src/App.jsx`, Navbar |
-| F08 Cyber Assistant | P0 | IMPLEMENTED | `backend/controllers/chatController.js` |
-| F09 Message Scanner | P0 | IMPLEMENTED foundation + safety signals | `/scan`, `POST /api/scan/message`, sensitive-input detection |
-| F10 Risk classification | P0 | IMPLEMENTED heuristic layer | `backend/services/analysis/cyberAnalysisService.js` |
-| F11 AI safety | P0 | IMPLEMENTED foundation | chat grounding, sensitive-input checks, fallback |
-| F12 Input validation | P0 | IMPLEMENTED foundation | chat/scanner/url/incident/verification services |
-| F13 Error handling | P0 | IMPLEMENTED foundation | Express error handler + frontend API client |
-| F14 Security middleware | P0 | IMPLEMENTED foundation | Helmet, CORS, rate limits, bounded JSON |
-| F15 Learning | P1 | IMPLEMENTED foundation | Learn + topic modules |
-| F16 Quiz | P1 | IMPLEMENTED foundation | existing quiz page/API |
-| F17 Get Help | P1 | IMPLEMENTED foundation | Emergency Help / Scam Solutions |
-| F18 Incident Assistant | P1 | IMPLEMENTED foundation | `/incident`, `POST /api/incidents` |
-| F19 Multilingual | P1 | IN DEVELOPMENT | product language direction exists; full content/AI switching still required |
-| F20 Responsive | P1 | IN DEVELOPMENT | responsive CSS exists; full device matrix still requires browser verification |
-| F21 Auth | P1 | IMPLEMENTED foundation | JWT/bcrypt routes/services |
-| F22 Accessibility | P1 | IN DEVELOPMENT | labels/ARIA exist in core screens; full audit pending |
-| F23 URL Scanner | P1 | IMPLEMENTED foundation + structural evidence boundary | `/url-scanner`, `POST /api/scan/url`, deterministic URL analysis |
-| F24 Social verification | P2 | IMPLEMENTED first deterministic layer | `/verify`, `POST /api/verify/social` |
-| F25 Evidence/source display | P2 | PARTIAL | chatbot sources + verification registry; live evidence retrieval not implemented |
-| F26 RAG | P2 | PLANNED | not claimed as implemented |
-| F27 OCR/image scanning | P3 | PLANNED | not claimed as implemented |
-| F28 Voice | P3 | PLANNED | not claimed as implemented |
-| F29 Native mobile | P3 | PLANNED | responsive web/PWA is the current shared-code direction |
-| F30 Analytics | P3 | PLANNED | no fabricated metrics |
-| F31 AWS deployment | P1 | PLANNED/IN DEVELOPMENT | architecture selected; production deployment still needs real environment verification |
-| F34 Automated tests | P1 | IN DEVELOPMENT | chat tests + new core safety-service coverage; full feature matrix pending |
-| F35 Security testing | P1 | IN DEVELOPMENT | baseline middleware and secret rules exist; dedicated security test pass pending |
-| F36 Technical docs | P1 | IN PROGRESS | docs are being updated with implementation evidence |
-| F37 Community validation | P1 | PLANNED | must be supported by real survey/session evidence |
-| F38 Final demo | P0 | IN DEVELOPMENT | core journey pieces exist; end-to-end demo verification pending |
-| F39 Final report | P0 | PARTIAL | report draft exists outside repository; final report must match verified implementation |
-| F40 Implementation audit | P0 | IN PROGRESS | this document |
+| Feature | Current state | Evidence path |
+|---|---|---|
+| Frontend and backend foundation | Implemented | frontend/, backend/ |
+| MongoDB connection and safe synthetic CRUD smoke | Code implemented; real database run pending private test-only URI | backend/config/db.js, backend/scripts/mongodb-persistence-smoke.js |
+| Message and URL scanning | Deterministic triage; not a reputation verdict | backend/services/analysis/ |
+| Social claim check | Local claim triage plus candidate retrieval from official PIB press-release RSS; no social platform scraping and no truth verdict from keyword overlap | backend/services/verification/ |
+| Offline shell | Service worker caches app shell/static assets only and bypasses /api; Chromium offline smoke added to CI | frontend/public/sw.js, frontend/scripts/offline-browser-smoke.mjs |
+| Browser sizes | CI emulates 390px, 820px and 1440px layouts; physical device and assistive-technology checks remain open | .github/workflows/ci.yml |
+| Deployment | Docker Compose and AWS ECS Fargate templates/workflow added; no cloud resources deployed | Dockerfiles, docker-compose.yml, deployment/aws/ecs.yml, .github/workflows/aws-deploy.yml |
+| Multilingual UI | English, Telugu and Hindi strings cover shared navigation and home content; other page content remains partial | frontend/src/contexts/LanguageContext.jsx |
+| Accessibility | Core labels/ARIA remain; complete keyboard, contrast, screen-reader and device audit remains open | frontend/src/ |
+| Auth | JWT/bcrypt foundation with protected current-user and logout routes | backend/middleware/auth.js |
+| AI | Provider boundary, grounding and response-contract fallback | backend/controllers/chatController.js, backend/services/ai/ |
+| RAG, OCR, voice, native mobile and analytics | Planned; not claimed as implemented | docs/FUTURE_ROADMAP.md |
 
 ## Current architecture
 
-```text
-React/Vite responsive web
-        |
-        +--> ASK / Chat
-        +--> SCAN / Message + URL
-        +--> LEARN / Lessons + Quiz
-        +--> RESPOND / Incident Assistant
-        +--> VERIFY / Social claim triage
-        +--> GET HELP / Official resources
-        |
-        v
-Shared REST API
-        |
-        v
-Node + Express
-  |       |        |
-  |       |        +--> Safety / validation / rate limits
-  |       +-----------> Deterministic cyber analysis
-  +-------------------> AI provider boundary + grounded knowledge
-        |
-        v
-MongoDB Atlas (configured foundation; runtime verification pending)
-```
+React/Vite responsive web app → shared REST API → Node/Express safety and analysis services → MongoDB Atlas.
+
+The web container serves the SPA and proxies API paths in local Compose. AWS uses separate Fargate web/API services behind an HTTPS Application Load Balancer. Runtime secrets are referenced from AWS Secrets Manager.
 
 ## Important truth boundary
 
-The project currently has deterministic message/URL heuristics and a first social-claim verification layer. It does **not** yet have live browsing-based social verification, RAG/vector search, OCR, voice, or a native mobile client. Those remain separate until built and tested.
+The project provides deterministic message/URL heuristics and a social-claim triage layer. The PIB RSS adapter retrieves candidate press releases using local keyword overlap; it does not establish whether a claim is true or false. The application does not scrape social platforms. Offline app-shell support does not make API-backed actions available offline.
 
-## Latest build work
+## Latest implementation work
 
-- Added deterministic URL-analysis safety boundaries and removed the duplicate unused URL-scanner implementation.
-- Hardened message scanning so sensitive-value presence is flagged without returning the submitted message as analysis output.
-- Added automated coverage for message scanning, URL scanning, incident planning, and social-claim triage.
-- CI is scoped to `main` and `cyberrakshak-2.0-final` so feature-branch noise does not become part of the release workflow.
-- These changes are committed to `cyberrakshak-2.0-final`; runtime CI/browser results still require verification.
+- Added bounded retrieval from the official PIB press-release RSS feed, with a fixed source URL, HTTPS host validation, timeout, response-size cap, redirect rejection and a short in-memory feed cache.
+- Added a Chromium CI smoke script for mobile/tablet/desktop-sized viewports, service-worker cache activation, offline deep-link loading, and network-only API calls.
+- Added production Dockerfiles, local Compose health checks, NGINX SPA/API routing, ECS Fargate CloudFormation, and a manual GitHub OIDC deployment workflow.
+- Made the language selector persist safely and set the document language attribute.
+- Kept database, AWS and device acceptance statuses open until actual external results exist.
 
-## Immediate verification gate
+## Verification gate
 
-Before calling this release-ready:
-
-1. Run backend tests.
-2. Run frontend lint and production build.
-3. Start MongoDB-backed backend with a real non-secret configuration.
-4. Exercise message, URL, incident and social-verification APIs.
-5. Browser-test the core journey on phone/tablet/desktop sizes.
-6. Record evidence IDs for each completed acceptance criterion.
-7. Update this audit with actual results.
+The new work must pass branch CI, including backend tests, frontend lint/build, container builds and the Chromium smoke. A live MongoDB CRUD run still requires a new private test-only credential; AWS deployment requires an AWS account and protected GitHub environment; physical acceptance requires real target devices.
