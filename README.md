@@ -83,6 +83,8 @@ Before running it, set \`MONGODB_TEST_URI\` in \`backend/.env\` to a separate da
 - Never ask users to share passwords, one-time codes, PINs, CVVs, recovery codes, or API keys.
 - Treat scanner results as guidance, not proof that a message or URL is malicious or safe.
 - Clearly distinguish CyberRakshak guidance from official reporting and banking channels.
+- Chat, scanner, and incident histories are not persisted. If the chat detects a labeled secret, it uses the application fallback and does not forward that conversation to the configured AI provider; detection is pattern-based and cannot guarantee catching every secret.
+- Scam reports are stored in MongoDB. The form explains the stored fields; public case lookup returns only the case reference, status, and submission date. Submitting a report does not notify police, a bank, or a government agency.
 - Configure AI and MongoDB credentials only on the backend.
 - See [Security](docs/SECURITY.md), [API](docs/API.md), [AI workflow](docs/AI_WORKFLOW.md), and [database notes](docs/DATABASE.md).
 
