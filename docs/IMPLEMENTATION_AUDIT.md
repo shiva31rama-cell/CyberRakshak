@@ -14,7 +14,7 @@
 |---|---|---|
 | Frontend and backend foundation | Implemented | frontend/, backend/ |
 | MongoDB connection and safe synthetic CRUD smoke | Code implemented; live CRUD step skipped because the private MONGODB_TEST_URI Actions secret is missing | backend/config/db.js, backend/scripts/mongodb-persistence-smoke.js |
-| Report data privacy | New case references are random; public lookup exposes only reference/status/date; report form lists stored fields; retention/deletion policy remains open | backend/services/caseNumberService.js, backend/controllers/scamReportController.js, frontend/src/pages/ScamSolutions/ |
+| Report workflow and privacy | Random case references, status-only public lookup with a matching UI, report form disclosure, and API/model status agreement; retention/deletion policy remains open | backend/services/caseNumberService.js, backend/controllers/scamReportController.js, backend/models/ScamReport.js, frontend/src/pages/ScamSolutions/ |
 | Message and URL scanning | Deterministic triage; not a reputation verdict | backend/services/analysis/ |
 | Social claim check | Local claim triage plus official PIB RSS candidate retrieval displayed as safe linked leads; no social platform scraping and no truth verdict from keyword overlap | backend/services/verification/, frontend/src/pages/SocialVerification/ |
 | Offline shell | Service worker caches app shell/static assets only and bypasses /api; Chromium offline smoke passed | frontend/public/sw.js, frontend/scripts/offline-browser-smoke.mjs |
@@ -47,6 +47,7 @@ The project provides deterministic message/URL heuristics and a social-claim tri
 - Added production Dockerfiles, local Compose health checks, NGINX SPA/API routing, ECS Fargate CloudFormation, and a manual GitHub OIDC deployment workflow.
 - Prevented chat conversations containing pattern-detected labeled secrets from reaching the external AI provider and added a regression test.
 - Changed scam report references to random 128-bit values, removed personal details from public status lookups and submission responses, and disclosed stored report fields and reporting limits in the form.
+- Added a report-status lookup in the UI that shows only the case number, status and submission date; aligned report status validation between the API and model.
 - Connected the ASK actions in navigation, home and footer to the same chatbot; removed fake social links, unimplemented policy links, unsupported trust badges and hard-coded emergency contact claims from the footer.
 - Configured explicit trusted-proxy hop counts for local Compose and AWS ALB deployments and added rate limits to public scam-report and feedback endpoints.
 - Kept chat, scan and incident histories transient as the MVP privacy decision until consent, retention and deletion requirements are approved.
