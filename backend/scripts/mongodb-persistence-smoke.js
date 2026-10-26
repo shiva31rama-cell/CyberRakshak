@@ -1,9 +1,33 @@
-require("dotenv").config();
+require("dotenv").config({
+  path: require("node:path").join(__dirname, "..", ".env"),
+});
 
 const assert = require("node:assert/strict");
 const mongoose = require("mongoose");
 const { randomUUID } = require("node:crypto");
 const ScamReport = require("../models/ScamReport");
+
+function getDatabaseNames(uri) {
+  let parsedUri;
+  try {
+    parsedUri = new URL(uri);
+  } catch {
+    throw new Error("MONGODB_TEST_URI is not a valid MongoDB connection URI.");
+  }
+
+  if (!["mongodb:", "mongodb+srv:"].includes(parsedUri.protocol)) {
+    throw new Error("MONGODB_TEST_URI must use the mongodb or mongodb+srv protocol.");
+  }
+
+  const pathDatabaseName = decodeURIComponent(
+    parsedUri.pathname.replace(/^\/+/, "").split("/")[0] || ""
+  );
+  const dbNameOptions = [...parsedUri.searchParams.entries()]
+    .filter(([key]) => key.toLowerCase() === "dbname")
+    .map(([, value]) => value);
+
+  return [pathDatabaseName, ...dbNameOptions];
+}
 
 async function main() {
   const uri = process.env.MONGODB_TEST_URI;
@@ -14,22 +38,25 @@ async function main() {
     );
   }
 
-  let databaseName;
+  let databaseNames;
   try {
-    databaseName = decodeURIComponent(
-      new URL(uri).pathname.replace(/^\/+/, "").split("/")[0] || ""
-    );
-  } catch {
-    throw new Error("MONGODB_TEST_URI is not a valid connection URI.");
+    databaseNames = getDatabaseNames(uri);
+  } catch (error) {
+    throw error;
   }
 
-  // Refuse to run against the main application database by accident.
-  if (!databaseName || !/test/i.test(databaseName)) {
+  // Check every database name that could be selected from the URI so an
+  // override cannot redirect this script to a non-test database.
+  if (
+    databaseNames.length === 0 ||
+    databaseNames.some((name) => !name || !/test/i.test(name))
+  ) {
     throw new Error(
-      "Safety check failed: the database name must contain 'test'. Use a separate test database."
+      "Safety check failed: every database name in MONGODB_TEST_URI must include 'test'. Use a separate test database."
     );
   }
 
+  const databaseName = databaseNames[0];
   let createdId;
 
   try {
@@ -40,12 +67,12 @@ async function main() {
 
     const marker = randomUUID();
 
-    // CREATE: use synthetic data only; no real person's information.
+    // Synthetic values only; no real person's information is used.
     const created = await ScamReport.create({
-      reporterEmail: `db-test-${marker}@example.com`,
+      reporterEmail: "db-test-" + marker + "@example.com",
       reporterName: "CyberRakshak Database Test",
       scamType: "phishing",
-      scamDescription: `Synthetic MongoDB persistence test record: ${marker}`,
+      scamDescription: "Synthetic MongoDB persistence test record: " + marker,
       suspectDetails: marker,
       amountLost: 0,
     });
@@ -61,27 +88,29 @@ async function main() {
     // UPDATE: prove writes can modify an existing document.
     const updated = await ScamReport.findByIdAndUpdate(
       createdId,
-      { suspectDetails: `${marker}-updated` },
+      { suspectDetails: marker + "-updated" },
       { new: true, runValidators: true }
     ).lean();
 
     assert.equal(
       updated?.suspectDetails,
-      `${marker}-updated`,
+      marker + "-updated",
       "Updated value should be persisted"
     );
 
-    // DELETE: verify the document is no longer present.
+    // DELETE: verify only this script's synthetic document is removed.
     await ScamReport.deleteOne({ _id: createdId });
     const deleted = await ScamReport.findById(createdId).lean();
     assert.equal(deleted, null, "Deleted document should no longer exist");
 
     createdId = null;
     console.log(
-      `PASS: MongoDB CRUD (create/read/update/delete) verified on "${databaseName}".`
+      "PASS: MongoDB CRUD (create/read/update/delete) verified on \"" +
+        databaseName +
+        "\"."
     );
   } finally {
-    // Clean up any remaining test document, including after an assertion fails.
+    // Clean up only the document created by this run, including after failure.
     if (createdId && mongoose.connection.readyState === 1) {
       await ScamReport.deleteOne({ _id: createdId });
     }
@@ -93,7 +122,11 @@ async function main() {
 }
 
 main().catch((error) => {
-  // Do not print connection strings or other environment values.
-  console.error("MongoDB persistence test failed:", error.message);
+  // Never print an environment value or an unredacted MongoDB URI.
+  const message = String(error?.message || error).replace(
+    /mongodb(?:\+srv)?:\/\/[^\s"'<>]+/gi,
+    "[redacted MongoDB URI]"
+  );
+  console.error("MongoDB persistence test failed:", message);
   process.exitCode = 1;
 });
