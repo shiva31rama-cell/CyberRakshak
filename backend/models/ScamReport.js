@@ -86,9 +86,8 @@ const scamReportSchema = new mongoose.Schema(
 );
 
 // Case references are random because the public status lookup accepts them as bearer tokens.
-scamReportSchema.pre("save", function (next) {
+scamReportSchema.pre("save", function () {
   if (!this.caseNumber) this.caseNumber = createCaseNumber();
-  next();
 });
 
 const ScamReport = mongoose.model("ScamReport", scamReportSchema);
