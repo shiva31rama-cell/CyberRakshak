@@ -15,10 +15,11 @@
 | B11 | AWS deployment is not live | P1 | Configure protected GitHub environment and AWS resources, then deploy deliberately | DEPLOYMENT CODE READY; AWS ACCOUNT SETUP PENDING |
 | B12 | Final report must match verified software and evidence | P0 | Record CI result and external acceptance limits | UPDATED FROM VERIFIED EVIDENCE |
 | B13 | Offline shell needs browser verification | P1 | Install the production service worker, check offline navigation and confirm API requests are not cached | CHROMIUM SMOKE PASS IN RUN 40305712328; PHYSICAL DEVICE CHECK OPEN |
+| B14 | Automatic retention and backup purge policy for reports and feedback is not approved | P0 | Set a product retention period and verify database-backup expiry before production | OPEN; USER-INITIATED CASE-REFERENCE DELETION IMPLEMENTED |
 
 ## Privacy decision
 
-Chat transcripts, message/URL scan history, and incident action plans are not persisted. Keeping these sensitive histories transient is the MVP decision because no approved consent, access, retention, or deletion requirements exist. Scam reports and feedback are separate database-backed workflows and their stored fields are disclosed in the security documentation and report form.
+Chat transcripts, message/URL scan history, and incident action plans are not persisted. Keeping these sensitive histories transient is the MVP decision because no approved consent, access, retention, or deletion requirements exist. Scam reports and feedback are separate database-backed workflows and their stored fields are disclosed in the security documentation and report form. Reporters can delete the active scam-report record with the private case reference; automatic retention and backup purge behavior still need an approved production policy.
 
 ## Release-blocking rule
 

@@ -12,7 +12,7 @@ const scamReportSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide reporter email"],
       match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
         "Please provide a valid email",
       ],
     },

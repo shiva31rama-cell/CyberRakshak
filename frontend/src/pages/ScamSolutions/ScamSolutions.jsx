@@ -3,19 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../services/api";
 import "./ScamSolutions.css";
 
-function CaseStatusLookup({ initialCaseNumber = "" }) {
+function CaseStatusLookup({ initialCaseNumber = "", onDeleted }) {
   const [caseNumber, setCaseNumber] = useState(initialCaseNumber);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const checkStatus = async (event) => {
     event.preventDefault();
     setError("");
+    setNotice("");
     setStatus(null);
 
     const value = caseNumber.trim().toUpperCase();
-    if (!/^CASE-[A-Z0-9-]{1,40}$/.test(value)) {
+    if (!/^CASE-[A-F0-9]{32}$/.test(value)) {
       setError("Enter a valid CyberRakshak case number.");
       return;
     }
@@ -32,6 +35,34 @@ function CaseStatusLookup({ initialCaseNumber = "" }) {
     }
   };
 
+  const deleteReport = async () => {
+    if (!status?.caseNumber || deleting) return;
+    const confirmed = window.confirm(
+      "Delete this report from active CyberRakshak records? This cannot be undone. Backup copies, if any, may remain under the hosting provider's backup policy."
+    );
+    if (!confirmed) return;
+
+    setError("");
+    setNotice("");
+    setDeleting(true);
+    try {
+      await apiRequest("/scam-report/case/" + encodeURIComponent(status.caseNumber), {
+        method: "DELETE",
+      });
+      setStatus(null);
+      setCaseNumber("");
+      if (onDeleted) {
+        onDeleted();
+      } else {
+        setNotice("The report was deleted from active CyberRakshak records.");
+      }
+    } catch (deleteError) {
+      setError(deleteError.message || "Unable to delete this report right now.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const submittedAt = status?.reportedAt ? new Date(status.reportedAt) : null;
   const formattedDate = submittedAt && !Number.isNaN(submittedAt.getTime())
     ? submittedAt.toLocaleString()
@@ -41,8 +72,8 @@ function CaseStatusLookup({ initialCaseNumber = "" }) {
     <section className="case-lookup" aria-labelledby="case-lookup-title">
       <h2 id="case-lookup-title">Check a CyberRakshak report</h2>
       <p id="case-lookup-note">
-        Enter the case number to see its basic status. Anyone with this number can view that status,
-        so keep it private. This does not check an official police or government report.
+        Enter the private case reference to see the status. Anyone with the reference can view the status
+        or delete the active report, so keep it private. This is not an official police or government report.
       </p>
       <form className="case-lookup-form" onSubmit={checkStatus}>
         <div className="form-group">
@@ -50,25 +81,40 @@ function CaseStatusLookup({ initialCaseNumber = "" }) {
           <input
             id="case-number-lookup"
             value={caseNumber}
-            onChange={(event) => setCaseNumber(event.target.value.toUpperCase())}
+            onChange={(event) => {
+              setCaseNumber(event.target.value.toUpperCase());
+              setStatus(null);
+              setNotice("");
+              setError("");
+            }}
             placeholder="CASE-..."
             maxLength={45}
             autoComplete="off"
+            disabled={loading || deleting}
             aria-describedby="case-lookup-note"
             required
           />
         </div>
-        <button type="submit" className="link-btn" disabled={loading || !caseNumber.trim()}>
+        <button type="submit" className="link-btn" disabled={loading || deleting || !caseNumber.trim()}>
           {loading ? "Checking…" : "Check status"}
         </button>
       </form>
       {error && <p className="case-lookup-error" role="alert">{error}</p>}
+      {notice && <p className="case-lookup-notice" role="status">{notice}</p>}
       {status && (
         <div className="case-lookup-status" role="status" aria-live="polite">
           <h3>CyberRakshak report status</h3>
           <p><strong>Case number:</strong> {status.caseNumber}</p>
           <p><strong>Status:</strong> {String(status.status || "unknown").replaceAll("-", " ")}</p>
           <p><strong>Submitted:</strong> {formattedDate}</p>
+          <button
+            type="button"
+            className="link-btn case-lookup-delete"
+            onClick={deleteReport}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting…" : "Delete my report"}
+          </button>
         </div>
       )}
     </section>
@@ -82,6 +128,7 @@ function ScamSolutions() {
   const [caseNumber, setCaseNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [reportNotice, setReportNotice] = useState("");
 
   const handleChange = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -105,7 +152,15 @@ function ScamSolutions() {
   };
 
   if (submitted) {
-    return <div className="scam-container"><div className="success-message"><div className="success-icon">✅</div><h1>Report Submitted Successfully!</h1><p>Your report has been registered by CyberRakshak.</p><div className="case-info"><p>Case Number:</p><p className="case-number">{caseNumber}</p><p className="case-note">Save this number for future reference.</p></div><CaseStatusLookup initialCaseNumber={caseNumber} /><div className="next-steps"><h3>Important Next Steps:</h3><ul><li>Keep relevant transaction details and evidence.</li><li>If money was lost, contact your bank/payment provider immediately.</li><li>For cyber financial fraud in India, report immediately through 1930 or the National Cyber Crime Reporting Portal.</li><li>CyberRakshak is an assistance/education platform, not a replacement for police, bank, or government reporting.</li></ul></div><div className="success-actions"><button className="action-btn primary" onClick={() => navigate("/")}>Go to Home</button><button className="action-btn secondary" onClick={() => navigate("/emergency-help")}>Emergency Help</button></div></div></div>;
+    return <div className="scam-container"><div className="success-message"><div className="success-icon">✅</div><h1>Report Submitted Successfully!</h1><p>Your report has been registered by CyberRakshak.</p><div className="case-info"><p>Case Number:</p><p className="case-number">{caseNumber}</p><p className="case-note">Save this number for future reference.</p></div><CaseStatusLookup
+        initialCaseNumber={caseNumber}
+        onDeleted={() => {
+          setSubmitted(false);
+          setCaseNumber("");
+          setFormData({ reporterName: "", reporterEmail: "", reporterPhone: "", scamType: "", scamDescription: "", suspectDetails: "", amountLost: "" });
+          setReportNotice("Your report was deleted from active CyberRakshak records. Backup copies, if any, may remain under the hosting provider's backup policy.");
+        }}
+      /><div className="next-steps"><h3>Important Next Steps:</h3><ul><li>Keep relevant transaction details and evidence.</li><li>If money was lost, contact your bank/payment provider immediately.</li><li>For cyber financial fraud in India, report immediately through 1930 or the National Cyber Crime Reporting Portal.</li><li>CyberRakshak is an assistance/education platform, not a replacement for police, bank, or government reporting.</li></ul></div><div className="success-actions"><button className="action-btn primary" onClick={() => navigate("/")}>Go to Home</button><button className="action-btn secondary" onClick={() => navigate("/emergency-help")}>Emergency Help</button></div></div></div>;
   }
 
   return (
@@ -113,6 +168,7 @@ function ScamSolutions() {
       <button className="back-button" onClick={() => navigate("/")}>← Back to Home</button>
       <div className="scam-header"><h1>⚠️ Report a Scam</h1><p>Document suspected fraudulent activity and get guidance on next steps.</p></div>
       <div className="scam-content">
+        {reportNotice && <p className="case-lookup-notice" role="status">{reportNotice}</p>}
         <div className="info-banner" role="note"><p><strong>Before you submit:</strong> CyberRakshak stores your name, email, optional phone, report description, suspect details, and amount lost so authorized administrators can manage the report.</p><p>Submitting here does not notify police, your bank, or a government agency. Use official channels for urgent reporting. Never include passwords, OTPs, PINs, CVVs, API keys, or other authentication secrets.</p></div>
         <form onSubmit={handleSubmit} className="scam-form">
           <section className="form-section"><h2>Your Information</h2><div className="form-group"><label htmlFor="reporterName">Full Name *</label><input type="text" id="reporterName" name="reporterName" value={formData.reporterName} onChange={handleChange} placeholder="Enter your full name" maxLength="100" required /></div><div className="form-row"><div className="form-group"><label htmlFor="reporterEmail">Email Address *</label><input type="email" id="reporterEmail" name="reporterEmail" value={formData.reporterEmail} onChange={handleChange} placeholder="your@email.com" maxLength="254" required /></div><div className="form-group"><label htmlFor="reporterPhone">Phone Number</label><input type="tel" id="reporterPhone" name="reporterPhone" value={formData.reporterPhone} onChange={handleChange} placeholder="10-digit phone number" maxLength="20" /></div></div></section>

@@ -34,7 +34,7 @@ Technical logs should not contain these values or raw sensitive incident details
 
 Scam reports are stored in MongoDB with the reporter's name, email, optional phone, scam type, description, suspect details, and amount lost. Authorized administrators and an authenticated report owner can retrieve a full report. The public case-number lookup returns only the case reference, status, and submission date. Newly created case references use random 128-bit values.
 
-Submitting a report in CyberRakshak does not send it to police, a bank, or a government agency. Retention and deletion controls for stored reports still need an approved product policy and implementation.
+Submitting a report in CyberRakshak does not send it to police, a bank, or a government agency. Anyone with the random case reference can see the limited status and request deletion of the active record; the interface warns users to keep the reference private. This does not guarantee immediate deletion from database backups. Automatic retention periods and backup deletion behavior still need an approved policy and hosting configuration before production.
 
 ## Environment variables
 

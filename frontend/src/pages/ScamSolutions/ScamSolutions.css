@@ -450,3 +450,26 @@
     grid-template-columns: 1fr;
   }
 }
+
+.case-lookup-delete {
+  margin-top: 0.5rem;
+  background: #b42318;
+}
+
+.case-lookup-delete:hover:not(:disabled) {
+  background: #8f1b13;
+}
+
+.case-lookup-delete:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.case-lookup-notice {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #2e7d32;
+  border-radius: 6px;
+  background: #e8f5e9;
+  color: #1b5e20;
+}

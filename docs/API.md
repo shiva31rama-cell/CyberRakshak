@@ -118,6 +118,17 @@ Returns basic API health. Full backend startup still requires a configured MONGO
 - Authentication secrets are server-side only.
 - The application must never ask users to submit passwords, OTPs, PINs, CVVs, recovery codes or API keys.
 
+## Scam reports
+
+- `POST /scam-report` creates a report and returns a random case reference.
+- `GET /scam-report/case/{caseNumber}` returns only the case reference, status and submission date.
+- `DELETE /scam-report/case/{caseNumber}` deletes the active report record. The case reference is a bearer token: anyone who has it can view status or request deletion. The response does not return report details.
+- `GET /scam-report?page=1&limit=20` is administrator-only and returns a paginated report list. The limit is capped at 100.
+- `GET /scam-report/user/{userId}?page=1&limit=20` requires authentication and allows the report owner or an administrator.
+- `PATCH /scam-report/{id}` is administrator-only. Supported statuses are `new`, `under-investigation`, `resolved` and `closed`.
+
+Deletion removes the report from active application records. Backup retention depends on the configured MongoDB hosting policy and must be reviewed before production.
+
 ## Future API surfaces
 
 These remain separate until implemented and tested:
