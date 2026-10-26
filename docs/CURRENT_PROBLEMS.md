@@ -2,7 +2,7 @@
 
 | ID | Problem or gap | Priority | Action | Status |
 |---|---|---:|---|---|
-| B01 | MongoDB persistence is not yet proven end-to-end | S1/P0 | Connect Atlas, exercise CRUD, record evidence | OPEN |
+| B01 | MongoDB persistence is not yet proven end-to-end | S1/P0 | Configure a separate Atlas test database, run `npm run test:db`, and record the result | CRUD TEST HARNESS ADDED; ATLAS VERIFICATION PENDING |
 | B02 | Analysis/incident history persistence is absent | P1 | Add minimal safe metadata models and retention rules | OPEN |
 | B03 | Full multilingual switching is not implemented | P1 | Add language state and reusable content keys | IN DEVELOPMENT |
 | B04 | Full accessibility matrix is not verified | P1 | Keyboard/focus/labels/contrast/screen-size audit | IN DEVELOPMENT |
