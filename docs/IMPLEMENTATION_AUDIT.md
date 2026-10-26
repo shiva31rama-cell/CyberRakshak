@@ -15,7 +15,7 @@
 | F01 Architecture | P0 | IMPLEMENTED foundation | `frontend/`, `backend/`, `docs/` |
 | F02 Frontend foundation | P0 | IMPLEMENTED | React/Vite routes and shared UI |
 | F03 Backend foundation | P0 | IMPLEMENTED | Express server and routes |
-| F04 MongoDB | P0 | PARTIALLY IMPLEMENTED | `backend/config/db.js`; end-to-end persistence still needs runtime verification |
+| F04 MongoDB | P0 | PARTIALLY IMPLEMENTED | `backend/config/db.js`, `backend/scripts/mongodb-persistence-smoke.js`; live Atlas CRUD execution still needs verification |
 | F05 Env/secrets | P0 | IMPLEMENTED foundation | `.gitignore`, `.env.example` files |
 | F06 Home | P0 | IMPLEMENTED | `frontend/src/pages/Home/Home.jsx` |
 | F07 Navigation/routing | P0 | IMPLEMENTED foundation | `frontend/src/App.jsx`, Navbar |
@@ -95,7 +95,7 @@ Before calling this release-ready:
 
 1. Run backend tests.
 2. Run frontend lint and production build.
-3. Start MongoDB-backed backend with a real non-secret configuration.
+3. Start MongoDB-backed backend with a real non-secret configuration and run `npm run test:db` using a dedicated `MONGODB_TEST_URI` database.
 4. Exercise message, URL, incident and social-verification APIs.
 5. Browser-test the core journey on phone/tablet/desktop sizes.
 6. Record evidence IDs for each completed acceptance criterion.
