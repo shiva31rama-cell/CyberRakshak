@@ -69,3 +69,11 @@ test("public case lookup returns status only and never exposes report personal d
   });
   assert.doesNotMatch(JSON.stringify(result.payload), /private@example\.test|Synthetic Reporter|private report details/i);
 });
+
+
+test("report model accepts every status exposed by the report API", () => {
+  const modelStatuses = ScamReport.schema.path("status").enumValues;
+  for (const status of ["new", "under-investigation", "resolved"]) {
+    assert.ok(modelStatuses.includes(status), `The report model must accept the API status: ${status}`);
+  }
+});
