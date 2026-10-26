@@ -38,18 +38,18 @@ jobs:
       - run: node -c services/ai/chatResponseContract.js
       - run: node -c scripts/mongodb-persistence-smoke.js
       - run: npm test
+      - name: Build backend container image
+        working-directory: .
+        run: docker build -f backend/Dockerfile -t cyberrakshak-api:ci .
       - name: Optional MongoDB persistence integration
         env:
-          MONGODB_TEST_URI: __DOLLAR__{{ secrets.MONGODB_TEST_URI }}
+          MONGODB_TEST_URI: ${{ secrets.MONGODB_TEST_URI }}
         run: |
           if [ -n "$MONGODB_TEST_URI" ]; then
             npm run test:db
           else
             echo "SKIP: MONGODB_TEST_URI secret is not configured; live MongoDB CRUD was not tested."
           fi
-      - name: Build backend container image
-        working-directory: .
-        run: docker build -f backend/Dockerfile -t cyberrakshak-api:ci .
 
   frontend-check:
     runs-on: ubuntu-latest
@@ -86,5 +86,5 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
       - name: Build frontend container image
-        working-directory: ..
+        working-directory: .
         run: docker build -f frontend/Dockerfile -t cyberrakshak-web:ci .
