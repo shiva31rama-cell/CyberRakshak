@@ -1,6 +1,6 @@
 const KNOWLEDGE_BASE = require("../data/cyberKnowledge");
 const { classify } = require("../services/ai/cyberRelevanceService");
-const { containsSensitiveSecret, safetyInstruction } = require("../services/safety/sensitiveInputService");
+const { containsSensitiveSecret } = require("../services/safety/sensitiveInputService");
 const aiService = require("../services/ai/aiService");
 const { validateChatResponse } = require("../services/ai/chatResponseContract");
 
@@ -144,12 +144,11 @@ exports.chat = async (req, res) => {
       return sendValidatedChatResponse(res, { success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", intent: "non_cyber", incidentType: null, triageStage: "general", sources: [] }, normalized);
     }
 
-    const secretWarning = safetyInstruction(normalized);
     const triageHint = incidentType
       ? `Incident category: ${incidentType}. Current triage stage: ${triageStage}. Continue from this stage; do not repeat answered questions.`
       : "If this is an incident, identify its category and ask only the most useful next question.";
     const systemPrompt = process.env.AI_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT;
-    const providerMessages = [{ role: "system", content: `${systemPrompt}\n${triageHint}\n${secretWarning}${formatGroundingForModel(grounding)}` }, ...safeMessages];
+    const providerMessages = [{ role: "system", content: `${systemPrompt}\n${triageHint}${formatGroundingForModel(grounding)}` }, ...safeMessages];
 
     if (!process.env.AI_API_KEY || !process.env.AI_API_URL || !process.env.AI_MODEL) {
       return sendValidatedChatResponse(res, { success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources }, normalized);
