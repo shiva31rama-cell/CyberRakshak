@@ -118,6 +118,8 @@ Resources:
               Value: production
             - Name: PORT
               Value: "5000"
+            - Name: TRUST_PROXY_HOPS
+              Value: "1"
             - Name: FRONTEND_URL
               Value:
                 Ref: FrontendOrigin
