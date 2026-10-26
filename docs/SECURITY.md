@@ -13,6 +13,7 @@
 - Pattern-based secret detection that keeps detected chat conversations on the application fallback instead of forwarding them to the configured AI provider
 - Fail-safe AI provider fallback
 - Centralized Express error response
+- Explicit trusted-proxy configuration and rate limits for public report/feedback writes
 
 ## Sensitive information
 
