@@ -88,6 +88,24 @@ try {
   assert.equal(await chatInput.evaluate((element) => element === document.activeElement), true, "Footer Ask should open and focus the assistant");
   await page.getByRole("button", { name: "Close CyberRakshak AI" }).click();
 
+  await page.route("**/scam-report/case/**", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({
+      success: true,
+      report: {
+        caseNumber: "CASE-" + "A".repeat(32),
+        status: "under-investigation",
+        reportedAt: "2026-01-01T12:00:00.000Z",
+      },
+    }),
+  }));
+  await page.goto(new URL("/report-scam", baseUrl).href, { waitUntil: "domcontentloaded" });
+  await page.getByLabel("CyberRakshak case number").fill("CASE-" + "A".repeat(32));
+  await page.getByRole("button", { name: "Check status" }).click();
+  await page.getByText("under investigation").waitFor();
+  assert.equal(await page.locator(".case-lookup-status").isVisible(), true, "The safe report status should be shown");
+
   const apiWasCached = await page.evaluate(async () => {
     const names = await caches.keys();
     const requests = [];
