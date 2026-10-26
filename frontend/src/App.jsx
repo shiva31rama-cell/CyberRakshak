@@ -35,8 +35,9 @@ function App() {
         <ErrorBoundary>
           <div className="app">
             <OfflineNotice />
+            <a className="skip-link" href="#main-content">Skip to main content</a>
             <Navbar />
-            <main className="app-main">
+            <main className="app-main" id="main-content" tabIndex="-1">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
