@@ -13,10 +13,10 @@
 | Feature | Current state | Evidence path |
 |---|---|---|
 | Frontend and backend foundation | Implemented | frontend/, backend/ |
-| MongoDB connection and safe synthetic CRUD smoke | Code implemented; real database run pending private test-only URI | backend/config/db.js, backend/scripts/mongodb-persistence-smoke.js |
+| MongoDB connection and safe synthetic CRUD smoke | Code implemented; live CRUD step skipped because the private MONGODB_TEST_URI Actions secret is missing | backend/config/db.js, backend/scripts/mongodb-persistence-smoke.js |
 | Message and URL scanning | Deterministic triage; not a reputation verdict | backend/services/analysis/ |
-| Social claim check | Local claim triage plus candidate retrieval from official PIB press-release RSS; no social platform scraping and no truth verdict from keyword overlap | backend/services/verification/ |
-| Offline shell | Service worker caches app shell/static assets only and bypasses /api; Chromium offline smoke added to CI | frontend/public/sw.js, frontend/scripts/offline-browser-smoke.mjs |
+| Social claim check | Local claim triage plus PIB RSS candidate retrieval; no social platform scraping and no truth verdict from keyword overlap | backend/services/verification/ |
+| Offline shell | Service worker caches app shell/static assets only and bypasses /api; Chromium offline smoke passed | frontend/public/sw.js, frontend/scripts/offline-browser-smoke.mjs |
 | Browser sizes | CI emulates 390px, 820px and 1440px layouts; physical device and assistive-technology checks remain open | .github/workflows/ci.yml |
 | Deployment | Docker Compose and AWS ECS Fargate templates/workflow added; no cloud resources deployed | Dockerfiles, docker-compose.yml, deployment/aws/ecs.yml, .github/workflows/aws-deploy.yml |
 | Multilingual UI | English, Telugu and Hindi strings cover shared navigation and home content; other page content remains partial | frontend/src/contexts/LanguageContext.jsx |
@@ -41,8 +41,10 @@ The project provides deterministic message/URL heuristics and a social-claim tri
 - Added a Chromium CI smoke script for mobile/tablet/desktop-sized viewports, service-worker cache activation, offline deep-link loading, and network-only API calls.
 - Added production Dockerfiles, local Compose health checks, NGINX SPA/API routing, ECS Fargate CloudFormation, and a manual GitHub OIDC deployment workflow.
 - Made the language selector persist safely and set the document language attribute.
-- Kept database, AWS and device acceptance statuses open until actual external results exist.
+- Recorded the live MongoDB, AWS, physical-device and assistive-technology checks as external work until those environments are available.
 
-## Verification gate
+## Verification evidence
 
-The new work must pass branch CI, including backend tests, frontend lint/build, container builds and the Chromium smoke. A live MongoDB CRUD run still requires a new private test-only credential; AWS deployment requires an AWS account and protected GitHub environment; physical acceptance requires real target devices.
+GitHub Actions run [40257551617](https://github.com/shiva31rama-cell/CyberRakshak/actions/runs/40257551617), for commit da8e015ac8843e69410c67c2c6410a6334d62967, completed successfully on 2026-10-26. Backend syntax checks, backend tests, backend container build, frontend lint/build, Chromium responsive/offline smoke, and frontend container build passed. The optional MongoDB step explicitly skipped because the MONGODB_TEST_URI secret was not configured; live database CRUD is therefore unverified.
+
+A live MongoDB CRUD run still requires a new private test-only credential. AWS deployment requires an AWS account, protected GitHub environment and the documented network/resources. Physical acceptance requires real target devices and assistive-technology testing. No cloud resources were deployed.
