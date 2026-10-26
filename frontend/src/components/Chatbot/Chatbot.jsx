@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { sendChatMessage } from "../../services/chatService";
 import "./Chatbot.css";
 
@@ -17,6 +17,12 @@ const stageLabels = {
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const openChat = () => setIsOpen(true);
+    window.addEventListener("cyberrakshak:open-chat", openChat);
+    return () => window.removeEventListener("cyberrakshak:open-chat", openChat);
+  }, []);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -60,11 +66,11 @@ function Chatbot() {
 
   return (
     <div className={`chatbot-container ${isOpen ? "open" : ""}`}>
-      <button type="button" className="chatbot-toggle" aria-label={isOpen ? "Close CyberRakshak AI" : "Open CyberRakshak AI"} aria-expanded={isOpen} onClick={() => setIsOpen((open) => !open)}>
+      <button type="button" className="chatbot-toggle" aria-label={isOpen ? "Close CyberRakshak AI" : "Open CyberRakshak AI"} aria-expanded={isOpen} aria-controls="cyberrakshak-chat-window" onClick={() => setIsOpen((open) => !open)}>
         {isOpen ? "✖️" : "💬"}
       </button>
 
-      <section className={`chatbot-window ${isOpen ? "active" : ""}`} aria-label="CyberRakshak AI chat">
+      <section id="cyberrakshak-chat-window" className={`chatbot-window ${isOpen ? "active" : ""}`} aria-label="CyberRakshak AI chat">
         <header className="chatbot-header">
           <h3>🤖 CyberRakshak AI</h3>
           <p>Your friendly cyber-safety guide</p>
