@@ -52,14 +52,17 @@ function Navbar() {
   useEffect(() => {
     if (!isOpen) return undefined;
 
-    firstMenuLinkRef.current?.focus();
+    const focusFrame = window.requestAnimationFrame(() => firstMenuLinkRef.current?.focus());
     const closeOnEscape = (event) => {
       if (event.key !== "Escape") return;
       setIsOpen(false);
       menuButtonRef.current?.focus();
     };
     window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
   }, [isOpen]);
 
   return (
