@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { createCaseNumber } = require("../services/caseNumberService");
 
 const scamReportSchema = new mongoose.Schema(
   {
@@ -84,12 +85,9 @@ const scamReportSchema = new mongoose.Schema(
   }
 );
 
-// Generate case number before saving
-scamReportSchema.pre("save", async function (next) {
-  if (!this.caseNumber) {
-    const count = await mongoose.model("ScamReport").countDocuments();
-    this.caseNumber = `CASE-${Date.now()}-${count + 1}`;
-  }
+// Case references are random because the public status lookup accepts them as bearer tokens.
+scamReportSchema.pre("save", function (next) {
+  if (!this.caseNumber) this.caseNumber = createCaseNumber();
   next();
 });
 
