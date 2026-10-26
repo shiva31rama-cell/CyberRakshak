@@ -25,7 +25,9 @@ function Chatbot() {
     return () => window.removeEventListener("cyberrakshak:open-chat", openChat);
   }, []);
   useEffect(() => {
-    if (isOpen) inputRef.current?.focus();
+    if (!isOpen) return undefined;
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 50);
+    return () => window.clearTimeout(focusTimer);
   }, [isOpen]);
   const [messages, setMessages] = useState([
     {
