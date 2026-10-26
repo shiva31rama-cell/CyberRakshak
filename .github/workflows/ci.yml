@@ -22,6 +22,7 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: backend/package-lock.json
+      - run: npm ci --prefix ..
       - run: npm ci
       - run: node -c server.js
       - run: node -c controllers/chatController.js
