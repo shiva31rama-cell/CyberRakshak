@@ -10,7 +10,7 @@
 - Scanner rate limiting
 - JWT/bcrypt authentication foundation
 - Backend-only AI credentials
-- Shared sensitive-input detection for the assistant
+- Pattern-based secret detection that keeps detected chat conversations on the application fallback instead of forwarding them to the configured AI provider
 - Fail-safe AI provider fallback
 - Centralized Express error response
 
@@ -27,7 +27,13 @@ CyberRakshak must never ask users to submit:
 - API keys
 - authentication tokens
 
-Technical logs should not contain these values or raw sensitive incident details.
+Technical logs should not contain these values or raw sensitive incident details. Secret detection is pattern-based and cannot guarantee detection of every secret, so the interface must continue warning users not to submit any authentication secret.
+
+## Report storage and case lookup
+
+Scam reports are stored in MongoDB with the reporter's name, email, optional phone, scam type, description, suspect details, and amount lost. Authorized administrators and an authenticated report owner can retrieve a full report. The public case-number lookup returns only the case reference, status, and submission date. Newly created case references use random 128-bit values.
+
+Submitting a report in CyberRakshak does not send it to police, a bank, or a government agency. Retention and deletion controls for stored reports still need an approved product policy and implementation.
 
 ## Environment variables
 
@@ -50,7 +56,7 @@ Risk levels describe observable indicators and should not be presented as legal 
 ## Future review items
 
 - Secure token-storage strategy documentation
-- Analysis-history deletion/privacy controls
+- Consent, access, retention and deletion controls before any future analysis-history persistence
 - URL-scanner threat-intelligence verification
 - Image-processing isolation
 - Dependency vulnerability review
