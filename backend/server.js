@@ -45,6 +45,7 @@ app.use("/api/scam-report", createLimiter(15, "Too many report requests. Please 
 app.use("/api/feedback", createLimiter(30, "Too many feedback requests. Please try again later."));
 
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/trust", require("./routes/trust"));
 app.use("/api/chat", require("./routes/chat"));
 app.use("/api/scan", require("./routes/scan"));
 app.use("/api/scan/url", require("./routes/urlScan"));
