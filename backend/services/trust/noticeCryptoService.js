@@ -8,6 +8,7 @@ const {
 } = require("node:crypto");
 
 const KEY_ID = process.env.NOTICE_SIGNING_KEY_ID || "cyberrakshak-demo-key-v1";
+const publicKeyRegistry = new Map();
 
 function canonicalize(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalize).join(",")}]`;
@@ -42,9 +43,26 @@ function getPrivateKey() {
   return createPrivateKey(pem.replace(/\\n/g, "\n"));
 }
 
-function getPublicKey() {
+function getPublicKey(keyId = KEY_ID) {
+  const registered = publicKeyRegistry.get(keyId);
+  if (registered) return registered;
   const pem = process.env.NOTICE_SIGNING_PUBLIC_KEY;
-  if (pem) return createPublicKey(pem.replace(/\\n/g, "\n"));
+  if (!pem) {
+    const error = new Error("Notice verification public key is not configured");
+    error.status = 503;
+    throw error;
+  }
+  return createPublicKey(pem.replace(/\\n/g, "\n"));
+}
+
+function registerPublicKey(keyId, publicKeyPem) {
+  if (!keyId || typeof keyId !== "string" || !publicKeyPem) {
+    throw new TypeError("A key ID and PEM public key are required");
+  }
+  publicKeyRegistry.set(keyId, createPublicKey(publicKeyPem));
+}
+
+function getPublicKeyFromPrivate() {
   return createPublicKey(getPrivateKey());
 }
 
@@ -66,12 +84,13 @@ function signNotice(notice) {
     payload,
   });
   const signature = sign(null, Buffer.from(envelope, "utf8"), getPrivateKey()).toString("base64");
+  registerPublicKey(KEY_ID, getPublicKeyFromPrivate());
   return { contentDigest: digest, signature, keyId: KEY_ID, signatureAlgorithm: "Ed25519" };
 }
 
 function verifyNotice(notice) {
   if (!notice?.contentDigest || !notice?.signature || !notice?.keyId || !notice?.signatureAlgorithm) return false;
-  if (notice.signatureAlgorithm !== "Ed25519" || notice.keyId !== KEY_ID) return false;
+  if (notice.signatureAlgorithm !== "Ed25519") return false;
   const payload = canonicalize(getSignedFields(notice));
   const digest = createHash("sha256").update(payload, "utf8").digest("hex");
   if (digest !== notice.contentDigest) return false;
@@ -82,10 +101,10 @@ function verifyNotice(notice) {
     payload,
   });
   try {
-    return verify(null, Buffer.from(envelope, "utf8"), getPublicKey(), Buffer.from(notice.signature, "base64"));
+    return verify(null, Buffer.from(envelope, "utf8"), getPublicKey(notice.keyId), Buffer.from(notice.signature, "base64"));
   } catch {
     return false;
   }
 }
 
-module.exports = { canonicalize, getSignedFields, signNotice, verifyNotice, createDevelopmentKeyPair, KEY_ID };
+module.exports = { canonicalize, getSignedFields, signNotice, verifyNotice, createDevelopmentKeyPair, registerPublicKey, KEY_ID };
