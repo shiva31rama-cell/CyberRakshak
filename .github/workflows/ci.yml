@@ -25,6 +25,9 @@ jobs:
       - run: npm ci --prefix ..
       - run: npm ci
       - run: node -c server.js
+      - run: node -c controllers/trustController.js
+      - run: node -c services/trust/noticeService.js
+      - run: node -c services/trust/noticeCryptoService.js
       - run: node -c controllers/chatController.js
       - run: node -c controllers/scanController.js
       - run: node -c controllers/urlScanController.js
