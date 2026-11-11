@@ -41,6 +41,7 @@ jobs:
       - run: node -c services/ai/chatResponseContract.js
       - run: node -c scripts/mongodb-persistence-smoke.js
       - run: npm test
+      - run: npm run test:trust
       - name: Build backend container image
         working-directory: .
         run: docker build -f backend/Dockerfile -t cyberrakshak-api:ci .
