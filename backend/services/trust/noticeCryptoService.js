@@ -1,11 +1,4 @@
-const {
-  createPrivateKey,
-  createPublicKey,
-  generateKeyPairSync,
-  sign,
-  verify,
-  createHash,
-} = require("node:crypto");
+const { createPrivateKey, createPublicKey, generateKeyPairSync, sign, verify, createHash } = require("node:crypto");
 
 const KEY_ID = process.env.NOTICE_SIGNING_KEY_ID || "cyberrakshak-demo-key-v1";
 const publicKeyRegistry = new Map();
@@ -16,6 +9,10 @@ function canonicalize(value) {
     return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalize(value[key])}`).join(",")}}`;
   }
   return JSON.stringify(value);
+}
+
+function readPem(value) {
+  return typeof value === "string" ? value.replace(/\\n/g, "\n") : value;
 }
 
 function getSignedFields(notice) {
@@ -35,35 +32,24 @@ function getSignedFields(notice) {
 
 function getPrivateKey() {
   const pem = process.env.NOTICE_SIGNING_PRIVATE_KEY;
-  if (!pem) {
-    const error = new Error("Notice signing is not configured");
-    error.status = 503;
-    throw error;
-  }
-  return createPrivateKey(pem.replace(/\\n/g, "\n"));
-}
-
-function getPublicKey(keyId = KEY_ID) {
-  const registered = publicKeyRegistry.get(keyId);
-  if (registered) return registered;
-  const pem = process.env.NOTICE_SIGNING_PUBLIC_KEY;
-  if (!pem) {
-    const error = new Error("Notice verification public key is not configured");
-    error.status = 503;
-    throw error;
-  }
-  return createPublicKey(pem.replace(/\\n/g, "\n"));
+  if (!pem) throw Object.assign(new Error("Notice signing is not configured"), { status: 503 });
+  return createPrivateKey(readPem(pem));
 }
 
 function registerPublicKey(keyId, publicKeyPem) {
   if (!keyId || typeof keyId !== "string" || !publicKeyPem) {
     throw new TypeError("A key ID and PEM public key are required");
   }
-  publicKeyRegistry.set(keyId, createPublicKey(publicKeyPem));
+  publicKeyRegistry.set(keyId, createPublicKey(readPem(publicKeyPem)));
 }
 
-function getPublicKeyFromPrivate() {
-  return createPublicKey(getPrivateKey());
+function getPublicKey(keyId) {
+  if (publicKeyRegistry.has(keyId)) return publicKeyRegistry.get(keyId);
+  if (keyId === KEY_ID && process.env.NOTICE_SIGNING_PUBLIC_KEY) {
+    registerPublicKey(keyId, process.env.NOTICE_SIGNING_PUBLIC_KEY);
+    return publicKeyRegistry.get(keyId);
+  }
+  throw Object.assign(new Error("Notice verification key is unavailable"), { status: 503 });
 }
 
 function createDevelopmentKeyPair() {
@@ -83,21 +69,24 @@ function signNotice(notice) {
     contentDigest: digest,
     payload,
   });
-  const signature = sign(null, Buffer.from(envelope, "utf8"), getPrivateKey()).toString("base64");
-  registerPublicKey(KEY_ID, getPublicKeyFromPrivate());
+  const privateKey = getPrivateKey();
+  const signature = sign(null, Buffer.from(envelope, "utf8"), privateKey).toString("base64");
+  const publicKeyPem = createPublicKey(privateKey).export({ type: "spki", format: "pem" });
+  registerPublicKey(KEY_ID, publicKeyPem);
   return { contentDigest: digest, signature, keyId: KEY_ID, signatureAlgorithm: "Ed25519" };
 }
 
 function verifyNotice(notice) {
-  if (!notice?.contentDigest || !notice?.signature || !notice?.keyId || !notice?.signatureAlgorithm) return false;
-  if (notice.signatureAlgorithm !== "Ed25519") return false;
+  if (!notice?.contentDigest || !notice?.signature || !notice?.keyId || notice.signatureAlgorithm !== "Ed25519") {
+    return false;
+  }
   const payload = canonicalize(getSignedFields(notice));
   const digest = createHash("sha256").update(payload, "utf8").digest("hex");
   if (digest !== notice.contentDigest) return false;
   const envelope = canonicalize({
     keyId: notice.keyId,
     signatureAlgorithm: notice.signatureAlgorithm,
-    contentDigest: notice.contentDigest,
+    contentDigest: digest,
     payload,
   });
   try {
