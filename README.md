@@ -91,3 +91,16 @@ Before running it, set \`MONGODB_TEST_URI\` in \`backend/.env\` to a separate da
 ## Current limitations
 
 Production deployment and live MongoDB persistence have not been verified by this repository change. AI chat depends on a correctly configured provider; deterministic analysis and the safe fallback remain available when it is not configured. Features listed in the roadmap are not represented as complete.
+
+
+## Campus TrustDesk (experimental branch)
+
+The branch `feat/campus-trustdesk-mvp` introduces the initial Campus TrustDesk design and backend foundations. It adds organisation/membership/notice/audit models and an Ed25519 notice-signing service. This is an early development slice, not a complete or production-ready campus verification service.
+
+The organisation created through the current API remains `pending`; it cannot publish until institutional verification and membership provisioning are performed through a trusted administrative process. Do not place a real campus signing key in Git or share it in chat.
+
+See:
+- [Campus TrustDesk product specification](docs/CAMPUS_TRUSTDESK_PRODUCT_SPEC.md)
+- [Research evidence register](docs/RESEARCH_EVIDENCE_REGISTER.md)
+- [Implementation plan](docs/IMPLEMENTATION_PLAN_CAMPUS_TRUSTDESK.md)
+- [Baseline audit](docs/BASELINE_AUDIT_2026-11-11.md)
