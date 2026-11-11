@@ -104,3 +104,8 @@ See:
 - [Research evidence register](docs/RESEARCH_EVIDENCE_REGISTER.md)
 - [Implementation plan](docs/IMPLEMENTATION_PLAN_CAMPUS_TRUSTDESK.md)
 - [Baseline audit](docs/BASELINE_AUDIT_2026-11-11.md)
+
+
+## Development status — Campus TrustDesk
+
+A separate experimental branch, `feat/campus-trustdesk-mvp`, contains the initial research register, product specification, baseline audit, proposed data models and first backend implementation slice for signed campus notices. This is not yet a production-ready or fully verified workflow. The next gates are multi-key public-key registry/rotation, trusted organisation verification and provisioning, stronger tenant-isolation tests, full backend/frontend CI, and a real end-to-end demo using synthetic data only.
