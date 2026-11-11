@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const translations = {
   en: {
@@ -32,17 +32,41 @@ const translations = {
 
 const LanguageContext = createContext(null);
 
+function readLanguagePreference() {
+  try {
+    const value = window.localStorage.getItem("cyberrakshak:language");
+    return ["en", "te", "hi"].includes(value) ? value : "en";
+  } catch {
+    return "en";
+  }
+}
+
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => localStorage.getItem("cyberrakshak:language") || "en");
+  const [language, setLanguage] = useState(readLanguagePreference);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
   const changeLanguage = (value) => {
     const next = ["en", "te", "hi"].includes(value) ? value : "en";
     setLanguage(next);
-    localStorage.setItem("cyberrakshak:language", next);
+    try {
+      window.localStorage.setItem("cyberrakshak:language", next);
+    } catch {
+      // The selected language still applies for this session when storage is disabled.
+    }
   };
-  const value = useMemo(() => ({ language, setLanguage: changeLanguage, t: translations[language] || translations.en }), [language]);
+
+  const value = useMemo(
+    () => ({ language, setLanguage: changeLanguage, t: translations[language] || translations.en }),
+    [language]
+  );
+
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useLanguage = () => {
   const value = useContext(LanguageContext);
   if (!value) throw new Error("useLanguage must be used inside LanguageProvider");

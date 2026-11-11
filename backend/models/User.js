@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const { hashPasswordBeforeSave } = require("../services/auth/passwordService");
 
 const userSchema = new mongoose.Schema(
   {
@@ -15,7 +16,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u,
         "Please provide a valid email",
       ],
     },
@@ -61,19 +62,9 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    return next();
-  }
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+// Mongoose 9 pre hooks use returned promises and do not receive next().
+userSchema.pre("save", function () {
+  return hashPasswordBeforeSave(this);
 });
 
 // Method to compare password

@@ -9,13 +9,21 @@
     "backend": "npm --prefix backend run dev",
     "build": "npm --prefix frontend run build",
     "test": "npm --prefix backend test",
+    "test:db": "npm --prefix backend run test:db",
     "lint": "npm --prefix frontend run lint"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shiva31rama-cell/CyberRakshak.git"
   },
-  "keywords": ["cybersecurity", "cyber-safety", "ai", "react", "express", "mongodb"],
+  "keywords": [
+    "cybersecurity",
+    "cyber-safety",
+    "ai",
+    "react",
+    "express",
+    "mongodb"
+  ],
   "license": "ISC",
   "type": "commonjs",
   "bugs": {

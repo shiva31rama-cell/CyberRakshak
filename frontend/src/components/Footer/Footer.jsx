@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { requestOpenChatbot } from "../../utils/chatbotEvents";
 import "./Footer.css";
 
 function Footer() {
@@ -7,72 +9,49 @@ function Footer() {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-content">
-          <div className="footer-section">
+          <section className="footer-section">
             <h3>About CyberRakshak</h3>
             <p>
-              Empowering citizens with cyber security knowledge to stay safe
-              online and protect themselves from digital threats.
+              Practical cyber-safety education and defensive guidance for suspicious messages,
+              online risks, and cyber incidents.
             </p>
-          </div>
+          </section>
 
-          <div className="footer-section">
-            <h3>Quick Links</h3>
+          <nav className="footer-section" aria-label="Footer navigation">
+            <h3>Explore</h3>
             <ul>
-              <li>
-                <a href="/">Home</a>
-              </li>
-              <li>
-                <a href="/learn">Learning Center</a>
-              </li>
-              <li>
-                <a href="/emergency-help">Emergency Help</a>
-              </li>
-              <li>
-                <a href="/report-scam">Report Scam</a>
-              </li>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/scan">Message Scanner</Link></li>
+              <li><Link to="/scan/url">URL Scanner</Link></li>
+              <li><Link to="/learn">Learning Center</Link></li>
             </ul>
-          </div>
+          </nav>
 
-          <div className="footer-section">
-            <h3>Emergency Contacts</h3>
+          <section className="footer-section">
+            <h3>Get help</h3>
+            <p>Find defensive steps and official reporting resources for India.</p>
             <ul>
-              <li>🚨 Cyber Helpline: 1930</li>
-              <li>📞 Police: 100</li>
-              <li>🏥 Ambulance: 102</li>
-              <li>🚒 Fire: 101</li>
+              <li><Link to="/incident">Incident Assistant</Link></li>
+              <li><Link to="/emergency-help">Emergency Help</Link></li>
+              <li><Link to="/report-scam">Submit a CyberRakshak Report</Link></li>
             </ul>
-          </div>
+          </section>
 
-          <div className="footer-section">
-            <h3>Connect With Us</h3>
-            <div className="social-links">
-              <a href="#" aria-label="Facebook">
-                f
-              </a>
-              <a href="#" aria-label="Twitter">
-                𝕏
-              </a>
-              <a href="#" aria-label="Instagram">
-                📷
-              </a>
-              <a href="#" aria-label="LinkedIn">
-                in
-              </a>
-            </div>
-          </div>
+          <section className="footer-section">
+            <h3>Ask CyberRakshak</h3>
+            <p>Describe a cyber-safety concern without sharing authentication secrets.</p>
+            <button type="button" className="footer-chat-link" onClick={requestOpenChatbot}>
+              Open the safety assistant
+            </button>
+          </section>
         </div>
 
         <div className="footer-bottom">
           <div className="footer-info">
             <p>
-              &copy; {currentYear} CyberRakshak. All rights reserved. | Privacy
-              Policy | Terms of Service
+              &copy; {currentYear} CyberRakshak. Educational guidance only; this is not a bank,
+              police service, or government authority.
             </p>
-          </div>
-          <div className="footer-badges">
-            <span className="badge">🔒 Secure</span>
-            <span className="badge">✅ Verified</span>
-            <span className="badge">🌍 Multi-language</span>
           </div>
         </div>
       </div>

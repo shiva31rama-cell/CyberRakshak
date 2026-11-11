@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../contexts/LanguageContext";
 import VideoEmbed from "../../components/VideoEmbed/VideoEmbed";
+import { requestOpenChatbot } from "../../utils/chatbotEvents";
 import "./Home.css";
 
 const capabilities = [
@@ -30,7 +31,7 @@ function Home() {
           <p>{t.heroText}</p>
           <div className="hero-actions-v2">
             <button className="primary-action" onClick={() => navigate("/scan")}>{t.scanMessage}</button>
-            <button className="secondary-action" onClick={() => navigate("/")}>{t.askCyber}</button>
+            <button className="secondary-action" onClick={requestOpenChatbot}>{t.askCyber}</button>
           </div>
           <div className="hero-trust"><span>✓ Cyber-safety focused</span><span>✓ English · తెలుగు · हिन्दी</span><span>✓ Never ask for your OTP or password</span></div>
         </div>

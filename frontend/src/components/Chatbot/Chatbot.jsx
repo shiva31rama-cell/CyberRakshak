@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { sendChatMessage } from "../../services/chatService";
 import "./Chatbot.css";
 
@@ -17,6 +17,18 @@ const stageLabels = {
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    const openChat = () => setIsOpen(true);
+    window.addEventListener("cyberrakshak:open-chat", openChat);
+    return () => window.removeEventListener("cyberrakshak:open-chat", openChat);
+  }, []);
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 50);
+    return () => window.clearTimeout(focusTimer);
+  }, [isOpen]);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -60,11 +72,11 @@ function Chatbot() {
 
   return (
     <div className={`chatbot-container ${isOpen ? "open" : ""}`}>
-      <button type="button" className="chatbot-toggle" aria-label={isOpen ? "Close CyberRakshak AI" : "Open CyberRakshak AI"} aria-expanded={isOpen} onClick={() => setIsOpen((open) => !open)}>
+      <button type="button" className="chatbot-toggle" aria-label={isOpen ? "Close CyberRakshak AI" : "Open CyberRakshak AI"} aria-expanded={isOpen} aria-controls="cyberrakshak-chat-window" onClick={() => setIsOpen((open) => !open)}>
         {isOpen ? "✖️" : "💬"}
       </button>
 
-      <section className={`chatbot-window ${isOpen ? "active" : ""}`} aria-label="CyberRakshak AI chat">
+      <section id="cyberrakshak-chat-window" className={`chatbot-window ${isOpen ? "active" : ""}`} aria-label="CyberRakshak AI chat">
         <header className="chatbot-header">
           <h3>🤖 CyberRakshak AI</h3>
           <p>Your friendly cyber-safety guide</p>
@@ -110,7 +122,7 @@ function Chatbot() {
         )}
 
         <form onSubmit={handleSubmit} className="chatbot-input-form">
-          <input type="text" placeholder="Tell me what happened..." value={inputValue} onChange={(event) => setInputValue(event.target.value)} disabled={isLoading} className="chatbot-input" maxLength={2000} aria-label="Chat message" />
+          <input ref={inputRef} type="text" placeholder="Tell me what happened..." value={inputValue} onChange={(event) => setInputValue(event.target.value)} disabled={isLoading} className="chatbot-input" maxLength={2000} aria-label="Chat message" />
           <button type="submit" disabled={isLoading || !inputValue.trim()} className="chatbot-send-btn">{isLoading ? "..." : "Send"}</button>
         </form>
       </section>

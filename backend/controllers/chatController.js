@@ -1,7 +1,8 @@
 const KNOWLEDGE_BASE = require("../data/cyberKnowledge");
 const { classify } = require("../services/ai/cyberRelevanceService");
-const { safetyInstruction } = require("../services/safety/sensitiveInputService");
+const { containsSensitiveSecret } = require("../services/safety/sensitiveInputService");
 const aiService = require("../services/ai/aiService");
+const { validateChatResponse } = require("../services/ai/chatResponseContract");
 
 const DEFAULT_SYSTEM_PROMPT = `You are CyberRakshak, a friendly and responsible cyber-safety assistant for general users.
 
@@ -27,7 +28,7 @@ RELIABILITY AND SAFETY:
 - If uncertain, say what is uncertain instead of guessing.`;
 
 const INCIDENT_PATTERNS = [
-  { type: "financial_fraud", pattern: /money lost|money debited|unauthori[sz]ed.*(?:transaction|payment)|upi fraud|bank fraud|financial fraud|payment fraud|sent money.*scam|scammed.*money|transaction.*not mine/i },
+  { type: "financial_fraud", pattern: /money lost|lost money.*(?:upi|scam|fraud|online|payment|bank)?|(?:upi|scam|fraud).*lost money|money debited|unauthori[sz]ed.*(?:transaction|payment)|upi fraud|bank fraud|financial fraud|payment fraud|sent money.*scam|scammed.*money|transaction.*not mine/i },
   { type: "phishing", pattern: /phish|suspicious link|fake website|suspicious email|suspicious message|clicked.*link|link.*clicked|attachment/i },
   { type: "account_compromise", pattern: /account hacked|account compromised|account taken|someone.*logged in|unknown login|can't login|cannot login|lost access|password.*changed|email.*hacked/i },
   { type: "device_compromise", pattern: /phone hacked|mobile hacked|device hacked|computer hacked|laptop hacked|phone.*compromised|device.*compromised|unknown app|strange app|pop.?ups|phone.*acting strange/i },
@@ -61,15 +62,54 @@ const fallbackReply = (message) => {
   const text = String(message || "").trim().toLowerCase();
   const relevance = classify(text);
   if (relevance.isGreeting) return "Hi! 👋 I'm CyberRakshak, your cyber-safety assistant. I can help with scams, phishing, suspicious links, UPI/payment fraud, OTP/password safety, privacy, malware and cyber incidents. Tell me what happened and we'll work through it safely. 🛡️";
-  if (!relevance.isCyberRelated) return "I’m CyberRakshak 🛡️, so I focus on cyber safety and online security. I can help with phishing, scams, suspicious links, UPI/payment fraud, OTP/password safety, privacy, malware, account/device safety and cyber incident reporting.";
+  if (!relevance.isCyberRelated) return "I’m CyberRakshak 🛡️, a cyber-safety assistant focused on cyber safety and online security. I can help with phishing, scams, suspicious links, UPI/payment fraud, OTP/password safety, privacy, malware, account/device safety and cyber incident reporting.";
   if (/money lost|money debited|unauthori[sz]ed.*(?:transaction|payment)|upi fraud|bank fraud|financial fraud|payment fraud/.test(text)) return "🚨 If money was lost or an unauthorized transaction occurred, contact your bank/payment provider immediately and use India's official cyber-fraud reporting channels. Do not share OTPs, PINs, CVVs or passwords. Keep transaction IDs and relevant evidence safe.";
   if (/account hacked|account compromised|account taken|can't login|cannot login/.test(text)) return "🔐 Let's check this safely. Do you still have access to the account, and did you notice an unfamiliar login or a recovery/password change you did not make? Please don't send the password or any OTP/recovery code.";
-  if (/phish|suspicious link|fake website|suspicious email|suspicious message/.test(text)) return "⚠️ Did you click the link/open the attachment, or did you only receive the message? Please don't paste any password, OTP, PIN or other secret here.";
+  if (/phish|suspicious link|fake website|suspicious email|suspicious message/.test(text)) return "⚠️ This may involve phishing or another suspicious message. Did you click the link/open the attachment, or did you only receive the message? Please don't paste any password, OTP, PIN or other secret here.";
   if (/otp|pin|cvv|password/.test(text)) return "🔑 Never share an OTP, UPI PIN, card PIN, CVV, password or recovery code. Tell me what happened around the request without including the secret itself.";
   return "I can help with that cyber-safety issue. Tell me what happened—what device, account, message, link or transaction is involved? Please don't share passwords, OTPs, PINs, CVVs, recovery codes or other secrets.";
 };
 
 const sanitizeMessages = (messages) => messages.filter((item) => item && ["user", "assistant"].includes(item.role) && typeof item.content === "string").slice(-12).map((item) => ({ role: item.role, content: item.content.trim().slice(0, 4000) }));
+
+
+const buildSafeResponse = (message) => {
+  const text = String(message || "");
+  const relevance = classify(text);
+  const incidentType = detectIncidentType(text);
+  const grounding = getGrounding(incidentType);
+  return {
+    success: true,
+    reply: fallbackReply(text),
+    provider: "CyberRakshak safety fallback",
+    intent: relevance.intent,
+    incidentType,
+    triageStage: "general",
+    sources: grounding.sources,
+  };
+};
+
+const sendValidatedChatResponse = (res, payload, sourceMessage) => {
+  const validation = validateChatResponse(payload);
+  if (validation.valid) return res.json(validation.data);
+
+  // Do not forward malformed provider output. Return a deterministic safe reply instead.
+  console.error("Chat response contract validation failed:", validation.errors.join("; "));
+  const fallback = validateChatResponse(buildSafeResponse(sourceMessage));
+  if (fallback.valid) return res.json(fallback.data);
+
+  // Static final guard: this payload is intentionally minimal and matches the contract.
+  return res.json({
+    success: true,
+    reply: "I can help with cyber safety. Please describe what happened without sharing passwords, OTPs, PINs, CVVs or recovery codes.",
+    provider: "CyberRakshak safety fallback",
+    intent: "cyber_assistance",
+    incidentType: null,
+    triageStage: "general",
+    sources: [],
+  });
+};
+
 
 exports.chat = async (req, res) => {
   try {
@@ -85,30 +125,47 @@ exports.chat = async (req, res) => {
     const triageStage = detectTriageStage(safeMessages, incidentType);
     const grounding = getGrounding(incidentType);
 
-    if (!relevance.isCyberRelated) {
-      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", intent: "non_cyber", incidentType: null, triageStage: "general", sources: [] });
+    // The server may receive a secret the user pasted, but never forward any part of
+    // that conversation to an external AI provider once a secret is detected.
+    const conversationContainsSecret = safeMessages.some((item) => containsSensitiveSecret(item.content));
+    if (conversationContainsSecret) {
+      return sendValidatedChatResponse(res, {
+        success: true,
+        reply: "For your safety, do not share passwords, OTPs, PINs, CVVs, recovery codes or API keys here. I will not send this conversation to the AI provider. Please describe what happened without the secret itself.",
+        provider: "CyberRakshak safety fallback",
+        intent: relevance.intent,
+        incidentType,
+        triageStage,
+        sources: grounding.sources,
+      }, normalized);
     }
 
-    const secretWarning = safetyInstruction(normalized);
+    if (!relevance.isCyberRelated) {
+      return sendValidatedChatResponse(res, { success: true, reply: fallbackReply(normalized), provider: "CyberRakshak scope guard", intent: "non_cyber", incidentType: null, triageStage: "general", sources: [] }, normalized);
+    }
+
     const triageHint = incidentType
       ? `Incident category: ${incidentType}. Current triage stage: ${triageStage}. Continue from this stage; do not repeat answered questions.`
       : "If this is an incident, identify its category and ask only the most useful next question.";
     const systemPrompt = process.env.AI_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT;
-    const providerMessages = [{ role: "system", content: `${systemPrompt}\n${triageHint}\n${secretWarning}${formatGroundingForModel(grounding)}` }, ...safeMessages];
+    const providerMessages = [{ role: "system", content: `${systemPrompt}\n${triageHint}${formatGroundingForModel(grounding)}` }, ...safeMessages];
 
     if (!process.env.AI_API_KEY || !process.env.AI_API_URL || !process.env.AI_MODEL) {
-      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources });
+      return sendValidatedChatResponse(res, { success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources }, normalized);
     }
 
     try {
       const reply = await aiService.generate(providerMessages);
-      return res.json({ success: true, reply, provider: "AI", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources });
+      return sendValidatedChatResponse(res, { success: true, reply, provider: "AI", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources }, normalized);
     } catch (providerError) {
       console.error("AI provider request failed:", providerError.message);
-      return res.json({ success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources });
+      return sendValidatedChatResponse(res, { success: true, reply: fallbackReply(normalized), provider: "CyberRakshak safety fallback", intent: relevance.intent, incidentType, triageStage, sources: grounding.sources }, normalized);
     }
   } catch (error) {
     console.error("Chat service error:", error.message);
-    return res.json({ success: true, reply: fallbackReply(req.body?.messages?.at?.(-1)?.content), provider: "CyberRakshak safety fallback", intent: "cyber_assistance", incidentType: null, triageStage: "general", sources: KNOWLEDGE_BASE.general.sources });
+    const latestMessage = Array.isArray(req.body?.messages)
+      ? [...req.body.messages].reverse().find((item) => item?.role === "user")?.content
+      : "";
+    return sendValidatedChatResponse(res, buildSafeResponse(latestMessage), latestMessage);
   }
 };

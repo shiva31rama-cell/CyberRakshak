@@ -54,6 +54,12 @@ The assistant should ask only the highest-value missing questions and must never
 
 Topic-specific facts, immediate actions, avoid-list items and sources are loaded from `backend/data/cyberKnowledge.js` before the provider request. Sources must come from the application knowledge base or verified official resources; the system must not invent citations.
 
+## Output contract validation
+
+Every response from `POST /api/chat` is validated against a backend-owned contract before it is returned. The validator checks the reply's type and length, the provider/intent/incident/triage enums, and the structure of curated source metadata. Source URLs must be credential-free HTTPS URLs.
+
+Malformed provider output is never returned as a successful AI reply; the controller attempts a deterministic safe fallback and has a minimal final guard. Contract validation verifies shape and metadata constraints only—it cannot establish that a model's prose is truthful. Grounding, cautious language, and provider-failure fallback remain necessary.
+
 ## Provider boundary
 
 The chat controller now calls:

@@ -113,3 +113,83 @@ test("chat rejects messages over the input limit", async () => {
   assert.equal(result.statusCode, 400);
   assert.equal(result.payload.success, false);
 });
+
+
+test("chat replaces malformed AI output with a schema-valid safety fallback", async (t) => {
+  const aiService = require("../services/ai/aiService");
+  const originalGenerate = aiService.generate;
+  const originalEnv = {
+    key: process.env.AI_API_KEY,
+    url: process.env.AI_API_URL,
+    model: process.env.AI_MODEL,
+  };
+
+  process.env.AI_API_KEY = "test-key";
+  process.env.AI_API_URL = "https://provider.example.test/chat";
+  process.env.AI_MODEL = "test-model";
+  aiService.generate = async () => ({ unexpected: "not a reply string" });
+
+  t.after(() => {
+    aiService.generate = originalGenerate;
+    if (originalEnv.key === undefined) delete process.env.AI_API_KEY;
+    else process.env.AI_API_KEY = originalEnv.key;
+    if (originalEnv.url === undefined) delete process.env.AI_API_URL;
+    else process.env.AI_API_URL = originalEnv.url;
+    if (originalEnv.model === undefined) delete process.env.AI_MODEL;
+    else process.env.AI_MODEL = originalEnv.model;
+  });
+
+  const result = await callChat({
+    messages: [{ role: "user", content: "I received a suspicious phishing link" }],
+  });
+
+  assert.equal(result.statusCode, 200);
+  assert.equal(result.payload.success, true);
+  assert.equal(result.payload.provider, "CyberRakshak safety fallback");
+  assert.match(result.payload.reply, /phishing/i);
+  assert.equal(result.payload.incidentType, "phishing");
+  assert.ok(Array.isArray(result.payload.sources));
+});
+
+
+test("chat does not send conversations containing a labeled secret to the AI provider", async (t) => {
+  const aiService = require("../services/ai/aiService");
+  const originalGenerate = aiService.generate;
+  const originalEnv = {
+    key: process.env.AI_API_KEY,
+    url: process.env.AI_API_URL,
+    model: process.env.AI_MODEL,
+  };
+  let providerCalled = false;
+
+  process.env.AI_API_KEY = "test-key";
+  process.env.AI_API_URL = "https://provider.example.test/chat";
+  process.env.AI_MODEL = "test-model";
+  aiService.generate = async () => {
+    providerCalled = true;
+    throw new Error("The provider must not receive this conversation");
+  };
+
+  t.after(() => {
+    aiService.generate = originalGenerate;
+    if (originalEnv.key === undefined) delete process.env.AI_API_KEY;
+    else process.env.AI_API_KEY = originalEnv.key;
+    if (originalEnv.url === undefined) delete process.env.AI_API_URL;
+    else process.env.AI_API_URL = originalEnv.url;
+    if (originalEnv.model === undefined) delete process.env.AI_MODEL;
+    else process.env.AI_MODEL = originalEnv.model;
+  });
+
+  const result = await callChat({
+    messages: [
+      { role: "user", content: "I cannot sign in to my account" },
+      { role: "user", content: "My password is local-test-only-42" },
+    ],
+  });
+
+  assert.equal(providerCalled, false);
+  assert.equal(result.statusCode, 200);
+  assert.equal(result.payload.provider, "CyberRakshak safety fallback");
+  assert.match(result.payload.reply, /will not send this conversation to the AI provider/i);
+  assert.doesNotMatch(result.payload.reply, /local-test-only-42/);
+});

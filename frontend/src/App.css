@@ -159,6 +159,46 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+:where(button, a, input, textarea, select, [tabindex]):focus-visible {
+  outline: 3px solid #1e3a8a;
+  outline-offset: 3px;
+}
+
+.navbar :where(button, a, select):focus-visible,
+.footer :where(button, a):focus-visible,
+.chatbot-toggle:focus-visible {
+  outline-color: #fff;
+}
+
+.skip-link {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 2001;
+  padding: 0.65rem 1rem;
+  border: 2px solid #1e3a8a;
+  border-radius: 6px;
+  background: #fff;
+  color: #172554;
+  font-weight: 700;
+  transform: translateY(-180%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Utility Classes */
 .container {
   max-width: 1200px;
@@ -417,13 +457,6 @@ select:focus {
 
   .section {
     padding: 1rem 0;
-  }
-}
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
   }
 }
 
