@@ -1,0 +1,12 @@
+.git
+.github
+**/node_modules
+**/dist
+**/coverage
+**/.env
+**/.env.*
+backend/.env.example
+frontend/.env.example
+docs
+research-paper
+testing

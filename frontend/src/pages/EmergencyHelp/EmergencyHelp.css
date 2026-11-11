@@ -1,0 +1,320 @@
+.emergency-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 20px;
+  min-height: calc(100vh - 200px);
+}
+
+.emergency-header {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+  padding: 3rem;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.emergency-header h1 {
+  font-size: 2.5rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.emergency-header p {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.emergency-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+/* Quick Actions */
+.quick-actions-section,
+.emergency-contacts-section,
+.steps-section,
+.info-section,
+.resources-section {
+  margin-bottom: 3rem;
+}
+
+.quick-actions-section h2,
+.emergency-contacts-section h2,
+.steps-section h2,
+.resources-section h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 2rem;
+  border-bottom: 3px solid #f44336;
+  padding-bottom: 0.5rem;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.quick-action-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.quick-action-btn:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+.action-icon {
+  font-size: 2.5rem;
+}
+
+.quick-action-btn h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.quick-action-btn p {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* Emergency Contacts */
+.contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.contact-card {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffe082 100%);
+  border-left: 4px solid #f57c00;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(245, 127, 0, 0.2);
+}
+
+.contact-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.contact-card h3 {
+  color: #f57c00;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.contact-desc {
+  color: #555;
+  font-size: 0.9rem;
+  margin: 0 0 1rem 0;
+}
+
+.contact-number {
+  margin: 0;
+}
+
+.contact-number a {
+  color: #f57c00;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.contact-number a:hover {
+  color: #e65100;
+}
+
+/* Steps to Take */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.step-card {
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: relative;
+  padding-left: 3rem;
+}
+
+.step-number {
+  position: absolute;
+  left: -15px;
+  top: -15px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.step-card h3 {
+  color: #1976d2;
+  margin: 0 0 0.5rem 0;
+}
+
+.step-card p {
+  margin: 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* Info Boxes */
+.info-box {
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid;
+}
+
+.info-box.warning {
+  background: #ffebee;
+  border-left-color: #f44336;
+}
+
+.info-box.warning h3 {
+  color: #f44336;
+}
+
+.info-box.tip {
+  background: #f3e5f5;
+  border-left-color: #7b1fa2;
+}
+
+.info-box.tip h3 {
+  color: #7b1fa2;
+}
+
+.info-box.help {
+  background: #e8f5e9;
+  border-left-color: #4caf50;
+}
+
+.info-box.help h3 {
+  color: #2e7d32;
+}
+
+.info-box h3 {
+  margin: 0 0 0.5rem 0;
+}
+
+.info-box p {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Resources */
+.resources-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.resource-link {
+  background: #f0f4ff;
+  border-left: 4px solid #667eea;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.resource-link:hover {
+  background: #e8ecff;
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+/* Back Button */
+.back-home-btn {
+  display: block;
+  margin: 2rem auto 0;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-home-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .emergency-container {
+    padding: 1rem 15px;
+  }
+
+  .emergency-header {
+    padding: 1.5rem;
+  }
+
+  .emergency-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .emergency-content {
+    padding: 1.5rem;
+  }
+
+  .quick-actions-grid,
+  .contacts-grid,
+  .steps-grid,
+  .resources-list {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions-section h2,
+  .emergency-contacts-section h2,
+  .steps-section h2,
+  .resources-section h2 {
+    font-size: 1.4rem;
+  }
+
+  .back-home-btn {
+    width: 100%;
+  }
+}
