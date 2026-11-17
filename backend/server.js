@@ -15,12 +15,18 @@ if (!Number.isSafeInteger(trustProxyHops) || trustProxyHops < 0) {
 // Set this only when the API is reachable exclusively through the configured trusted proxies.
 app.set("trust proxy", trustProxyHops);
 const PORT = Number(process.env.PORT) || 5000;
+const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",").map((origin) => origin.trim()).filter(Boolean);
 let dbReady = false;
 
 app.disable("x-powered-by");
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin(origin, callback) {
+    // Native clients without an Origin header are allowed; browser origins must match explicitly.
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Origin is not allowed by CyberRakshak CORS policy"));
+  },
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
