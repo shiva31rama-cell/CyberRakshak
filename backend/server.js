@@ -58,6 +58,16 @@ app.use("/api/scam-report", require("./routes/scamReport"));
 app.get("/", (req, res) => res.json({ success: true, message: "CyberRakshak Backend Running Successfully 🚀", version: "2.0.0" }));
 app.get("/health", (req, res) => res.json({ success: true, status: dbReady ? "ok" : "degraded", database: dbReady ? "connected" : "unavailable", service: "CyberRakshak API", version: "2.0.0" }));
 
+// Compatibility health route used by the Flutter/DartPad jury preview.
+app.get("/api/health", (req, res) => res.json({
+  success: true,
+  status: dbReady ? "ok" : "degraded",
+  database: dbReady ? "connected" : "unavailable",
+  service: "CyberRakshak API",
+  version: "jury-demo-1",
+  timestamp: new Date().toISOString(),
+}));
+
 app.use((req, res) => res.status(404).json({ success: false, message: "Route not found" }));
 app.use((err, req, res, next) => {
   console.error(err);
