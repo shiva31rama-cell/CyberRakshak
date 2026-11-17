@@ -46,6 +46,7 @@ app.use("/api/feedback", createLimiter(30, "Too many feedback requests. Please t
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/trust", require("./routes/trust"));
+app.use("/api", require("./routes/juryDemo"));
 app.use("/api/chat", require("./routes/chat"));
 app.use("/api/scan", require("./routes/scan"));
 app.use("/api/scan/url", require("./routes/urlScan"));
