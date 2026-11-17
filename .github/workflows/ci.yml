@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: [main, "cyberrakshak-2.0-final", "codex/cyberrakshak-security-hardening"]
+    branches: [main, "cyberrakshak-2.0-final", "codex/cyberrakshak-security-hardening", "feat/jury-live-demo-integration"]
   pull_request:
-    branches: [main, "cyberrakshak-2.0-final"]
+    branches: [main, "cyberrakshak-2.0-final", "feat/jury-live-demo-integration"]
 
 jobs:
   backend-check:
@@ -26,6 +26,9 @@ jobs:
       - run: npm ci
       - run: node -c server.js
       - run: node -c controllers/trustController.js
+      - run: node -c controllers/juryDemoController.js
+      - run: node -c routes/juryDemo.js
+      - run: node -c routes/juryCampus.js
       - run: node -c services/trust/noticeService.js
       - run: node -c services/trust/noticeCryptoService.js
       - run: node -c controllers/chatController.js
@@ -42,6 +45,7 @@ jobs:
       - run: node -c scripts/mongodb-persistence-smoke.js
       - run: npm test
       - run: npm run test:trust
+      - run: npm run test:jury-demo
       - name: Build backend container image
         working-directory: .
         run: docker build -f backend/Dockerfile -t cyberrakshak-api:ci .
