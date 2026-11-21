@@ -1,262 +1,85 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { THREATS } from "../../../../shared/content/threats.mjs";
+import { VIDEOS } from "../../../../shared/content/videos.mjs";
+import { getProgress } from "../../services/progress";
+import { ThreatCard } from "../Threats/Threats";
+import { VideoCard } from "../Videos/Videos";
+import Icon from "../../components/Icon/Icon";
 import "./Home.css";
 
+const FEATURED = ["phishing", "upi-fraud", "otp-scams", "fake-job-scams", "investment-scams", "social-engineering"];
+const RECENT_VIDEOS = ["dx5A2-j19nI", "Q1p4WW359bM", "tfYBMwKq-1E"];
+
 function Home() {
-  const navigate = useNavigate();
-
-  const features = [
-    {
-      icon: "📚",
-      title: "Learn Cyber Safety",
-      description: "Comprehensive courses on cybersecurity topics",
-      action: "/learn",
-    },
-    {
-      icon: "🎯",
-      title: "Take Quizzes",
-      description: "Test your knowledge with interactive quizzes",
-      action: "/digital-literacy-quiz",
-    },
-    {
-      icon: "🆘",
-      title: "Emergency Help",
-      description: "Get immediate help and emergency contacts",
-      action: "/emergency-help",
-    },
-    {
-      icon: "⚠️",
-      title: "Report a Scam",
-      description: "Report scams and get a case number",
-      action: "/report-scam",
-    },
-  ];
-
-  const topicCards = [
-    {
-      icon: "💳",
-      title: "UPI & Payment Security",
-      description: "Learn how to protect your digital payments",
-      link: "/upi-safety",
-    },
-    {
-      icon: "🔐",
-      title: "Password Security",
-      description: "Create and manage strong passwords",
-      link: "/password-security",
-    },
-    {
-      icon: "💬",
-      title: "Social Media Safety",
-      description: "Stay safe on social media platforms",
-      link: "/social-media-safety",
-    },
-    {
-      icon: "🚨",
-      title: "Cyber Crime Awareness",
-      description: "Understand common cyber crimes",
-      link: "/cyber-crime-awareness",
-    },
-  ];
-
-  const stats = [
-    { number: "10K+", label: "Active Learners" },
-    { number: "50+", label: "Modules" },
-    { number: "100%", label: "Free Access" },
-    { number: "24/7", label: "AI Support" },
-  ];
+  const { t } = useLanguage();
+  const progress = getProgress();
+  const featured = FEATURED.map((s) => THREATS.find((x) => x.slug === s)).filter(Boolean);
+  const videos = RECENT_VIDEOS.map((id) => VIDEOS.find((v) => v.id === id)).filter(Boolean);
 
   return (
-    <div className="home">
-      {/* Hero Section */}
+    <>
       <section className="hero">
-        <div className="hero-content">
-          <h1>🛡️ CyberRakshak</h1>
-          <p className="hero-subtitle">Your Complete Guide to Cyber Security</p>
-          <p className="hero-description">
-            Learn how to protect yourself from cyber threats, scams, and online
-            dangers. Free, comprehensive cyber security education for everyone.
-          </p>
-
-          <div className="hero-buttons">
-            <button className="btn-primary" onClick={() => navigate("/learn")}>
-              Start Learning
-            </button>
-            <button
-              className="btn-secondary"
-              onClick={() => navigate("/emergency-help")}
-            >
-              Emergency Help
-            </button>
-          </div>
-        </div>
-
-        <div className="hero-image">
-          <div className="shield-icon">🛡️</div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="stats">
-        <div className="stats-container">
-          {stats.map((stat, index) => (
-            <div key={index} className="stat-card">
-              <div className="stat-number">{stat.number}</div>
-              <div className="stat-label">{stat.label}</div>
+        <div className="container hero-inner">
+          <div className="hero-copy">
+            <span className="eyebrow"><Icon name="shield" size={14} /> CyberRakshak</span>
+            <h1>{t("home.title")}</h1>
+            <p>{t("home.desc")}</p>
+            <div className="hero-ctas">
+              <Link className="btn btn-primary" to="/threats"><Icon name="book" size={18} />{t("home.cta.threats")}</Link>
+              <Link className="btn btn-secondary" to="/analyser"><Icon name="message" size={18} />{t("home.cta.analyse")}</Link>
+              <Link className="btn btn-secondary" to="/quiz"><Icon name="quiz" size={18} />{t("home.cta.quiz")}</Link>
             </div>
-          ))}
+          </div>
+          <div className="hero-panel card" aria-hidden="true">
+            <div className="hp-row"><span className="hp-dot crit" /><span>“Your KYC expires today. Share OTP…”</span><span className="badge sev-critical">{t("lvl.critical")}</span></div>
+            <div className="hp-row"><span className="hp-dot warn" /><span>“Flat 40% off – shop now”</span><span className="badge sev-medium">{t("cls.potential_spam")}</span></div>
+            <div className="hp-row"><span className="hp-dot ok" /><span>“Reached home, will call later”</span><span className="badge badge-official">{t("cls.likely_safe")}</span></div>
+            <p className="small muted" style={{ margin: "8px 0 0" }}>{t("t.scenarioNote")}</p>
+          </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="features">
-        <h2>📋 Main Features</h2>
-        <p className="section-subtitle">
-          Everything you need to stay cyber safe
-        </p>
+      <div className="container">
+        <section className="section">
+          <div className="section-head"><h2>{t("home.why.title")}</h2></div>
+          <div className="grid grid-3">
+            {[1, 2, 3].map((n) => <div className="card" key={n}><span className="icon-tile"><Icon name={["users", "wallet", "shield"][n - 1]} /></span><h3>{t(`home.why.${n}t`)}</h3><p className="muted" style={{ margin: 0 }}>{t(`home.why.${n}d`)}</p></div>)}
+          </div>
+        </section>
 
-        <div className="features-grid">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="feature-card"
-              onClick={() => navigate(feature.action)}
-            >
-              <div className="feature-icon">{feature.icon}</div>
-              <h3>{feature.title}</h3>
-              <p>{feature.description}</p>
-              <button className="feature-btn">Explore</button>
+        <section className="section grid grid-2">
+          <div className="card">
+            <h2>{t("home.tips.title")}</h2>
+            <ul className="check-list">{t("home.tips").map((tip) => <li key={tip}><Icon name="check" size={16} />{tip}</li>)}</ul>
+          </div>
+          <div className="card quick-analyse">
+            <span className="icon-tile"><Icon name="message" /></span>
+            <h2>{t("home.quick.title")}</h2>
+            <p className="muted">{t("home.quick.desc")}</p>
+            <Link className="btn btn-primary" to="/analyser">{t("home.cta.analyse")} <Icon name="arrow" size={18} /></Link>
+            <div className="progress-box">
+              <h3>{t("home.progress")}</h3>
+              <div className="progress-stats">
+                <div><strong>{progress.topics.length}/{THREATS.length}</strong><span>{t("home.progress.topics")}</span></div>
+                <div><strong>{progress.bestScore === null ? "—" : `${progress.bestScore}%`}</strong><span>{progress.bestScore === null ? t("home.progress.none") : t("home.progress.quiz")}</span></div>
+              </div>
+              <p className="small muted" style={{ margin: 0 }}>{t("home.progress.note")}</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Learning Topics Section */}
-      <section className="topics">
-        <h2>📖 Popular Learning Topics</h2>
-        <p className="section-subtitle">
-          Master essential cyber security skills
-        </p>
-
-        <div className="topics-grid">
-          {topicCards.map((topic, index) => (
-            <div
-              key={index}
-              className="topic-card"
-              onClick={() => navigate(topic.link)}
-            >
-              <div className="topic-icon">{topic.icon}</div>
-              <h3>{topic.title}</h3>
-              <p>{topic.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Why Section */}
-      <section className="why">
-        <h2>Why CyberRakshak?</h2>
-
-        <div className="why-grid">
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Comprehensive Coverage</h3>
-            <p>
-              From basics to advanced topics, we cover everything about cyber
-              security
-            </p>
           </div>
+        </section>
 
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Free for Everyone</h3>
-            <p>
-              Access all our learning materials and resources completely free
-            </p>
-          </div>
+        <section className="section">
+          <div className="section-head"><h2>{t("home.featured")}</h2><Link className="link-more" to="/threats">{t("home.viewall")} <Icon name="arrow" size={16} /></Link></div>
+          <div className="grid grid-3">{featured.map((x) => <ThreatCard key={x.slug} threat={x} />)}</div>
+        </section>
 
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Interactive Learning</h3>
-            <p>
-              Engage with interactive quizzes, case studies, and real-world
-              examples
-            </p>
-          </div>
-
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Expert Resources</h3>
-            <p>
-              Content reviewed by cyber security experts and government
-              advisories
-            </p>
-          </div>
-
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>24/7 Support</h3>
-            <p>Get instant answers from our AI chatbot anytime, anywhere</p>
-          </div>
-
-          <div className="why-card">
-            <span className="why-icon">✅</span>
-            <h3>Emergency Help</h3>
-            <p>
-              Quick access to emergency contacts and resources in cyber
-              incidents
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="cta">
-        <h2>Ready to Stay Cyber Safe?</h2>
-        <p>
-          Join thousands of learners protecting themselves from cyber threats
-        </p>
-
-        <div className="cta-buttons">
-          <button className="btn-large" onClick={() => navigate("/learn")}>
-            Start Learning Now
-          </button>
-          <button
-            className="btn-large-outline"
-            onClick={() => navigate("/feedback")}
-          >
-            Send Feedback
-          </button>
-        </div>
-      </section>
-
-      {/* Quick Links Section */}
-      <section className="quick-links">
-        <h3>Quick Links</h3>
-        <div className="quick-links-grid">
-          <button className="quick-link-btn" onClick={() => navigate("/learn")}>
-            📚 Learn
-          </button>
-          <button
-            className="quick-link-btn"
-            onClick={() => navigate("/emergency-help")}
-          >
-            🆘 Emergency Help
-          </button>
-          <button
-            className="quick-link-btn"
-            onClick={() => navigate("/report-scam")}
-          >
-            ⚠️ Report Scam
-          </button>
-          <button
-            className="quick-link-btn"
-            onClick={() => navigate("/feedback")}
-          >
-            💬 Feedback
-          </button>
-        </div>
-      </section>
-    </div>
+        <section className="section">
+          <div className="section-head"><h2>{t("home.videos")}</h2><Link className="link-more" to="/videos">{t("home.allvideos")} <Icon name="arrow" size={16} /></Link></div>
+          <div className="grid grid-3">{videos.map((v) => <VideoCard key={v.id} video={v} />)}</div>
+        </section>
+      </div>
+    </>
   );
 }
 

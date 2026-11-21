@@ -1,85 +1,45 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { getStoredUser, isAuthenticated, logout } from "../../services/authService";
+import { NavLink, Link } from "react-router-dom";
+import { useState } from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
+import Icon from "../Icon/Icon";
 import "./Navbar.css";
 
+const LINKS = [
+  ["/", "nav.home"], ["/threats", "nav.threats"], ["/analyser", "nav.analyser"], ["/videos", "nav.videos"],
+  ["/safety-guide", "nav.guide"], ["/quiz", "nav.quiz"], ["/about", "nav.about"],
+];
+
 function Navbar() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
-  const [userName, setUserName] = useState(() => getStoredUser()?.name || "");
-
-  useEffect(() => {
-    const syncAuth = () => {
-      const user = getStoredUser();
-      setIsLoggedIn(isAuthenticated());
-      setUserName(user?.name || "");
-    };
-
-    syncAuth();
-    window.addEventListener("storage", syncAuth);
-    window.addEventListener("cyberrakshak:auth-changed", syncAuth);
-
-    return () => {
-      window.removeEventListener("storage", syncAuth);
-      window.removeEventListener("cyberrakshak:auth-changed", syncAuth);
-    };
-  }, [location]);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch {
-      // The local session is cleared by authService even if the API is unavailable.
-    } finally {
-      setIsLoggedIn(false);
-      setUserName("");
-      setIsOpen(false);
-      window.dispatchEvent(new Event("cyberrakshak:auth-changed"));
-      navigate("/");
-    }
-  };
-
-  const handleNavClick = (path) => {
-    navigate(path);
-    setIsOpen(false);
-  };
+  const { t, lang, setLang } = useLanguage();
+  const [open, setOpen] = useState(false);
 
   return (
-    <nav className="navbar" aria-label="Primary navigation">
-      <div className="navbar-container">
-        <button className="navbar-logo" onClick={() => handleNavClick("/")} aria-label="CyberRakshak home">
-          <span className="logo-icon" aria-hidden="true">🛡️</span>
-          <span className="logo-text">CyberRakshak</span>
-        </button>
+    <header className="nav">
+      <a href="#main" className="skip-link">{t("nav.skip")}</a>
+      <div className="nav-inner">
+        <Link to="/" className="nav-brand" aria-label="CyberRakshak">
+          <span className="nav-logo"><Icon name="shield" size={20} /></span>
+          <span className="nav-brand-text"><strong>CyberRakshak</strong><small>{t("brand.tag")}</small></span>
+        </Link>
 
-        <div className={`nav-menu ${isOpen ? "active" : ""}`}>
-          <button className={`nav-link ${location.pathname === "/" ? "active" : ""}`} onClick={() => handleNavClick("/")}>Home</button>
-          <button className={`nav-link ${location.pathname === "/learn" ? "active" : ""}`} onClick={() => handleNavClick("/learn")}>Learn</button>
-          <button className={`nav-link ${location.pathname === "/digital-literacy-quiz" ? "active" : ""}`} onClick={() => handleNavClick("/digital-literacy-quiz")}>Quiz</button>
-          <button className={`nav-link ${location.pathname === "/emergency-help" ? "active" : ""}`} onClick={() => handleNavClick("/emergency-help")}>Emergency</button>
-          <button className={`nav-link ${location.pathname === "/report-scam" ? "active" : ""}`} onClick={() => handleNavClick("/report-scam")}>Report Scam</button>
-          <button className={`nav-link ${location.pathname === "/feedback" ? "active" : ""}`} onClick={() => handleNavClick("/feedback")}>Feedback</button>
+        <nav className={`nav-links ${open ? "open" : ""}`} aria-label="Primary">
+          {LINKS.map(([to, key]) => (
+            <NavLink key={to} to={to} end={to === "/"} onClick={() => setOpen(false)} className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>{t(key)}</NavLink>
+          ))}
+        </nav>
 
-          {isLoggedIn ? (
-            <div className="user-menu">
-              <span className="user-name">Hi, {userName || "User"}!</span>
-              <button className="nav-link logout-btn" onClick={handleLogout}>Logout</button>
-            </div>
-          ) : (
-            <div className="auth-buttons">
-              <button className="nav-link login-link" onClick={() => handleNavClick("/login")}>Login</button>
-              <button className="nav-link register-link" onClick={() => handleNavClick("/register")}>Register</button>
-            </div>
-          )}
+        <div className="nav-actions">
+          <div className="lang-switch" role="group" aria-label={t("nav.language")}>
+            <button type="button" className={lang === "en" ? "on" : ""} aria-pressed={lang === "en"} onClick={() => setLang("en")}>English</button>
+            <span aria-hidden="true">|</span>
+            <button type="button" className={lang === "te" ? "on" : ""} aria-pressed={lang === "te"} onClick={() => setLang("te")} lang="te">తెలుగు</button>
+          </div>
+          <button type="button" className="nav-toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? t("nav.close") : t("nav.menu")}>
+            <Icon name={open ? "x" : "menu"} size={22} />
+          </button>
         </div>
-
-        <button className="hamburger" onClick={() => setIsOpen((open) => !open)} aria-label={isOpen ? "Close menu" : "Open menu"} aria-expanded={isOpen}>
-          <span></span><span></span><span></span>
-        </button>
       </div>
-    </nav>
+    </header>
   );
 }
 

@@ -36,6 +36,16 @@ const chatLimiter = rateLimit({
   message: { success: false, message: "Too many chat requests. Please try again later." },
 });
 
+const analyzeLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: Number(process.env.ANALYZE_RATE_LIMIT) || 30,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many analysis requests. Please try again later." },
+});
+
+app.use("/api/analyze", analyzeLimiter, require("./routes/analyze"));
+app.use("/api/content", require("./routes/content"));
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 app.use("/api/chat", chatLimiter);
