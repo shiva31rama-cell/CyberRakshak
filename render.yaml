@@ -1,0 +1,24 @@
+# Render Blueprint for the CyberRakshak API. Secrets (MONGODB_URI, JWT_SECRET) are entered in the Render dashboard.
+services:
+  - type: web
+    name: cyberrakshak-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: .
+    buildCommand: cd backend && npm install --omit=dev
+    startCommand: cd backend && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://anirudhleetcode-max.github.io,http://localhost:5173
+      - key: ANALYZE_RATE_LIMIT
+        value: "30"
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
