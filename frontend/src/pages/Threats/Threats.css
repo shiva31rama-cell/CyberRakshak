@@ -1,0 +1,9 @@
+.threat-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.td-head { display: flex; gap: 16px; align-items: flex-start; margin: 16px 0 24px; }
+.td-head .icon-tile { width: 56px; height: 56px; flex-shrink: 0; }
+.td-head h1 { font-size: clamp(1.6rem, 3.5vw, 2.3rem); margin-top: 10px; }
+.td-section h2 { font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+.td-section h2 .icon { color: var(--accent); }
+.td-section p { margin: 0 0 8px; }
+.td-scenario { border-left: 4px solid var(--accent); }
+.td-victim { border-left: 4px solid var(--high); }

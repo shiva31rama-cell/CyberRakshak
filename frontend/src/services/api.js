@@ -1,5 +1,6 @@
 /** Shared API client for CyberRakshak. */
-export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api").replace(/\/$/, "");
+// Production builds need VITE_API_BASE_URL; without it server-only features degrade gracefully.
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? "http://localhost:5000/api" : "")).replace(/\/$/, "");
 const DEFAULT_TIMEOUT_MS = 15000;
 
 export const getAuthToken = () => localStorage.getItem("authToken");
